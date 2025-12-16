@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qual é o Meu Endereço IP? | Verificador de IP Público (IPv4 & IPv6)</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configure Tailwind for custom theme -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-dark': '#111827', // Gray-900 (Dark Mode Body)
+                        'secondary-dark': '#1F2937', // Gray-800 (Dark Mode Card)
+                        'accent': '#3B82F6', // Blue-500
+                        'error': '#EF4444', // Red-500
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Ensures smooth loading transition for the main IP block */
+        .ip-card {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+        .ip-card.loaded {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* Custom loading spinner */
+        .loader {
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-top: 4px solid #3B82F6; /* Accent color */
+            border-radius: 50%;
+            width: 30px; 
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Custom button styling for better appearance */
+        .copy-btn {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-primary-dark text-gray-100 min-h-screen flex flex-col font-sans p-4">
+
+    <!-- Header / Branding -->
+    <header class="text-center py-6 relative">
+        <div class="flex flex-col items-center justify-center space-y-2 mb-4">
+            <!-- Main Title and Copy All Button -->
+            <div class="flex items-center justify-center space-x-3">
+                <h1 id="main-title" class="text-3xl font-bold tracking-tight">
+                    Verificador de IP <span class="text-accent">Completo</span>
+                </h1>
+                <!-- Copy All Button -->
+                <button id="copy-all-button" class="copy-btn flex items-center justify-center p-2 text-xs bg-accent hover:bg-blue-600 text-white font-medium rounded-full shadow-md transition-all duration-200" title="Copiar Todas as Informações">
+                    <svg id="copy-all-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                        <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Container for Theme/Language buttons -->
+        <div class="absolute top-4 right-4 md:top-6 md:right-6 flex space-x-2">
+            <!-- Language Toggle Button -->
+            <button id="lang-toggle" class="px-3 py-1 text-sm font-medium rounded-full 
+                transition duration-200 shadow-md">
+                EN / PT
+            </button>
+            <!-- Theme Toggle Button -->
+            <button id="theme-toggle" class="px-3 py-1 text-sm font-medium rounded-full 
+                transition duration-200 shadow-md">
+                <!-- Icon will be inserted by JS -->
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content - Central Card -->
+    <main class="flex-grow flex justify-center py-8">
+        <div id="ip-card" class="ip-card w-full max-w-2xl p-6 md:p-10 rounded-xl text-center">
+            
+            <!-- NEW IP SEARCH TOOL SECTION -->
+            <div id="ip-search-section" class="p-4 rounded-xl border-2 border-dashed mb-8">
+                <h3 id="search-title" class="text-lg font-semibold mb-4 text-left">Ferramenta de Pesquisa de IP</h3>
+                <div class="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-3">
+                    <input id="ip-search-input" type="text" placeholder="Ex: 8.8.8.8 ou 2001:4860:4860::8888" 
+                           class="flex-grow p-3 rounded-lg border focus:ring-accent focus:border-accent"
+                           aria-label="Insira um endereço IP para pesquisar">
+                    <button id="ip-search-button" 
+                            class="px-6 py-3 bg-accent hover:bg-blue-600 text-white font-semibold rounded-lg shadow-md transition-colors duration-200">
+                        Verificar
+                    </button>
+                </div>
+                <!-- Search Feedback/Error Message -->
+                <p id="search-message" class="text-sm mt-3 text-left hidden"></p>
+            </div>
+            <!-- END NEW IP SEARCH TOOL SECTION -->
+
+
+            <h2 id="detected-ip-title" class="text-xl md:text-2xl font-semibold mb-8 pt-4 border-t">
+                Seu Endereço IP Detectado
+            </h2>
+
+            <!-- IP Container Block - Vertical Stack -->
+            <div id="ip-container" class="mb-8 flex flex-col space-y-8 w-full">
+                
+                <!-- IPv4 Block - Top Position -->
+                <div id="ipv4-block" class="p-6 rounded-xl">
+                    <!-- Título e Botão Copiar lado a lado -->
+                    <div class="flex justify-between items-center mb-4">
+                        <p class="text-lg font-semibold">IPv4</p>
+                        <!-- Copy IPv4 Button -->
+                        <button id="copy-ipv4-button" class="copy-btn flex items-center justify-center px-4 py-2 text-sm bg-accent hover:bg-blue-600 text-white font-medium rounded-lg shadow-md transition-all duration-200 opacity-0 pointer-events-none" disabled>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" /></svg>
+                            <span id="copy-ipv4-text">Copiar</span>
+                        </button>
+                    </div>
+                    <!-- Display IP -->
+                    <div id="ipv4-display" class="min-h-[50px] flex flex-col items-center justify-center text-center">
+                        <div class="loader" role="status" aria-label="Carregando IPv4"></div>
+                        <p id="ipv4-status" class="mt-2 text-sm">Detectando...</p>
+                    </div>
+                </div>
+
+                <!-- IPv6 Block - Bottom Position -->
+                <div id="ipv6-block" class="p-6 rounded-xl">
+                    <!-- Título e Botão Copiar lado a lado -->
+                    <div class="flex justify-between items-center mb-4">
+                        <p class="text-lg font-semibold">IPv6</p>
+                        <!-- Copy IPv6 Button -->
+                        <button id="copy-ipv6-button" class="copy-btn flex items-center justify-center px-4 py-2 text-sm bg-accent hover:bg-blue-600 text-white font-medium rounded-lg shadow-md transition-all duration-200 opacity-0 pointer-events-none" disabled>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" /></svg>
+                            <span id="copy-ipv6-text">Copiar</span>
+                        </button>
+                    </div>
+                    <!-- Display IP -->
+                    <div id="ipv6-display" class="min-h-[50px] flex flex-col items-center justify-center text-center">
+                        <div class="loader" role="status" aria-label="Carregando IPv6"></div>
+                        <p id="ipv6-status" class="mt-2 text-sm">Detectando...</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Context Information Block (Bloco de Geolocalização) -->
+            <div id="context-info-card" class="mt-8 pt-6 border-t text-left">
+                <!-- Header for Geo Details, indicating the IP being displayed -->
+                <div class="mb-4">
+                    <h2 id="geo-details-title-display" class="text-xl md:text-2xl font-semibold mb-1">
+                        Detalhes da Geolocalização
+                    </h2>
+                    <p id="geo-ip-source-display" class="text-sm italic text-gray-400">
+                        Consultando detalhes para o seu IP...
+                    </p>
+                </div>
+                
+                <!-- Initial state: Loading -->
+                <div id="geo-display" class="flex flex-col justify-center items-center h-20">
+                    <div class="loader mr-3 mb-2"></div>
+                    <p id="geo-status-loading" class="text-gray-400">Consultando detalhes da conexão...</p>
+                </div>
+            </div>
+            
+            <!-- NOVO: Nota de Aviso de Precisão GeoIP -->
+            <div id="geoip-warning-note" class="mt-6 p-4 rounded-xl border-l-4">
+                <h3 id="geo-warning-title" class="text-base font-semibold mb-1"></h3>
+                <p id="geo-warning-text" class="text-sm"></p>
+            </div>
+            <!-- FIM NOVO: Nota de Aviso de Precisão GeoIP -->
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-4 text-xs mt-auto">
+        <div class="h-10 rounded-lg flex items-center justify-center mb-4 max-w-xl mx-auto">
+            <p id="footer-privacy-text" class="text-sm italic">Privacidade garantida: Seus dados não são armazenados.</p>
+        </div>
+        &copy; 2025 Verificador de IP. | <a href="#" id="privacy-policy-link" class="hover:text-gray-300">Política de Privacidade</a>
+    </footer>
+
+    <script>
+        // Define o mapeamento de idioma para todos os textos da UI
+        const languageMap = {
+            PT: {
+                // Títulos e Headers
+                title: 'Verificador de IP Completo',
+                detectedIpTitle: 'Seu Endereço IP Detectado',
+                geoDetailsTitle: 'Detalhes da Geolocalização',
+                searchToolTitle: 'Ferramenta de Pesquisa de IP',
+                searchPlaceholder: 'Ex: 8.8.8.8 ou 2001:4860:4860::8888',
+                searchButton: 'Verificar',
+                
+                // Labels e Status
+                copy: 'Copiar',
+                copied: 'Copiado!',
+                failed: 'Falha',
+                detecting: 'Detectando...',
+                notDetected: 'Não Detectado',
+                loadingIpv4: 'Carregando IPv4',
+                loadingIpv6: 'Carregando IPv6',
+                copyAll: 'Copiar Todas as Informações',
+                allCopied: 'Tudo Copiado!',
+                
+                // Geo Details
+                country: 'País',
+                city: 'Cidade',
+                timezone: 'Fuso Horário', 
+                asn: 'Número do Sistema Autônomo (ASN)', 
+                isp: 'Organização / Provedor', 
+                connectionType: 'Tipo de Conexão',
+                typeDatacenter: 'Datacenter / Hospedagem (Cloud)',
+                typeResidential: 'Residencial / Corporativo',
+                typeUnknown: 'Desconhecido',
+
+                // NEW Security Details
+                securityTitle: 'Informações de Segurança',
+                securityStatus: 'Status de Uso',
+                isProxy: 'Proxy Detectado',
+                isVpn: 'VPN Dedicada Detectada',
+                isTor: 'Nó TOR Detectado',
+                isClean: 'Conexão Limpa', // Default status when none detected
+                detected: 'Sim (Risco)',
+                notDetectedSec: 'Não',
+
+                // Search Messages
+                searchInvalid: 'Endereço IP inválido. Por favor, insira um IPv4 ou IPv6 válido.',
+                searchSuccess: 'Detalhes para o IP pesquisado abaixo.',
+                searchError: 'Falha ao buscar detalhes para este IP.',
+                sourceMyIp: 'Consultando detalhes para o seu IP...',
+                sourceSearchedIp: 'Detalhes para o IP pesquisado:',
+                
+                // Mensagens
+                statusLoadingGeo: 'Consultando detalhes da conexão...',
+                errorGeo: 'Não foi possível obter detalhes de geolocalização.',
+                footerInfo: 'O endereço IP é a base para a identificação da sua localização aproximada e provedor de serviço.',
+                footerPrivacy: 'Privacidade garantida: Seus dados não são armazenados.',
+                privacyPolicy: 'Política de Privacidade',
+
+                // NEW WARNING TEXTS
+                geoWarningTitle: '⚠️ Nota sobre a Precisão da Geolocalização',
+                geoWarningText: 'A precisão da geolocalização por IP é uma estimativa. Endereços **IPv6** frequentemente apontam para o PoP (Ponto de Presença) principal do provedor (ex: São Paulo), e não para sua localização exata. Seu IPv4 é geralmente mais preciso.',
+            },
+            EN: {
+                // Títulos e Headers
+                title: 'Full IP Checker',
+                detectedIpTitle: 'Your Detected IP Address',
+                geoDetailsTitle: 'Geolocation Details',
+                searchToolTitle: 'IP Lookup Tool',
+                searchPlaceholder: 'Ex: 8.8.8.8 or 2001:4860:4860::8888',
+                searchButton: 'Lookup',
+                
+                // Labels e Status
+                copy: 'Copy',
+                copied: 'Copied!',
+                failed: 'Failed',
+                detecting: 'Detecting...',
+                notDetected: 'Not Detected',
+                loadingIpv4: 'Loading IPv4',
+                loadingIpv6: 'Loading IPv6',
+                copyAll: 'Copy All Information',
+                allCopied: 'All Copied!',
+                
+                // Geo Details
+                country: 'Country',
+                city: 'City',
+                timezone: 'Timezone', 
+                asn: 'Autonomous System Number (ASN)', 
+                isp: 'Organization / Provider (ISP)', 
+                connectionType: 'Connection Type',
+                typeDatacenter: 'Datacenter / Hosting (Cloud)',
+                typeResidential: 'Residential / Corporate',
+                typeUnknown: 'Unknown',
+
+                // NEW Security Details
+                securityTitle: 'Security Information',
+                securityStatus: 'Usage Status',
+                isProxy: 'Proxy Detected',
+                isVpn: 'Dedicated VPN Detected',
+                isTor: 'TOR Node Detected',
+                isClean: 'Clean Connection', // Default status when none detected
+                detected: 'Yes (Risk)',
+                notDetectedSec: 'No',
+
+                // Search Messages
+                searchInvalid: 'Invalid IP address. Please enter a valid IPv4 or IPv6.',
+                searchSuccess: 'Details for the searched IP are displayed below.',
+                searchError: 'Failed to fetch details for this IP.',
+                sourceMyIp: 'Querying details for your IP...',
+                sourceSearchedIp: 'Details for searched IP:',
+
+                // Mensagens
+                statusLoadingGeo: 'Querying connection details...',
+                errorGeo: 'Could not retrieve geolocation details.',
+                footerInfo: 'The IP address is the basis for identifying your approximate location and service provider.',
+                footerPrivacy: 'Privacy guaranteed: Your data is not stored.',
+                privacyPolicy: 'Privacy Policy',
+
+                // NEW WARNING TEXTS
+                geoWarningTitle: '⚠️ Geolocation Accuracy Note',
+                geoWarningText: 'IP geolocation accuracy is an estimate. **IPv6** addresses frequently point to the provider’s main PoP (Point of Presence) (e.g., São Paulo), not your exact physical location. Your IPv4 is generally more precise.',
+            }
+        };
+
+        // Estado Global: Tema e Idioma
+        let currentLang = 'PT';
+        let currentTheme = 'dark'; // 'dark' ou 'light'
+
+        // Dados globais para re-renderização e cópia
+        let userIpv4 = null;
+        let userIpv6 = null;
+        let currentGeoData = null; // Detalhes de Geo do último IP consultado
+        let currentGeoIp = null;    // O IP associado ao currentGeoData
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Elementos de UI
+            const ipCard = document.getElementById('ip-card');
+            const langToggleButton = document.getElementById('lang-toggle');
+            const themeToggleButton = document.getElementById('theme-toggle');
+            const copyAllButton = document.getElementById('copy-all-button');
+
+            // IP Detection elements
+            const ipv4Display = document.getElementById('ipv4-display');
+            const copyIpv4Button = document.getElementById('copy-ipv4-button');
+            const copyIpv4Text = document.getElementById('copy-ipv4-text');
+            const ipv4StatusText = document.getElementById('ipv4-status');
+            const ipv4Block = document.getElementById('ipv4-block');
+            const ipv6Display = document.getElementById('ipv6-display');
+            const copyIpv6Button = document.getElementById('copy-ipv6-button');
+            const copyIpv6Text = document.getElementById('copy-ipv6-text');
+            const ipv6StatusText = document.getElementById('ipv6-status');
+            const ipv6Block = document.getElementById('ipv6-block');
+
+            // Geo Details elements
+            const geoDisplay = document.getElementById('geo-display');
+            const geoStatusLoadingText = document.getElementById('geo-status-loading');
+            const contextInfoCard = document.getElementById('context-info-card');
+            const geoIpSourceDisplay = document.getElementById('geo-ip-source-display');
+            const geoDetailsTitleDisplay = document.getElementById('geo-details-title-display');
+
+            // Warning Note elements
+            const geoWarningNote = document.getElementById('geoip-warning-note');
+            const geoWarningTitle = document.getElementById('geo-warning-title');
+            const geoWarningText = document.getElementById('geo-warning-text');
+
+
+            // Static elements
+            const body = document.body;
+            const mainTitle = document.getElementById('main-title');
+            const detectedIpTitle = document.getElementById('detected-ip-title');
+            const footerPrivacyText = document.getElementById('footer-privacy-text');
+            const privacyPolicyLink = document.getElementById('privacy-policy-link');
+            const footerContainer = document.querySelector('footer > div');
+            const copyAllIcon = document.getElementById('copy-all-icon');
+            
+            // Search Tool elements
+            const ipSearchInput = document.getElementById('ip-search-input');
+            const ipSearchButton = document.getElementById('ip-search-button');
+            const ipSearchSection = document.getElementById('ip-search-section');
+            const searchMessage = document.getElementById('search-message');
+
+
+            // Ícones SVG
+            const copyIconSvg = `<path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />`;
+            const checkIconSvg = `<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />`;
+
+            // Endpoints da API
+            const API_V4 = 'https://api.ipify.org?format=json';
+            const API_V6 = 'https://api6.ipify.org?format=json';
+            const API_GEO_BASE = 'https://ipapi.co/'; 
+            
+            // Regex simples para validação básica de IP
+            const ipv4Regex = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
+            // IPv6 é mais complexo, mas aceitaremos formas abreviadas (ex: ::1)
+            const ipv6Regex = /^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|([0-9a-fA-F]{1,4}:){1,4}:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}))$/;
+
+            /**
+             * Valida um endereço IP (IPv4 ou IPv6).
+             */
+            function isValidIp(ip) {
+                return ipv4Regex.test(ip) || ipv6Regex.test(ip);
+            }
+
+            /**
+             * Aplica as classes Tailwind de tema em um elemento com base na sua 'função' (role).
+             */
+            function applyThemeClasses(element, role) {
+                // Classes que mudam de tema para tema.
+                const darkClasses = {
+                    body: 'bg-primary-dark text-gray-100',
+                    card: 'bg-secondary-dark border border-gray-700/50 shadow-2xl',
+                    innerBlock: 'bg-gray-800 border border-gray-700 transition-shadow hover:shadow-lg hover:shadow-gray-800/50',
+                    geoCard: 'bg-gray-700/50',
+                    footerBox: 'bg-gray-800/30 border border-gray-700/50',
+                    toggleButton: 'bg-gray-700 hover:bg-gray-600 text-gray-100 border border-gray-600',
+                    title: 'text-white',
+                    subtitle: 'text-gray-300',
+                    text: 'text-gray-100', // General text
+                    statusText: 'text-gray-500',
+                    statusLoading: 'text-gray-400',
+                    footerText: 'text-gray-500',
+                    link: 'hover:text-gray-300',
+                    border: 'border-gray-700',
+                    searchBorder: 'border-gray-700/50',
+                    searchInput: 'bg-gray-900 border-gray-700 text-white placeholder-gray-500',
+                    searchMessage: 'text-gray-300',
+                    // Warning Note Colors (Dark Mode)
+                    geoWarningNote: 'bg-yellow-900/30 border-yellow-500 text-yellow-100', 
+                    geoWarningText: 'text-yellow-200/90',
+                    geoWarningTitle: 'text-yellow-100'
+
+                };
+
+                const lightClasses = {
+                    body: 'bg-gray-100 text-gray-900',
+                    card: 'bg-white border border-gray-300 shadow-xl',
+                    innerBlock: 'bg-gray-200 border border-gray-300 transition-shadow hover:shadow-md hover:shadow-gray-300/50',
+                    geoCard: 'bg-gray-300',
+                    footerBox: 'bg-gray-300/50 border border-gray-300',
+                    toggleButton: 'bg-white hover:bg-gray-100 text-gray-800 border border-gray-300',
+                    title: 'text-gray-900',
+                    subtitle: 'text-gray-700',
+                    text: 'text-gray-900', // General text
+                    statusText: 'text-gray-600',
+                    statusLoading: 'text-gray-500',
+                    footerText: 'text-gray-700',
+                    link: 'hover:text-gray-700',
+                    border: 'border-gray-300',
+                    searchBorder: 'border-gray-300',
+                    searchInput: 'bg-white border-gray-300 text-gray-900 placeholder-gray-400',
+                    searchMessage: 'text-gray-700',
+                    // Warning Note Colors (Light Mode)
+                    geoWarningNote: 'bg-yellow-100 border-yellow-600 text-yellow-800',
+                    geoWarningText: 'text-yellow-800',
+                    geoWarningTitle: 'text-yellow-900'
+                };
+
+                const classes = currentTheme === 'dark' ? darkClasses : lightClasses;
+                
+                // Função auxiliar para remover classes de uma lista e adicionar novas
+                function replaceClasses(element, classesToRemove, classesToAdd) {
+                    // Remoção genérica de todas as classes que mudam de tema (expandida para incluir classes de input e warning)
+                    const removableClasses = [
+                        'bg-primary-dark', 'text-gray-100', 'bg-secondary-dark', 'border-gray-700/50', 
+                        'shadow-2xl', 'bg-gray-800', 'border-gray-700', 'hover:shadow-lg', 
+                        'hover:shadow-gray-800/50', 'bg-gray-700/50', 'bg-gray-800/30', 
+                        'text-white', 'text-gray-300', 'text-gray-500', 'text-gray-400',
+                        'bg-gray-100', 'text-gray-900', 'bg-white', 'border-gray-300', 
+                        'shadow-xl', 'bg-gray-200', 'hover:shadow-md', 'hover:shadow-gray-300/50',
+                        'bg-gray-300', 'bg-gray-300/50', 'text-gray-700', 'text-gray-600', 
+                        'text-gray-500', 'hover:text-gray-300', 'hover:text-gray-700', 'bg-gray-700',
+                        'hover:bg-gray-600', 'border-gray-600', 'bg-white', 'hover:bg-gray-100', 'text-gray-800',
+                        
+                        // Search classes
+                        'bg-gray-900', 'placeholder-gray-500', 'bg-white', 'placeholder-gray-400', 'border-gray-700', 'border-gray-300',
+
+                        // Warning classes
+                        'bg-yellow-900/30', 'border-yellow-500', 'text-yellow-100', 'text-yellow-200/90', 'text-yellow-100',
+                        'bg-yellow-100', 'border-yellow-600', 'text-yellow-800', 'text-yellow-900'
+                    ];
+
+                    element.classList.remove(...removableClasses.join(' ').split(' ').filter(c => c));
+                    element.classList.add(...classes[role].split(' ').filter(c => c));
+                }
+                
+                replaceClasses(element, '', classes[role]);
+            }
+
+            /**
+             * Altera o tema (Dark/Light) de toda a aplicação.
+             */
+            function applyTheme() {
+                // 1. Body e Card Principal
+                applyThemeClasses(body, 'body');
+                applyThemeClasses(ipCard, 'card');
+                
+                // 2. Blocos de IP e Search
+                applyThemeClasses(ipv4Block, 'innerBlock');
+                applyThemeClasses(ipv6Block, 'innerBlock');
+                applyThemeClasses(ipSearchSection, 'searchBorder');
+                applyThemeClasses(ipSearchInput, 'searchInput');
+                applyThemeClasses(searchMessage, 'searchMessage');
+                
+                // 3. Warning Note
+                applyThemeClasses(geoWarningNote, 'geoWarningNote');
+                applyThemeClasses(geoWarningTitle, 'geoWarningTitle');
+                applyThemeClasses(geoWarningText, 'geoWarningText');
+
+                // 4. Border/Divider
+                applyThemeClasses(contextInfoCard, 'border');
+                
+                // 5. Textos estáticos
+                applyThemeClasses(mainTitle, 'title');
+                // Re-aplica a cor accent na span
+                mainTitle.innerHTML = mainTitle.innerHTML.replace(/<span class="text-accent">.*?<\/span>/g, `<span class="text-accent">${currentLang === 'PT' ? 'Completo' : 'Full'}</span>`);
+                
+                applyThemeClasses(detectedIpTitle, 'subtitle');
+                applyThemeClasses(document.getElementById('search-title'), 'subtitle');
+                applyThemeClasses(geoDetailsTitleDisplay, 'subtitle');
+                applyThemeClasses(geoIpSourceDisplay, 'statusLoading');
+                
+                // 6. Footer
+                applyThemeClasses(footerContainer, 'footerBox');
+                applyThemeClasses(footerPrivacyText, 'footerText');
+                applyThemeClasses(document.querySelector('footer'), 'footerText');
+                applyThemeClasses(privacyPolicyLink, 'link');
+
+
+                // 7. Botões de Toggle
+                applyThemeClasses(langToggleButton, 'toggleButton');
+                applyThemeClasses(themeToggleButton, 'toggleButton');
+
+                // 8. Atualiza o ícone do botão de tema
+                themeToggleButton.innerHTML = currentTheme === 'dark' 
+                    ? '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.041A6.99 6.99 0 0110 2a8 8 0 000 16 7.99 7.99 0 007.293-4.959z" /></svg>' // Lua (Dark)
+                    : '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 14.95a1 1 0 101.414 1.414l.707-.707a1 1 0 00-1.414-1.414l-.707.707zm1.414-8.486l-.707-.707a1 1 0 011.414-1.414l.707.707a1 1 0 01-1.414 1.414zM3 11a1 1 0 100-2H2a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>'; // Sol (Light)
+
+                // 9. Atualiza os status texts
+                applyThemeClasses(ipv4StatusText, 'statusText');
+                applyThemeClasses(ipv6StatusText, 'statusText');
+                applyThemeClasses(geoStatusLoadingText, 'statusLoading');
+                
+                // 10. Re-renderiza Geo Details e blocos de IP para atualizar cores de texto/fundo.
+                updateIpBlock(userIpv4, ipv4Display, copyIpv4Button, copyIpv4Text, languageMap[currentLang].copy, 'text-3xl md:text-5xl');
+                updateIpBlock(userIpv6, ipv6Display, copyIpv6Button, copyIpv6Text, languageMap[currentLang].copy, 'text-xl md:text-3xl');
+                renderGeoDetails(currentGeoData, currentGeoIp);
+            }
+
+            // Adiciona listener para o botão de toggle de tema
+            themeToggleButton.addEventListener('click', () => {
+                currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                applyTheme();
+            });
+
+            /**
+             * Traduz todos os elementos estáticos da página.
+             */
+            function translatePage() {
+                const lang = languageMap[currentLang];
+                
+                // Atualiza o atributo lang e o toggle
+                document.documentElement.lang = currentLang === 'PT' ? 'pt-BR' : 'en-US';
+                langToggleButton.textContent = currentLang === 'PT' ? 'EN / PT' : 'PT / EN';
+                
+                // Atualiza o título/tooltip do botão Copiar Tudo
+                copyAllButton.title = lang.copyAll;
+
+                // Títulos e cabeçalhos
+                mainTitle.innerHTML = lang.title.replace('Completo', `<span class="text-accent">${currentLang === 'PT' ? 'Completo' : 'Full'}</span>`);
+                detectedIpTitle.textContent = lang.detectedIpTitle;
+                document.getElementById('search-title').textContent = lang.searchToolTitle;
+                ipSearchInput.placeholder = lang.searchPlaceholder;
+                ipSearchButton.textContent = lang.searchButton;
+
+                // Status de carregamento/detecção
+                ipv4StatusText.textContent = lang.detecting;
+                ipv6StatusText.textContent = lang.detecting;
+                geoStatusLoadingText.textContent = lang.statusLoadingGeo;
+
+                // Footer
+                footerPrivacyText.textContent = lang.footerPrivacy;
+                privacyPolicyLink.textContent = lang.privacyPolicy;
+                
+                // Warning Note
+                geoWarningTitle.textContent = lang.geoWarningTitle;
+                geoWarningText.textContent = lang.geoWarningText;
+
+                // Re-renderiza blocos de IP e Geo (chama applyTheme implicitamente através de updateIpBlock/renderGeoDetails)
+                applyTheme();
+            }
+            
+            // Adiciona o listener para o botão de toggle de idioma
+            langToggleButton.addEventListener('click', () => {
+                currentLang = currentLang === 'PT' ? 'EN' : 'PT';
+                translatePage();
+            });
+
+            /**
+             * Copia o texto para a área de transferência.
+             */
+            function copyToClipboard(ip, buttonElement, textElement) {
+                const lang = languageMap[currentLang];
+                const tempInput = document.createElement('textarea');
+                tempInput.value = ip;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                
+                try {
+                    const successful = document.execCommand('copy');
+                    if (successful) {
+                        textElement.textContent = lang.copied;
+                        setTimeout(() => { textElement.textContent = lang.copy; }, 1500);
+                    } else {
+                        textElement.textContent = lang.failed;
+                    }
+                } catch (err) {
+                    console.error('Erro ao copiar', err);
+                    textElement.textContent = lang.failed;
+                }
+                document.body.removeChild(tempInput);
+            }
+
+            /**
+             * Coleta e copia todas as informações de IP e geolocalização.
+             */
+            function collectAllDataAndCopy() {
+                const lang = languageMap[currentLang];
+                
+                // Pega o tipo de conexão para o IP atualmente exibido nos detalhes de Geo
+                const typeKey = currentGeoData ? getConnectionTypeKey(currentGeoData) : 'typeUnknown';
+                const connectionType = lang[typeKey];
+
+                let allData = `${lang.title} (${currentLang})\n`;
+                allData += '------------------------------------------\n\n';
+
+                // --- Seção de IPs do Usuário ---
+                allData += `${lang.detectedIpTitle}:\n`;
+                allData += `  - IPv4: ${userIpv4 || lang.notDetected}\n`;
+                allData += `  - IPv6: ${userIpv6 || lang.notDetected}\n\n`;
+
+                // --- Seção de Segurança ---
+                allData += `${lang.securityTitle}:\n`;
+                if (currentGeoData) {
+                    const isRisky = currentGeoData.isProxy || currentGeoData.isVpn || currentGeoData.isTor;
+                    if (isRisky) {
+                        allData += `  - ${lang.securityStatus}: ${lang.detected}\n`;
+                        if (currentGeoData.isProxy) allData += `    - ${lang.isProxy}: ${lang.detected}\n`;
+                        if (currentGeoData.isVpn) allData += `    - ${lang.isVpn}: ${lang.detected}\n`;
+                        if (currentGeoData.isTor) allData += `    - ${lang.isTor}: ${lang.detected}\n`;
+                    } else {
+                        allData += `  - ${lang.securityStatus}: ${lang.isClean}\n`;
+                    }
+                } else {
+                    allData += `  - ${lang.errorGeo}\n`;
+                }
+                allData += '\n';
+
+                // --- Seção de Geolocalização (do IP atualmente consultado) ---
+                allData += `${lang.geoDetailsTitle} (${currentGeoIp || 'N/A'}):\n`;
+                if (currentGeoData) {
+                    allData += `  - ${lang.country}: ${currentGeoData.country || 'N/A'}\n`;
+                    allData += `  - ${lang.city}: ${currentGeoData.city || 'N/A'}\n`;
+                    allData += `  - ${lang.timezone}: ${currentGeoData.timezone || 'N/A'}\n`; 
+                    allData += `  - ${lang.asn}: ${currentGeoData.asn || 'N/A'}\n`; 
+                    allData += `  - ${lang.isp}: ${currentGeoData.isp || 'N/A'}\n`; 
+                    allData += `  - ${lang.connectionType}: ${connectionType}\n\n`;
+                    allData += `${lang.geoWarningTitle.replace('⚠️ ', '')}: ${lang.geoWarningText}\n`;
+                } else {
+                    allData += `  - ${lang.errorGeo}\n\n`;
+                }
+                
+                // Copia o texto formatado
+                const tempInput = document.createElement('textarea');
+                tempInput.value = allData;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                
+                try {
+                    const successful = document.execCommand('copy');
+                    if (successful) {
+                        // Feedback visual (Ícone de checkmark e tooltip de Copiado!)
+                        copyAllIcon.innerHTML = checkIconSvg;
+                        copyAllButton.title = lang.allCopied;
+
+                        setTimeout(() => { 
+                            copyAllIcon.innerHTML = copyIconSvg;
+                            copyAllButton.title = lang.copyAll;
+                        }, 2000);
+                    } else {
+                        copyAllButton.title = lang.failed;
+                    }
+                } catch (err) {
+                    console.error('Erro ao copiar todos os dados', err);
+                    copyAllButton.title = lang.failed;
+                }
+                document.body.removeChild(tempInput);
+            }
+            
+            // Adiciona o listener para o novo botão
+            copyAllButton.addEventListener('click', collectAllDataAndCopy);
+
+
+            /**
+             * Atualiza a exibição visual dos blocos de IP do usuário.
+             */
+            function updateIpBlock(ip, displayEl, buttonEl, textEl, buttonText, fontSizeClass) {
+                const lang = languageMap[currentLang];
+                
+                if (ip) {
+                    displayEl.innerHTML = `
+                        <p class="${fontSizeClass} font-extrabold text-accent break-all select-text leading-tight" style="line-height: 1.2;">
+                            ${ip}
+                        </p>
+                    `;
+                    textEl.textContent = buttonText;
+                    buttonEl.onclick = () => copyToClipboard(ip, buttonEl, textEl);
+                    buttonEl.disabled = false;
+                    buttonEl.classList.remove('opacity-0', 'pointer-events-none', 'bg-gray-500');
+                    buttonEl.classList.add('opacity-100', 'bg-accent', 'hover:bg-blue-600');
+                } else {
+                    const notDetectedColor = currentTheme === 'dark' ? 'text-gray-500' : 'text-gray-600';
+                    displayEl.innerHTML = `
+                        <p class="text-2xl ${notDetectedColor} font-extrabold leading-tight">
+                            ${lang.notDetected}
+                        </p>
+                    `;
+                    textEl.textContent = lang.notDetected;
+                    buttonEl.disabled = true;
+                    buttonEl.classList.remove('opacity-100', 'bg-accent', 'hover:bg-blue-600');
+                    buttonEl.classList.add('opacity-50', 'pointer-events-none', 'bg-gray-500');
+                }
+            }
+            
+            // Adiciona a função de delay para o backoff
+            function delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            /**
+             * Função que tenta fazer fetch com retentativas e backoff exponencial.
+             * Isso torna a consulta de Geo mais resiliente a erros transitórios de rede/API.
+             */
+            async function retryFetch(url, options = {}, maxRetries = 3) {
+                for (let i = 0; i < maxRetries; i++) {
+                    try {
+                        const response = await fetch(url, options);
+                        if (response.ok) {
+                            return response;
+                        }
+                        // Se o status for 4xx ou 5xx (erro), e não for a última tentativa, tentamos novamente
+                        if (i < maxRetries - 1) {
+                            const waitTime = Math.pow(2, i) * 1000;
+                            // console.log(`Tentativa ${i + 1} falhou com status ${response.status}. Tentando novamente em ${waitTime / 1000}s...`);
+                            await delay(waitTime);
+                            continue; // Retenta o loop
+                        }
+                        // Para erros persistentes após a última tentativa, lança o erro.
+                        throw new Error(`HTTP Error: ${response.status}`);
+
+                    } catch (error) {
+                        // Erro de rede (Failed to fetch)
+                        if (i < maxRetries - 1) {
+                            const waitTime = Math.pow(2, i) * 1000;
+                            // console.log(`Falha de rede na tentativa ${i + 1}. Tentando novamente em ${waitTime / 1000}s...`);
+                            await delay(waitTime);
+                            continue; // Retenta o loop
+                        }
+                        throw error; // Relança o erro de rede após a última tentativa
+                    }
+                }
+            }
+
+            /**
+             * Busca o endereço IP simples.
+             */
+            async function fetchIp(url) {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                const ip = data.ip;
+                return (ip && ip !== '0.0.0.0') ? ip : null;
+            }
+
+            /**
+             * Busca detalhes de geolocalização.
+             */
+            async function fetchGeoDetails(ip) {
+                if (!ip) return null;
+                const url = `${API_GEO_BASE}${ip}/json/`;
+                
+                try {
+                    // Usamos retryFetch para resiliência de rede/API.
+                    const response = await retryFetch(url); 
+                    const data = await response.json();
+                    
+                    // Verifica se a API ipapi.co retornou sucesso
+                    if (data.error || !data.country_name) {
+                         console.error("Geo API retornou falha ou dados incompletos:", data);
+                         return null;
+                    }
+
+                    // Mapeamento de campos do ipapi.co
+                    return {
+                        country: data.country_name || 'N/A', 
+                        city: data.city || 'N/A',      
+                        isp: data.org || 'N/A', // Nome da Organização / Provedor
+                        asn: data.asn || 'N/A', 
+                        timezone: data.timezone || 'N/A', 
+                        // NOVOS Campos de Segurança
+                        isProxy: data.proxy || false,
+                        isVpn: data.vpn || false,
+                        isTor: data.security?.is_tor || false, // 'security' é um objeto em ipapi.co
+                    };
+
+                } catch (error) {
+                    // Isso captura erros persistentes após todas as retentativas do retryFetch
+                    console.error("Geo fetch error (após retentativas):", error);
+                    return null;
+                }
+            }
+            
+            /**
+             * Infere o tipo de conexão baseado no nome do ISP. Retorna a chave do idioma.
+             */
+            function getConnectionTypeKey(data) {
+                if (!data || !data.isp || data.isp === 'N/A') return 'typeUnknown';
+                // Note: 'isp' now holds the Organization Name/Provider
+                const orgName = data.isp.replace(/AS\d+\s+/, '').toLowerCase();
+                
+                if (orgName.includes('cloud') || orgName.includes('amazon') || orgName.includes('google') || 
+                    orgName.includes('datacenter') || orgName.includes('hosting') || orgName.includes('digitalocean') || 
+                    orgName.includes('vps') || orgName.includes('server') || orgName.includes('oracle') || orgName.includes('microsoft')) {
+                    return 'typeDatacenter';
+                }
+                
+                return 'typeResidential';
+            }
+
+            /**
+             * Renderiza os dados de geolocalização e segurança no HTML com base no idioma e tema atual.
+             * @param {object} data - Os detalhes de geolocalização e segurança.
+             * @param {string} ip - O endereço IP que está sendo exibido.
+             * @param {string} sourceKey - Chave da tradução ('sourceMyIp' ou 'sourceSearchedIp').
+             */
+            function renderGeoDetails(data, ip, sourceKey = 'sourceMyIp') {
+                const lang = languageMap[currentLang];
+                
+                currentGeoData = data;
+                currentGeoIp = ip;
+
+                // Atualiza o display de qual IP está sendo consultado
+                const sourceText = sourceKey === 'sourceSearchedIp' ? `${lang.sourceSearchedIp} ${ip || ''}` : lang.sourceMyIp;
+                geoIpSourceDisplay.textContent = sourceText;
+
+                // Remove o estado de loading do geoDisplay
+                geoDisplay.classList.remove('flex', 'justify-center', 'items-center', 'h-20');
+                
+                if (!data) {
+                    const errorTextColor = currentTheme === 'dark' ? 'text-red-400' : 'text-red-600';
+                    geoDisplay.innerHTML = `
+                        <p class="text-base ${errorTextColor} text-center">
+                            ${lang.errorGeo}
+                        </p>
+                    `;
+                    return;
+                }
+
+                const connectionTypeKey = getConnectionTypeKey(data);
+                
+                // Classes de cor baseadas no tema
+                const labelClasses = currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700';
+                const valueClasses = currentTheme === 'dark' ? 'text-white' : 'text-gray-900';
+                const geoCardClasses = currentTheme === 'dark' ? 'bg-gray-700/50' : 'bg-gray-300';
+                const footerInfoColor = currentTheme === 'dark' ? 'text-gray-400' : 'text-gray-600';
+
+
+                // Estrutura de Segurança
+                let securityContent = '';
+                if (data.isProxy || data.isVpn || data.isTor) {
+                    // Risco detectado
+                    const riskClasses = 'font-extrabold text-error';
+                    const riskLabelClasses = currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700';
+                    const riskBlockClasses = currentTheme === 'dark' 
+                        ? 'p-4 rounded-lg border border-red-500/50 bg-red-900/20' 
+                        : 'p-4 rounded-lg border border-red-600/50 bg-red-100';
+                    const riskTitleClasses = currentTheme === 'dark' ? 'text-red-400' : 'text-red-800';
+                    const riskDividerClasses = currentTheme === 'dark' ? 'border-gray-600/50' : 'border-gray-300';
+
+                    const riskItems = [
+                        { key: 'isProxy', label: lang.isProxy },
+                        { key: 'isVpn', label: lang.isVpn },
+                        { key: 'isTor', label: lang.isTor },
+                    ].map(item => {
+                        if (data[item.key]) {
+                            return `<div class="flex justify-between py-2 border-b ${riskDividerClasses} last:border-b-0">
+                                        <span class="font-medium ${riskLabelClasses}">${item.label}</span>
+                                        <span class="${riskClasses} text-right">${lang.detected}</span>
+                                    </div>`;
+                        }
+                        return '';
+                    }).join('');
+                    
+                    securityContent = `
+                        <div class="mt-8 ${riskBlockClasses}">
+                            <h3 class="text-lg font-bold ${riskTitleClasses} mb-2">${lang.securityTitle}</h3>
+                            <div class="space-y-1">
+                                ${riskItems}
+                            </div>
+                        </div>
+                    `;
+
+                } else {
+                    // Conexão Limpa
+                    const cleanClasses = 'font-extrabold text-green-500';
+                    const cleanLabelClasses = currentTheme === 'dark' ? 'text-gray-300' : 'text-gray-700';
+                    const cleanBlockClasses = currentTheme === 'dark'
+                        ? 'p-4 rounded-lg border border-green-500/50 bg-green-900/20'
+                        : 'p-4 rounded-lg border border-green-600/50 bg-green-100';
+                    const cleanTitleClasses = currentTheme === 'dark' ? 'text-green-400' : 'text-green-800';
+
+                    securityContent = `
+                        <div class="mt-8 ${cleanBlockClasses}">
+                            <h3 class="text-lg font-bold ${cleanTitleClasses} mb-2">${lang.securityTitle}</h3>
+                            <div class="flex justify-between py-2">
+                                <span class="font-medium ${cleanLabelClasses}">${lang.securityStatus}</span>
+                                <span class="${cleanClasses}">${lang.isClean}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+
+
+                // Estrutura de Geolocalização (reorganizada)
+                geoDisplay.innerHTML = `
+                    <!-- CONTEÚDO GEO: Cards empilhados verticalmente (gap-4 = ~16px) -->
+                    <div class="grid grid-cols-2 gap-4 text-sm md:text-base">
+                        <!-- Campo: País -->
+                        <div class="col-span-2 flex flex-col p-3 ${geoCardClasses} rounded-lg">
+                            <span class="font-medium ${labelClasses}">${lang.country}</span>
+                            <span class="font-extrabold ${valueClasses}">${data.country || 'N/A'}</span>
+                        </div>
+                        
+                        <!-- Campo: Cidade -->
+                        <div class="col-span-2 flex flex-col p-3 ${geoCardClasses} rounded-lg">
+                            <span class="font-medium ${labelClasses}">${lang.city}</span>
+                            <span class="font-extrabold ${valueClasses}">${data.city || 'N/A'}</span>
+                        </div>
+
+                        <!-- Campo: Fuso Horário (Timezone) -->
+                        <div class="col-span-2 flex flex-col p-3 ${geoCardClasses} rounded-lg">
+                            <span class="font-medium ${labelClasses}">${lang.timezone}</span>
+                            <span class="font-extrabold ${valueClasses}">${data.timezone || 'N/A'}</span>
+                        </div>
+                        
+                        <!-- CAMPO: ASN -->
+                        <div class="col-span-2 flex flex-col p-3 ${geoCardClasses} rounded-lg">
+                            <span class="font-medium ${labelClasses}">${lang.asn}</span>
+                            <span class="font-extrabold ${valueClasses} break-all">${data.asn || 'N/A'}</span>
+                        </div>
+                        
+                        <!-- Campo: Organização / Provedor (ISP) -->
+                        <div class="col-span-2 flex flex-col p-3 ${geoCardClasses} rounded-lg">
+                            <span class="font-medium ${labelClasses}">${lang.isp}</span>
+                            <span class="font-extrabold ${valueClasses} break-all">${data.isp || 'N/A'}</span>
+                        </div>
+                        
+                        <!-- Campo: Tipo de Conexão -->
+                        <div class="col-span-2 flex flex-col p-3 ${geoCardClasses} rounded-lg">
+                            <span class="font-medium ${labelClasses}">${lang.connectionType}</span>
+                            <span class="font-extrabold ${valueClasses}">${lang[connectionTypeKey]}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- NOVO: BLOCO DE INFORMAÇÕES DE SEGURANÇA -->
+                    ${securityContent}
+
+                    <!-- FOOTER INFORMATIVO: com margem superior (mt-6) -->
+                    <p class="mt-6 text-sm ${footerInfoColor} text-center">
+                        ${lang.footerInfo}
+                    </p>
+                `;
+            }
+
+            /**
+             * Lógica para buscar detalhes de um IP específico inserido pelo usuário.
+             */
+            async function handleIpSearch() {
+                const lang = languageMap[currentLang];
+                const inputIp = ipSearchInput.value.trim();
+
+                // 1. Limpar mensagens de erro anteriores
+                searchMessage.classList.add('hidden');
+                searchMessage.textContent = '';
+                searchMessage.classList.remove('text-error', 'text-green-500');
+                
+                // 2. Validação
+                if (!isValidIp(inputIp)) {
+                    searchMessage.textContent = lang.searchInvalid;
+                    searchMessage.classList.remove('hidden');
+                    searchMessage.classList.add('text-error');
+                    return;
+                }
+
+                // 3. Atualizar UI para carregamento
+                geoDisplay.innerHTML = `<div class="loader mr-3 mb-2"></div>`;
+                geoDisplay.classList.add('flex', 'justify-center', 'items-center', 'h-20');
+                geoIpSourceDisplay.textContent = `${lang.sourceSearchedIp} ${inputIp}...`;
+
+                // 4. Buscar detalhes
+                const geoData = await fetchGeoDetails(inputIp);
+
+                // 5. Renderizar resultados
+                if (geoData) {
+                    renderGeoDetails(geoData, inputIp, 'sourceSearchedIp');
+                    searchMessage.textContent = lang.searchSuccess;
+                    searchMessage.classList.remove('hidden');
+                    searchMessage.classList.add('text-green-500');
+                } else {
+                    renderGeoDetails(null, inputIp, 'sourceSearchedIp');
+                    searchMessage.textContent = lang.searchError;
+                    searchMessage.classList.remove('hidden');
+                    searchMessage.classList.add('text-error');
+                }
+            }
+
+            // Adicionar listener para o botão de pesquisa
+            ipSearchButton.addEventListener('click', handleIpSearch);
+            // Permitir Enter no campo de input
+            ipSearchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handleIpSearch();
+                }
+            });
+
+            /**
+             * Função principal.
+             */
+            async function getPublicIp() {
+                
+                try {
+                    // 1. Busca IPs do usuário simultaneamente
+                    // Adiciona um bloco try/catch interno para que um IP (v4 ou v6) não bloqueie o outro.
+                    const ipv4Promise = fetchIp(API_V4).catch((e) => { console.error("Erro ao buscar IPv4:", e); return null; });
+                    const ipv6Promise = fetchIp(API_V6).catch((e) => { console.error("Erro ao buscar IPv6:", e); return null; });
+
+                    [userIpv4, userIpv6] = await Promise.all([ipv4Promise, ipv6Promise]);
+
+                    // 2. Decide qual IP do usuário usar para Geolocalização (IPv4 preferencial)
+                    const ipForGeo = userIpv4 || userIpv6;
+
+                    // 3. Busca detalhes Geo se houver IP
+                    let geoData = null;
+                    if (ipForGeo) {
+                         geoData = await fetchGeoDetails(ipForGeo);
+                    }
+                    
+                    // 4. Renderiza resultados iniciais
+                    renderGeoDetails(geoData, ipForGeo, 'sourceMyIp');
+                    
+                } catch (error) {
+                    console.error("Erro geral na detecção:", error);
+                    // Em caso de erro total, ainda renderiza a UI estática/tema
+                    renderGeoDetails(null, null, 'sourceMyIp');
+                } finally {
+                    // 5. Atualiza UI de idioma e tema.
+                    translatePage();
+
+                    // 6. Exibe o card principal
+                    ipCard.classList.add('loaded');
+                }
+            }
+            
+            // Inicializa o tema e carrega os dados
+            applyTheme(); 
+            getPublicIp();
+        });
+    </script>
+
+</body>
+</html>
