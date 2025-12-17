@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en-US">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Qual é o Meu Endereço IP? | Verificador de IP Público (IPv4 & IPv6)</title>
+    <title>What is My IP Address? | Full Public IP Checker (IPv4 & IPv6)</title>
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Configure Tailwind for custom theme -->
@@ -62,10 +62,10 @@
             <!-- Main Title and Copy All Button -->
             <div class="flex items-center justify-center space-x-3">
                 <h1 id="main-title" class="text-3xl font-bold tracking-tight">
-                    Verificador de IP <span class="text-accent">Completo</span>
+                    Full IP <span class="text-accent">Checker</span>
                 </h1>
                 <!-- Copy All Button -->
-                <button id="copy-all-button" class="copy-btn flex items-center justify-center p-2 text-xs bg-accent hover:bg-blue-600 text-white font-medium rounded-full shadow-md transition-all duration-200" title="Copiar Todas as Informações">
+                <button id="copy-all-button" class="copy-btn flex items-center justify-center p-2 text-xs bg-accent hover:bg-blue-600 text-white font-medium rounded-full shadow-md transition-all duration-200" title="Copy All Information">
                     <svg id="copy-all-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
                         <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
@@ -79,7 +79,7 @@
             <!-- Language Toggle Button -->
             <button id="lang-toggle" class="px-3 py-1 text-sm font-medium rounded-full 
                 transition duration-200 shadow-md">
-                EN / PT
+                PT / EN
             </button>
             <!-- Theme Toggle Button -->
             <button id="theme-toggle" class="px-3 py-1 text-sm font-medium rounded-full 
@@ -95,14 +95,14 @@
             
             <!-- NEW IP SEARCH TOOL SECTION -->
             <div id="ip-search-section" class="p-4 rounded-xl border-2 border-dashed mb-8">
-                <h3 id="search-title" class="text-lg font-semibold mb-4 text-left">Ferramenta de Pesquisa de IP</h3>
+                <h3 id="search-title" class="text-lg font-semibold mb-4 text-left">IP Lookup Tool</h3>
                 <div class="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-3">
-                    <input id="ip-search-input" type="text" placeholder="Ex: 8.8.8.8 ou 2001:4860:4860::8888" 
+                    <input id="ip-search-input" type="text" placeholder="Ex: 8.8.8.8 or 2001:4860:4860::8888" 
                            class="flex-grow p-3 rounded-lg border focus:ring-accent focus:border-accent"
-                           aria-label="Insira um endereço IP para pesquisar">
+                           aria-label="Enter an IP address to lookup">
                     <button id="ip-search-button" 
                             class="px-6 py-3 bg-accent hover:bg-blue-600 text-white font-semibold rounded-lg shadow-md transition-colors duration-200">
-                        Verificar
+                        Lookup
                     </button>
                 </div>
                 <!-- Search Feedback/Error Message -->
@@ -112,7 +112,7 @@
 
 
             <h2 id="detected-ip-title" class="text-xl md:text-2xl font-semibold mb-8 pt-4 border-t">
-                Seu Endereço IP Detectado
+                Your Detected IP Address
             </h2>
 
             <!-- IP Container Block - Vertical Stack -->
@@ -126,13 +126,13 @@
                         <!-- Copy IPv4 Button -->
                         <button id="copy-ipv4-button" class="copy-btn flex items-center justify-center px-4 py-2 text-sm bg-accent hover:bg-blue-600 text-white font-medium rounded-lg shadow-md transition-all duration-200 opacity-0 pointer-events-none" disabled>
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" /></svg>
-                            <span id="copy-ipv4-text">Copiar</span>
+                            <span id="copy-ipv4-text">Copy</span>
                         </button>
                     </div>
                     <!-- Display IP -->
                     <div id="ipv4-display" class="min-h-[50px] flex flex-col items-center justify-center text-center">
-                        <div class="loader" role="status" aria-label="Carregando IPv4"></div>
-                        <p id="ipv4-status" class="mt-2 text-sm">Detectando...</p>
+                        <div class="loader" role="status" aria-label="Loading IPv4"></div>
+                        <p id="ipv4-status" class="mt-2 text-sm">Detecting...</p>
                     </div>
                 </div>
 
@@ -144,13 +144,13 @@
                         <!-- Copy IPv6 Button -->
                         <button id="copy-ipv6-button" class="copy-btn flex items-center justify-center px-4 py-2 text-sm bg-accent hover:bg-blue-600 text-white font-medium rounded-lg shadow-md transition-all duration-200 opacity-0 pointer-events-none" disabled>
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" /></svg>
-                            <span id="copy-ipv6-text">Copiar</span>
+                            <span id="copy-ipv6-text">Copy</span>
                         </button>
                     </div>
                     <!-- Display IP -->
                     <div id="ipv6-display" class="min-h-[50px] flex flex-col items-center justify-center text-center">
-                        <div class="loader" role="status" aria-label="Carregando IPv6"></div>
-                        <p id="ipv6-status" class="mt-2 text-sm">Detectando...</p>
+                        <div class="loader" role="status" aria-label="Loading IPv6"></div>
+                        <p id="ipv6-status" class="mt-2 text-sm">Detecting...</p>
                     </div>
                 </div>
 
@@ -160,18 +160,19 @@
             <div id="context-info-card" class="mt-8 pt-6 border-t text-left">
                 <!-- Header for Geo Details, indicating the IP being displayed -->
                 <div class="mb-4">
-                    <h2 id="geo-details-title-display" class="text-xl md:text-2xl font-semibold mb-1">
-                        Detalhes da Geolocalização
+                    <!-- ID Adicionado aqui para tradução -->
+                    <h2 id="geo-details-title" class="text-xl md:text-2xl font-semibold mb-1">
+                        Geolocation Details
                     </h2>
                     <p id="geo-ip-source-display" class="text-sm italic text-gray-400">
-                        Consultando detalhes para o seu IP...
+                        Querying details for your IP...
                     </p>
                 </div>
                 
                 <!-- Initial state: Loading -->
                 <div id="geo-display" class="flex flex-col justify-center items-center h-20">
                     <div class="loader mr-3 mb-2"></div>
-                    <p id="geo-status-loading" class="text-gray-400">Consultando detalhes da conexão...</p>
+                    <p id="geo-status-loading" class="text-gray-400">Querying connection details...</p>
                 </div>
             </div>
             
@@ -188,9 +189,9 @@
     <!-- Footer -->
     <footer class="text-center py-4 text-xs mt-auto">
         <div class="h-10 rounded-lg flex items-center justify-center mb-4 max-w-xl mx-auto">
-            <p id="footer-privacy-text" class="text-sm italic">Privacidade garantida: Seus dados não são armazenados.</p>
+            <p id="footer-privacy-text" class="text-sm italic">Privacy guaranteed: Your data is not stored.</p>
         </div>
-        &copy; 2025 Verificador de IP. | <a href="#" id="privacy-policy-link" class="hover:text-gray-300">Política de Privacidade</a>
+        &copy; 2025 IP Checker. | <a href="#" id="privacy-policy-link" class="hover:text-gray-300">Privacy Policy</a>
     </footer>
 
     <script>
@@ -317,7 +318,7 @@
         };
 
         // Estado Global: Tema e Idioma
-        let currentLang = 'PT';
+        let currentLang = 'EN'; // Começa em Inglês (EN)
         let currentTheme = 'dark'; // 'dark' ou 'light'
 
         // Dados globais para re-renderização e cópia
@@ -350,7 +351,8 @@
             const geoStatusLoadingText = document.getElementById('geo-status-loading');
             const contextInfoCard = document.getElementById('context-info-card');
             const geoIpSourceDisplay = document.getElementById('geo-ip-source-display');
-            const geoDetailsTitleDisplay = document.getElementById('geo-details-title-display');
+            // Elemento de Título da Geolocalização (Obrigatório para tradução)
+            const geoDetailsTitle = document.getElementById('geo-details-title');
 
             // Warning Note elements
             const geoWarningNote = document.getElementById('geoip-warning-note');
@@ -510,7 +512,7 @@
                 
                 applyThemeClasses(detectedIpTitle, 'subtitle');
                 applyThemeClasses(document.getElementById('search-title'), 'subtitle');
-                applyThemeClasses(geoDetailsTitleDisplay, 'subtitle');
+                applyThemeClasses(geoDetailsTitle, 'subtitle'); // Título da Geolocalização
                 applyThemeClasses(geoIpSourceDisplay, 'statusLoading');
                 
                 // 6. Footer
@@ -565,6 +567,9 @@
                 document.getElementById('search-title').textContent = lang.searchToolTitle;
                 ipSearchInput.placeholder = lang.searchPlaceholder;
                 ipSearchButton.textContent = lang.searchButton;
+                
+                // NOVO: Título de Geolocalização
+                geoDetailsTitle.textContent = lang.geoDetailsTitle;
 
                 // Status de carregamento/detecção
                 ipv4StatusText.textContent = lang.detecting;
@@ -845,6 +850,10 @@
                 // Atualiza o display de qual IP está sendo consultado
                 const sourceText = sourceKey === 'sourceSearchedIp' ? `${lang.sourceSearchedIp} ${ip || ''}` : lang.sourceMyIp;
                 geoIpSourceDisplay.textContent = sourceText;
+                
+                // NOVO: Atualiza o texto do título de geolocalização
+                geoDetailsTitle.textContent = lang.geoDetailsTitle;
+
 
                 // Remove o estado de loading do geoDisplay
                 geoDisplay.classList.remove('flex', 'justify-center', 'items-center', 'h-20');
