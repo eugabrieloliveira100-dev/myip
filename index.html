@@ -38,7 +38,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>What is My IP Address? | Full Public IP Checker (IPv4 & IPv6)</title>
-    <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -48,7 +47,6 @@
                         'primary-dark': '#111827', 
                         'secondary-dark': '#1F2937', 
                         'accent': '#3B82F6', 
-                        'error': '#EF4444', 
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -58,38 +56,15 @@
         }
     </script>
     <style>
-        .ip-card {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
-        }
-        .ip-card.loaded {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        .loader {
-            border: 4px solid rgba(255, 255, 255, 0.2);
-            border-top: 4px solid #3B82F6; 
-            border-radius: 50%;
-            width: 30px; 
-            height: 30px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .copy-btn {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-        }
-        .terminal-box {
-            background-color: #1a1a1a;
-            color: #d1d1d1;
-            font-family: 'Courier New', Courier, monospace;
-        }
+        .ip-card { opacity: 0; transform: translateY(20px); transition: all 0.5s ease-out; }
+        .ip-card.loaded { opacity: 1; transform: translateY(0); }
+        .loader { border: 4px solid rgba(0,0,0,0.1); border-top: 4px solid #3B82F6; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
+        .dark .loader { border: 4px solid rgba(255, 255, 255, 0.1); border-top: 4px solid #3B82F6; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .terminal-box { background-color: #1a1a1a; color: #d1d1d1; font-family: 'Courier New', Courier, monospace; }
     </style>
 </head>
-<body class="bg-primary-dark text-gray-100 min-h-screen flex flex-col font-sans p-4">
+<body class="bg-primary-dark text-gray-100 min-h-screen flex flex-col font-sans p-4 transition-colors duration-300">
 
     <!-- Header -->
     <header class="text-center py-6 relative">
@@ -98,7 +73,7 @@
                 <h1 id="main-title" class="text-3xl font-bold tracking-tight">
                     Full IP <span class="text-accent">Checker</span>
                 </h1>
-                <button id="copy-all-button" class="copy-btn flex items-center justify-center p-2 text-xs bg-accent hover:bg-blue-600 text-white font-medium rounded-full shadow-md transition-all duration-200" title="Copy All Information">
+                <button id="copy-all-button" class="flex items-center justify-center p-2 text-xs bg-accent hover:bg-blue-600 text-white font-medium rounded-full shadow-md transition-all duration-200" title="Copy All Information">
                     <svg id="copy-all-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
                         <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
@@ -108,11 +83,11 @@
         </div>
         
         <div class="absolute top-4 right-4 md:top-6 md:right-6 flex space-x-2">
-            <button id="lang-toggle" class="px-3 py-1 text-sm font-medium rounded-full transition duration-200 shadow-md">
+            <button id="lang-toggle" class="px-3 py-1 text-sm font-medium rounded-full transition duration-200 shadow-sm border border-gray-700 bg-secondary-dark hover:bg-gray-700 text-white">
                 EN / PT
             </button>
-            <button id="theme-toggle" class="px-3 py-1 text-sm font-medium rounded-full transition duration-200 shadow-md">
-                <!-- Icon via JS -->
+            <button id="theme-toggle" class="px-3 py-1 text-sm font-medium rounded-full transition duration-200 shadow-sm border border-gray-700 bg-secondary-dark hover:bg-gray-700 text-white">
+                <!-- Icon -->
             </button>
         </div>
     </header>
@@ -122,125 +97,90 @@
         <div id="ip-card" class="ip-card w-full max-w-2xl p-6 md:p-10 rounded-xl text-center mb-8">
             
             <!-- IP SEARCH TOOL SECTION -->
-            <div id="ip-search-section" class="p-4 rounded-xl border-2 border-dashed mb-8">
-                <h3 id="search-title" class="text-lg font-semibold mb-4 text-left text-gray-300">IP Lookup Tool</h3>
+            <div id="ip-search-section" class="p-4 rounded-xl border-2 border-dashed mb-8 border-gray-700/50">
+                <h3 id="search-title" class="text-lg font-semibold mb-4 text-left">IP Lookup Tool</h3>
                 <div class="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-3">
-                    <input id="ip-search-input" type="text" placeholder="Ex: 8.8.8.8 or 2001:4860:4860::8888" 
-                           class="flex-grow p-3 rounded-lg border focus:ring-accent focus:border-accent bg-gray-900 border-gray-700 text-white"
-                           aria-label="Enter an IP address to lookup">
-                    <button id="ip-search-button" 
-                            class="px-6 py-3 bg-accent hover:bg-blue-600 text-white font-semibold rounded-lg shadow-md transition-colors duration-200">
+                    <input id="ip-search-input" type="text" placeholder="Ex: 8.8.8.8" 
+                           class="flex-grow p-3 rounded-lg border focus:ring-accent focus:border-accent bg-gray-900 border-gray-700 text-white">
+                    <button id="ip-search-button" class="px-6 py-3 bg-accent hover:bg-blue-600 text-white font-semibold rounded-lg shadow-md transition-colors">
                         Lookup
                     </button>
                 </div>
-                <p id="search-message" class="text-sm mt-3 text-left hidden text-gray-400"></p>
+                <p id="search-message" class="text-sm mt-3 text-left hidden"></p>
             </div>
 
-
-            <h2 id="detected-ip-title" class="text-xl md:text-2xl font-semibold mb-8 pt-4 border-t border-gray-700">
+            <h2 id="detected-ip-title" class="text-xl md:text-2xl font-semibold mb-8 pt-4 border-t border-gray-700/30">
                 Your Detected IP Address
             </h2>
 
             <!-- IP Container -->
             <div id="ip-container" class="mb-8 flex flex-col space-y-8 w-full">
-                
-                <div id="ipv4-block" class="p-6 rounded-xl bg-gray-800 border border-gray-700">
+                <div id="ipv4-block" class="p-6 rounded-xl border">
                     <div class="flex justify-between items-center mb-4">
                         <p class="text-lg font-semibold">IPv4</p>
-                        <button id="copy-ipv4-button" class="copy-btn flex items-center justify-center px-4 py-2 text-sm bg-accent hover:bg-blue-600 text-white font-medium rounded-lg shadow-md transition-all duration-200 opacity-0 pointer-events-none" disabled>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" /></svg>
+                        <button id="copy-ipv4-button" class="flex items-center justify-center px-4 py-2 text-sm bg-accent hover:bg-blue-600 text-white font-medium rounded-lg opacity-0 pointer-events-none transition-all" disabled>
                             <span id="copy-ipv4-text">Copy</span>
                         </button>
                     </div>
-                    <div id="ipv4-display" class="min-h-[50px] flex flex-col items-center justify-center text-center">
-                        <div class="loader" role="status" aria-label="Loading IPv4"></div>
-                        <p id="ipv4-status" class="mt-2 text-sm text-gray-500">Detecting...</p>
+                    <div id="ipv4-display" class="min-h-[50px] flex flex-col items-center justify-center">
+                        <div class="loader"></div>
                     </div>
                 </div>
 
-                <div id="ipv6-block" class="p-6 rounded-xl bg-gray-800 border border-gray-700">
+                <div id="ipv6-block" class="p-6 rounded-xl border">
                     <div class="flex justify-between items-center mb-4">
                         <p class="text-lg font-semibold">IPv6</p>
-                        <button id="copy-ipv6-button" class="copy-btn flex items-center justify-center px-4 py-2 text-sm bg-accent hover:bg-blue-600 text-white font-medium rounded-lg shadow-md transition-all duration-200 opacity-0 pointer-events-none" disabled>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" /></svg>
+                        <button id="copy-ipv6-button" class="flex items-center justify-center px-4 py-2 text-sm bg-accent hover:bg-blue-600 text-white font-medium rounded-lg opacity-0 pointer-events-none transition-all" disabled>
                             <span id="copy-ipv6-text">Copy</span>
                         </button>
                     </div>
-                    <div id="ipv6-display" class="min-h-[50px] flex flex-col items-center justify-center text-center">
-                        <div class="loader" role="status" aria-label="Loading IPv6"></div>
-                        <p id="ipv6-status" class="mt-2 text-sm text-gray-500">Detecting...</p>
+                    <div id="ipv6-display" class="min-h-[50px] flex flex-col items-center justify-center">
+                        <div class="loader"></div>
                     </div>
                 </div>
-
             </div>
 
-            <div id="context-info-card" class="mt-8 pt-6 border-t border-gray-700 text-left">
+            <div id="context-info-card" class="mt-8 pt-6 border-t border-gray-700/30 text-left">
                 <div class="mb-4">
-                    <h2 id="geo-details-title" class="text-xl md:text-2xl font-semibold mb-1 text-gray-300">
-                        Geolocation Details
-                    </h2>
-                    <p id="geo-ip-source-display" class="text-sm italic text-gray-400">
-                        Querying details for your IP...
-                    </p>
+                    <h2 id="geo-details-title" class="text-xl md:text-2xl font-semibold mb-1">Geolocation Details</h2>
+                    <p id="geo-ip-source-display" class="text-sm italic">Querying details...</p>
                 </div>
-                
-                <div id="geo-display" class="flex flex-col justify-center items-center h-20">
-                    <div class="loader mr-3 mb-2"></div>
-                    <p id="geo-status-loading" class="text-gray-400">Querying connection details...</p>
+                <div id="geo-display" class="flex flex-col items-center justify-center h-24">
+                    <div class="loader mb-2"></div>
                 </div>
             </div>
             
-            <div id="geoip-warning-note" class="mt-6 p-4 rounded-xl border-l-4 bg-yellow-900/30 border-yellow-500 text-yellow-100">
+            <div id="geoip-warning-note" class="mt-6 p-4 rounded-xl border-l-4">
                 <h3 id="geo-warning-title" class="text-base font-semibold mb-1"></h3>
-                <p id="geo-warning-text" class="text-sm text-yellow-200/90"></p>
+                <p id="geo-warning-text" class="text-sm"></p>
             </div>
         </div>
 
-        <!-- NEW EDUCATIONAL SECTION -->
+        <!-- EDUCATIONAL SECTION -->
         <div class="w-full max-w-2xl mt-4 px-4">
-            <div class="p-6 md:p-8 rounded-xl bg-secondary-dark border border-gray-700/50 shadow-2xl">
+            <div id="edu-card" class="p-6 md:p-8 rounded-xl border shadow-lg">
                 <h2 id="edu-section-title" class="text-2xl font-bold mb-6 text-accent">How to check your IP via Terminal</h2>
-                
                 <div class="space-y-6">
-                    <!-- Windows -->
                     <div>
-                        <h3 class="text-lg font-semibold mb-2 flex items-center">
-                            <span class="mr-2">🪟</span> Windows (Command Prompt / PowerShell)
-                        </h3>
-                        <p id="edu-win-desc" class="text-gray-400 text-sm mb-2">Open the terminal and type the following command to see your network adapters:</p>
-                        <div class="terminal-box p-3 rounded-lg text-sm mb-1 select-all">
-                            ipconfig
-                        </div>
+                        <h3 id="edu-win-title" class="text-lg font-semibold mb-2 flex items-center">🪟 Windows</h3>
+                        <p id="edu-win-desc" class="text-sm mb-2 opacity-80">Open terminal and type:</p>
+                        <div class="terminal-box p-3 rounded-lg text-sm select-all">ipconfig</div>
                     </div>
-
-                    <!-- Linux/Mac -->
                     <div>
-                        <h3 class="text-lg font-semibold mb-2 flex items-center">
-                            <span class="mr-2">🐧</span> Linux / <span class="ml-1 mr-2">🍎</span> macOS
-                        </h3>
-                        <p id="edu-linux-desc" class="text-gray-400 text-sm mb-2">Use these commands to list your network interfaces and addresses:</p>
-                        <div class="terminal-box p-3 rounded-lg text-sm mb-1 select-all">
-                            ip a <span class="text-gray-600"># Modern Linux</span>
-                        </div>
-                        <div class="terminal-box p-3 rounded-lg text-sm select-all">
-                            ifconfig <span class="text-gray-600"># macOS & Legacy Linux</span>
-                        </div>
+                        <h3 id="edu-linux-title" class="text-lg font-semibold mb-2 flex items-center">🐧 Linux / 🍎 macOS</h3>
+                        <p id="edu-linux-desc" class="text-sm mb-2 opacity-80">Use these commands:</p>
+                        <div class="terminal-box p-3 rounded-lg text-sm mb-1 select-all">ip a</div>
+                        <div class="terminal-box p-3 rounded-lg text-sm select-all">ifconfig</div>
                     </div>
-
-                    <p id="edu-footer-note" class="text-xs text-gray-500 italic mt-4">
-                        Note: Terminal commands usually show your **local (private) IP**. To see your **public IP** via terminal, use: <code class="bg-gray-800 px-1 rounded">curl ifconfig.me</code>
-                    </p>
+                    <p id="edu-footer-note" class="text-xs italic mt-4"></p>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="text-center py-4 text-xs mt-auto">
-        <div class="h-10 rounded-lg flex items-center justify-center mb-4 max-w-xl mx-auto bg-gray-800/30 border border-gray-700/50">
-            <p id="footer-privacy-text" class="text-sm italic text-gray-500">Privacy guaranteed: Your data is not stored.</p>
-        </div>
-        &copy; 2025 IP Checker. | <a href="#" id="privacy-policy-link" class="hover:text-gray-300 text-gray-700">Privacy Policy</a>
+    <footer class="text-center py-8 text-xs mt-auto">
+        <p id="footer-privacy-text" class="mb-2 opacity-60">Privacy guaranteed: Your data is not stored.</p>
+        <p>&copy; 2025 IP Checker. | <a href="#" id="privacy-policy-link" class="underline opacity-50 hover:opacity-100">Privacy Policy</a></p>
     </footer>
 
     <script>
@@ -250,320 +190,204 @@
                 detectedIpTitle: 'Seu Endereço IP Detectado',
                 geoDetailsTitle: 'Detalhes da Geolocalização',
                 searchToolTitle: 'Ferramenta de Pesquisa de IP',
-                searchPlaceholder: 'Ex: 8.8.8.8 ou 2001:4860:4860::8888',
+                searchPlaceholder: 'Ex: 8.8.8.8',
                 searchButton: 'Verificar',
                 copy: 'Copiar',
                 copied: 'Copiado!',
-                failed: 'Falha',
-                detecting: 'Detectando...',
                 notDetected: 'Não Detectado',
-                loadingIpv4: 'Carregando IPv4',
-                loadingIpv6: 'Carregando IPv6',
-                copyAll: 'Copiar Todas as Informações',
-                allCopied: 'Tudo Copiado!',
-                country: 'País',
-                city: 'Cidade',
-                timezone: 'Fuso Horário', 
-                asn: 'Número do Sistema Autônomo (ASN)', 
-                isp: 'Organização / Provedor', 
-                connectionType: 'Tipo de Conexão',
-                typeDatacenter: 'Datacenter / Hospedagem (Cloud)',
-                typeResidential: 'Residencial / Corporativo',
-                typeUnknown: 'Desconhecido',
-                securityTitle: 'Informações de Segurança',
-                securityStatus: 'Status de Uso',
-                isProxy: 'Proxy Detectado',
-                isVpn: 'VPN Dedicada Detectada',
-                isTor: 'Nó TOR Detectado',
-                isClean: 'Conexão Limpa', 
-                detected: 'Sim (Risco)',
-                notDetectedSec: 'Não',
-                searchInvalid: 'Endereço IP inválido. Por favor, insira um IPv4 ou IPv6 válido.',
-                searchSuccess: 'Detalhes para o IP pesquisado abaixo.',
-                searchError: 'Falha ao buscar detalhes para este IP.',
-                sourceMyIp: 'Consultando detalhes para o seu IP...',
-                sourceSearchedIp: 'Detalhes para o IP pesquisado:',
-                statusLoadingGeo: 'Consultando detalhes da conexão...',
-                errorGeo: 'Não foi possível obter detalhes de geolocalização.',
-                footerInfo: 'O endereço IP é a base para a identificação da sua localização aproximada e provedor de serviço.',
+                copyAll: 'Copiar Tudo',
+                country: 'País', city: 'Cidade', timezone: 'Fuso Horário', asn: 'ASN', isp: 'Provedor (ISP)',
+                securityTitle: 'Segurança', isClean: 'Conexão Limpa', detected: 'Sim (Risco)',
+                searchInvalid: 'IP inválido.',
+                sourceMyIp: 'Consultando seus detalhes...',
+                sourceSearchedIp: 'Detalhes para:',
+                errorGeo: 'Erro ao obter localização.',
                 footerPrivacy: 'Privacidade garantida: Seus dados não são armazenados.',
                 privacyPolicy: 'Política de Privacidade',
-                geoWarningTitle: '⚠️ Nota sobre a Precisão da Geolocalização',
-                geoWarningText: 'A precisão da geolocalização por IP é uma estimativa. Endereços **IPv6** frequentemente apontam para o PoP (Ponto de Presença) principal do provedor (ex: São Paulo), e não para sua localização exata. Seu IPv4 é geralmente mais preciso.',
+                geoWarningTitle: '⚠️ Precisão da Geolocalização',
+                geoWarningText: 'A precisão por IP é uma estimativa. IPv6 geralmente aponta para a central do provedor, enquanto o IPv4 tende a ser mais preciso.',
                 eduTitle: 'Como checar seu IP via Terminal',
-                eduWinDesc: 'Abra o terminal e digite o comando abaixo para ver seus adaptadores de rede:',
-                eduLinuxDesc: 'Use estes comandos para listar suas interfaces e endereços:',
-                eduFooter: 'Nota: Comandos de terminal geralmente mostram seu **IP local (privado)**. Para ver seu **IP público**, use: curl ifconfig.me'
+                eduWinDesc: 'Abra o terminal e digite:',
+                eduLinuxDesc: 'Use estes comandos:',
+                eduFooter: 'Nota: Estes mostram o **IP local**. Para o **público**, use: <code class="bg-gray-800 px-1 rounded text-accent">curl ifconfig.me</code>'
             },
             EN: {
                 title: 'Full IP Checker',
                 detectedIpTitle: 'Your Detected IP Address',
                 geoDetailsTitle: 'Geolocation Details',
                 searchToolTitle: 'IP Lookup Tool',
-                searchPlaceholder: 'Ex: 8.8.8.8 or 2001:4860:4860::8888',
+                searchPlaceholder: 'Ex: 8.8.8.8',
                 searchButton: 'Lookup',
                 copy: 'Copy',
                 copied: 'Copied!',
-                failed: 'Failed',
-                detecting: 'Detecting...',
                 notDetected: 'Not Detected',
-                loadingIpv4: 'Loading IPv4',
-                loadingIpv6: 'Loading IPv6',
-                copyAll: 'Copy All Information',
-                allCopied: 'All Copied!',
-                country: 'Country',
-                city: 'City',
-                timezone: 'Timezone', 
-                asn: 'Autonomous System Number (ASN)', 
-                isp: 'Organization / Provider (ISP)', 
-                connectionType: 'Connection Type',
-                typeDatacenter: 'Datacenter / Hosting (Cloud)',
-                typeResidential: 'Residential / Corporate',
-                typeUnknown: 'Unknown',
-                securityTitle: 'Security Information',
-                securityStatus: 'Usage Status',
-                isProxy: 'Proxy Detected',
-                isVpn: 'Dedicated VPN Detected',
-                isTor: 'TOR Node Detected',
-                isClean: 'Clean Connection', 
-                detected: 'Yes (Risk)',
-                notDetectedSec: 'No',
-                searchInvalid: 'Invalid IP address. Please enter a valid IPv4 or IPv6.',
-                searchSuccess: 'Details for the searched IP are displayed below.',
-                searchError: 'Failed to fetch details for this IP.',
-                sourceMyIp: 'Querying details for your IP...',
-                sourceSearchedIp: 'Details for searched IP:',
-                statusLoadingGeo: 'Querying connection details...',
-                errorGeo: 'Could not retrieve geolocation details.',
-                footerInfo: 'The IP address is the basis for identifying your approximate location and service provider.',
+                copyAll: 'Copy All',
+                country: 'Country', city: 'City', timezone: 'Timezone', asn: 'ASN', isp: 'Provider (ISP)',
+                securityTitle: 'Security', isClean: 'Clean Connection', detected: 'Yes (Risk)',
+                searchInvalid: 'Invalid IP.',
+                sourceMyIp: 'Querying details...',
+                sourceSearchedIp: 'Details for:',
+                errorGeo: 'Could not retrieve location.',
                 footerPrivacy: 'Privacy guaranteed: Your data is not stored.',
                 privacyPolicy: 'Privacy Policy',
-                geoWarningTitle: '⚠️ Geolocation Accuracy Note',
-                geoWarningText: 'IP geolocation accuracy is an estimate. **IPv6** addresses frequently point to the provider’s main PoP (Point of Presence) (e.g., New York), not your exact physical location. Your IPv4 is generally more precise.',
+                geoWarningTitle: '⚠️ Geolocation Accuracy',
+                geoWarningText: 'IP accuracy is an estimate. IPv6 often points to the provider headquarters, while IPv4 is usually more precise.',
                 eduTitle: 'How to check your IP via Terminal',
-                eduWinDesc: 'Open the terminal and type the following command to see your network adapters:',
-                eduLinuxDesc: 'Use these commands to list your network interfaces and addresses:',
-                eduFooter: 'Note: Terminal commands usually show your **local (private) IP**. To see your **public IP** via terminal, use: curl ifconfig.me'
+                eduWinDesc: 'Open terminal and type:',
+                eduLinuxDesc: 'Use these commands:',
+                eduFooter: 'Note: These show **local IP**. For **public IP**, use: <code class="bg-gray-800 px-1 rounded text-accent">curl ifconfig.me</code>'
             }
         };
 
         let currentLang = 'EN'; 
         let currentTheme = 'dark'; 
-        let userIpv4 = null;
-        let userIpv6 = null;
-        let currentGeoData = null; 
-        let currentGeoIp = null;    
+        let userIpv4 = null, userIpv6 = null, currentGeoData = null, currentGeoIp = null;
 
-        const API_GEO_BASE = 'https://ipapi.co/'; 
-        const IPV4_ENDPOINTS = [
-            { url: 'https://api.ipify.org?format=json', parser: data => data.ip },
-            { url: 'https://api.bigdatacloud.net/data/client-ip', parser: data => data.ipString },
-        ];
-        const IPV6_ENDPOINTS = [
-            { url: 'https://api6.ipify.org?format=json', parser: data => data.ip },
-            { url: 'https://ipapi.co/ip', parser: data => data.trim(), isText: true } 
-        ];
-
-        const ipv4Regex = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
-        const ipv6Regex = /^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|([0-9a-fA-F]{1,4}:){1,4}:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}))$/;
-
-        async function delay(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
-
-        async function resilientFetchAndParse(endpoint, maxRetries = 3) {
-            const { url, parser, isText = false } = endpoint;
-            for (let i = 0; i < maxRetries; i++) {
-                try {
-                    const response = await fetch(url);
-                    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-                    let data = isText ? await response.text() : await response.json();
-                    let ip = parser(data);
-                    if (ip && ip.trim) ip = ip.trim();
-                    if (ip && (ipv4Regex.test(ip) || ipv6Regex.test(ip))) return ip;
-                    throw new Error("Invalid IP");
-                } catch (error) {
-                    if (i < maxRetries - 1) await delay(Math.pow(2, i) * 1000);
-                    else throw error;
-                }
-            }
-        }
-        
-        async function robustFetchIp(endpoints) {
-            for (const endpoint of endpoints) {
-                try { return await resilientFetchAndParse(endpoint, 1); } catch (e) {}
-            }
-            return null;
-        }
-
-        function isValidIp(ip) { return ipv4Regex.test(ip) || ipv6Regex.test(ip); }
-
-        async function resilientFetch(url, options = {}, maxRetries = 3) {
-            for (let i = 0; i < maxRetries; i++) {
-                try {
-                    const response = await fetch(url, options);
-                    if (response.ok) return response;
-                    if (i < maxRetries - 1) await delay(Math.pow(2, i) * 1000);
-                } catch (error) {
-                    if (i < maxRetries - 1) await delay(Math.pow(2, i) * 1000);
-                    else throw error;
-                }
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const ipCard = document.getElementById('ip-card');
-            const langToggleButton = document.getElementById('lang-toggle');
-            const themeToggleButton = document.getElementById('theme-toggle');
-            const copyAllButton = document.getElementById('copy-all-button');
-            const ipv4Display = document.getElementById('ipv4-display');
-            const copyIpv4Button = document.getElementById('copy-ipv4-button');
-            const copyIpv4Text = document.getElementById('copy-ipv4-text');
-            const ipv6Display = document.getElementById('ipv6-display');
-            const copyIpv6Button = document.getElementById('copy-ipv6-button');
-            const copyIpv6Text = document.getElementById('copy-ipv6-text');
-            const geoDisplay = document.getElementById('geo-display');
-            const geoIpSourceDisplay = document.getElementById('geo-ip-source-display');
+        function applyTheme() {
+            const isDark = currentTheme === 'dark';
             const body = document.body;
-            const mainTitle = document.getElementById('main-title');
-            const detectedIpTitle = document.getElementById('detected-ip-title');
-            const footerPrivacyText = document.getElementById('footer-privacy-text');
-            const privacyPolicyLink = document.getElementById('privacy-policy-link');
-            const copyAllIcon = document.getElementById('copy-all-icon');
-            const ipSearchInput = document.getElementById('ip-search-input');
-            const ipSearchButton = document.getElementById('ip-search-button');
-            const searchMessage = document.getElementById('search-message');
-
-            const copyIconSvg = `<path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />`;
-            const checkIconSvg = `<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />`;
-
-            function applyTheme() {
-                const isDark = currentTheme === 'dark';
-                body.className = isDark ? 'bg-primary-dark text-gray-100 min-h-screen flex flex-col font-sans p-4' : 'bg-gray-100 text-gray-900 min-h-screen flex flex-col font-sans p-4';
-                
-                themeToggleButton.innerHTML = isDark ? '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.041A6.99 6.99 0 0110 2a8 8 0 000 16 7.99 7.99 0 007.293-4.959z" /></svg>' : '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 14.95a1 1 0 101.414 1.414l.707-.707a1 1 0 00-1.414-1.414l-.707.707zm1.414-8.486l-.707-.707a1 1 0 011.414-1.414l.707.707a1 1 0 01-1.414 1.414zM3 11a1 1 0 100-2H2a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>';
-                
-                updateIpBlock(userIpv4, ipv4Display, copyIpv4Button, copyIpv4Text, languageMap[currentLang].copy, 'text-3xl md:text-5xl');
-                updateIpBlock(userIpv6, ipv6Display, copyIpv6Button, copyIpv6Text, languageMap[currentLang].copy, 'text-xl md:text-3xl');
-                renderGeoDetails(currentGeoData, currentGeoIp);
-            }
-
-            themeToggleButton.addEventListener('click', () => { currentTheme = currentTheme === 'dark' ? 'light' : 'dark'; applyTheme(); });
-
-            function translatePage() {
-                const lang = languageMap[currentLang];
-                document.documentElement.lang = currentLang === 'PT' ? 'pt-BR' : 'en-US';
-                langToggleButton.textContent = currentLang === 'PT' ? 'EN / PT' : 'PT / EN';
-                mainTitle.innerHTML = lang.title.replace('Full', `<span class="text-accent">Full</span>`).replace('Completo', `<span class="text-accent">Completo</span>`);
-                detectedIpTitle.textContent = lang.detectedIpTitle;
-                document.getElementById('search-title').textContent = lang.searchToolTitle;
-                ipSearchInput.placeholder = lang.searchPlaceholder;
-                ipSearchButton.textContent = lang.searchButton;
-                document.getElementById('geo-details-title').textContent = lang.geoDetailsTitle;
-                document.getElementById('geo-warning-title').textContent = lang.geoWarningTitle;
-                document.getElementById('geo-warning-text').textContent = lang.geoWarningText;
-                footerPrivacyText.textContent = lang.footerPrivacy;
-                privacyPolicyLink.textContent = lang.privacyPolicy;
-                
-                // Trans Educational
-                document.getElementById('edu-section-title').textContent = lang.eduTitle;
-                document.getElementById('edu-win-desc').textContent = lang.eduWinDesc;
-                document.getElementById('edu-linux-desc').textContent = lang.eduLinuxDesc;
-                document.getElementById('edu-footer-note').innerHTML = lang.eduFooter;
-
-                applyTheme();
-            }
+            const ipCard = document.getElementById('ip-card');
+            const eduCard = document.getElementById('edu-card');
+            const searchSection = document.getElementById('ip-search-section');
+            const searchInput = document.getElementById('ip-search-input');
+            const warningNote = document.getElementById('geoip-warning-note');
             
-            langToggleButton.addEventListener('click', () => { currentLang = currentLang === 'PT' ? 'EN' : 'PT'; translatePage(); });
-
-            function copyToClipboard(ip, buttonElement, textElement) {
-                const lang = languageMap[currentLang];
-                const tempInput = document.createElement('textarea');
-                tempInput.value = ip;
-                document.body.appendChild(tempInput);
-                tempInput.select();
-                if (document.execCommand('copy')) {
-                    textElement.textContent = lang.copied;
-                    setTimeout(() => { textElement.textContent = lang.copy; }, 1500);
-                }
-                document.body.removeChild(tempInput);
+            // Core themes
+            if (isDark) {
+                body.classList.add('bg-primary-dark', 'text-gray-100');
+                body.classList.remove('bg-gray-50', 'text-gray-900', 'dark');
+                ipCard.className = "ip-card w-full max-w-2xl p-6 md:p-10 rounded-xl text-center mb-8 bg-secondary-dark border border-gray-700 loaded";
+                eduCard.className = "p-6 md:p-8 rounded-xl bg-secondary-dark border border-gray-700 shadow-2xl";
+                searchSection.classList.add('border-gray-700');
+                searchInput.className = "flex-grow p-3 rounded-lg border bg-gray-900 border-gray-700 text-white focus:ring-accent";
+                warningNote.className = "mt-6 p-4 rounded-xl border-l-4 bg-yellow-900/30 border-yellow-500 text-yellow-100";
+                
+                // Text Colors (Dark Mode)
+                document.getElementById('search-title').className = "text-lg font-semibold mb-4 text-left text-gray-300";
+                document.getElementById('geo-details-title').className = "text-xl md:text-2xl font-semibold mb-1 text-gray-200";
+                document.getElementById('geo-ip-source-display').className = "text-sm italic text-gray-400";
+            } else {
+                body.classList.remove('bg-primary-dark', 'text-gray-100');
+                body.classList.add('bg-gray-50', 'text-gray-900');
+                ipCard.className = "ip-card w-full max-w-2xl p-6 md:p-10 rounded-xl text-center mb-8 bg-white border border-gray-200 shadow-xl loaded";
+                eduCard.className = "p-6 md:p-8 rounded-xl bg-white border border-gray-200 shadow-lg";
+                searchSection.classList.remove('border-gray-700');
+                searchSection.classList.add('border-gray-200');
+                searchInput.className = "flex-grow p-3 rounded-lg border bg-gray-50 border-gray-300 text-gray-900 focus:ring-accent";
+                warningNote.className = "mt-6 p-4 rounded-xl border-l-4 bg-yellow-50 border-yellow-400 text-yellow-800";
+                
+                // Text Colors (Light Mode) - FIXING THE VISIBILITY
+                document.getElementById('search-title').className = "text-lg font-semibold mb-4 text-left text-gray-700";
+                document.getElementById('geo-details-title').className = "text-xl md:text-2xl font-semibold mb-1 text-gray-800";
+                document.getElementById('geo-ip-source-display').className = "text-sm italic text-gray-500";
             }
 
-            copyAllButton.addEventListener('click', () => {
-                const lang = languageMap[currentLang];
-                let allData = `${lang.title} (${currentLang})\n---\nIPv4: ${userIpv4 || 'N/A'}\nIPv6: ${userIpv6 || 'N/A'}\nLocation: ${currentGeoData?.city}, ${currentGeoData?.country}\nISP: ${currentGeoData?.isp}`;
-                const tempInput = document.createElement('textarea');
-                tempInput.value = allData;
-                document.body.appendChild(tempInput);
-                tempInput.select();
-                if (document.execCommand('copy')) {
-                    copyAllIcon.innerHTML = checkIconSvg;
-                    setTimeout(() => { copyAllIcon.innerHTML = copyIconSvg; }, 2000);
-                }
-                document.body.removeChild(tempInput);
+            // Blocks (IPv4/IPv6)
+            ['ipv4-block', 'ipv6-block'].forEach(id => {
+                const el = document.getElementById(id);
+                el.className = isDark ? 'p-6 rounded-xl bg-gray-800 border border-gray-700' : 'p-6 rounded-xl bg-gray-50 border border-gray-200';
             });
 
-            function updateIpBlock(ip, displayEl, buttonEl, textEl, buttonText, fontSizeClass) {
-                if (ip) {
-                    displayEl.innerHTML = `<p class="${fontSizeClass} font-extrabold text-accent break-all select-text leading-tight">${ip}</p>`;
-                    textEl.textContent = buttonText;
-                    buttonEl.onclick = () => copyToClipboard(ip, buttonEl, textEl);
-                    buttonEl.disabled = false;
-                    buttonEl.className = buttonEl.className.replace('opacity-0', 'opacity-100').replace('pointer-events-none', '').replace('bg-gray-500', 'bg-accent');
-                } else {
-                    displayEl.innerHTML = `<p class="text-2xl text-gray-500 font-extrabold">${languageMap[currentLang].notDetected}</p>`;
-                    buttonEl.disabled = true;
-                    buttonEl.classList.add('opacity-0', 'pointer-events-none');
-                }
-            }
-            
-            async function fetchGeoDetails(ip) {
-                try {
-                    const response = await resilientFetch(`${API_GEO_BASE}${ip}/json/`); 
-                    const data = await response.json();
-                    if (data.error) return null;
-                    return { country: data.country_name, city: data.city, isp: data.org, asn: data.asn, timezone: data.timezone, isProxy: data.proxy, isVpn: data.vpn, isTor: data.security?.is_tor };
-                } catch (e) { return null; }
-            }
-            
-            function renderGeoDetails(data, ip, sourceKey = 'sourceMyIp') {
-                const lang = languageMap[currentLang];
-                currentGeoData = data; currentGeoIp = ip;
-                geoIpSourceDisplay.textContent = sourceKey === 'sourceSearchedIp' ? `${lang.sourceSearchedIp} ${ip}` : lang.sourceMyIp;
-                geoDisplay.className = '';
-                if (!data) {
-                    geoDisplay.innerHTML = `<p class="text-red-500 text-center">${lang.errorGeo}</p>`;
-                    return;
-                }
-                const isRisky = data.isProxy || data.isVpn || data.isTor;
-                geoDisplay.innerHTML = `
-                    <div class="grid grid-cols-2 gap-4 text-sm md:text-base w-full">
-                        ${['country', 'city', 'timezone', 'asn', 'isp'].map(k => `<div class="col-span-2 flex flex-col p-3 ${currentTheme === 'dark' ? 'bg-gray-700/50' : 'bg-gray-200'} rounded-lg"><span class="font-medium opacity-70">${lang[k]}</span><span class="font-extrabold">${data[k] || 'N/A'}</span></div>`).join('')}
-                    </div>
-                    <div class="mt-8 p-4 rounded-lg border w-full ${isRisky ? 'border-red-500/50 bg-red-900/10' : 'border-green-500/50 bg-green-900/10'}">
-                        <h3 class="font-bold mb-2">${lang.securityTitle}</h3>
-                        <p>${isRisky ? lang.detected : lang.isClean}</p>
-                    </div>
-                `;
-            }
+            document.getElementById('theme-toggle').innerHTML = isDark ? '🌙' : '☀️';
+            renderGeoDetails(currentGeoData, currentGeoIp);
+            updateIpUI();
+        }
 
-            ipSearchButton.addEventListener('click', async () => {
-                const inputIp = ipSearchInput.value.trim();
-                if (!isValidIp(inputIp)) { searchMessage.textContent = languageMap[currentLang].searchInvalid; searchMessage.classList.remove('hidden'); return; }
-                geoDisplay.innerHTML = `<div class="loader"></div>`;
-                const data = await fetchGeoDetails(inputIp);
-                renderGeoDetails(data, inputIp, 'sourceSearchedIp');
-            });
+        function updateIpUI() {
+            const lang = languageMap[currentLang];
+            updateIpBlock(userIpv4, 'ipv4-display', 'copy-ipv4-button', 'copy-ipv4-text', lang.copy, 'text-3xl md:text-5xl');
+            updateIpBlock(userIpv6, 'ipv6-display', 'copy-ipv6-button', 'copy-ipv6-text', lang.copy, 'text-xl md:text-3xl');
+        }
 
-            async function init() {
-                [userIpv4, userIpv6] = await Promise.all([robustFetchIp(IPV4_ENDPOINTS), robustFetchIp(IPV6_ENDPOINTS)]);
-                const geo = await fetchGeoDetails(userIpv4 || userIpv6);
-                renderGeoDetails(geo, userIpv4 || userIpv6);
-                ipCard.classList.add('loaded');
-                applyTheme();
+        function updateIpBlock(ip, displayId, buttonId, textId, btnText, size) {
+            const display = document.getElementById(displayId);
+            const btn = document.getElementById(buttonId);
+            const txt = document.getElementById(textId);
+            if (ip) {
+                display.innerHTML = `<p class="${size} font-extrabold text-accent break-all">${ip}</p>`;
+                txt.textContent = btnText;
+                btn.onclick = () => {
+                    const temp = document.createElement('textarea'); temp.value = ip; document.body.appendChild(temp); temp.select();
+                    if(document.execCommand('copy')) { txt.textContent = languageMap[currentLang].copied; setTimeout(()=> txt.textContent = btnText, 1500); }
+                    document.body.removeChild(temp);
+                };
+                btn.disabled = false; btn.classList.remove('opacity-0', 'pointer-events-none');
+            } else if (userIpv4 !== null || userIpv6 !== null) {
+                display.innerHTML = `<p class="text-xl text-gray-500">${languageMap[currentLang].notDetected}</p>`;
             }
+        }
+
+        function translatePage() {
+            const lang = languageMap[currentLang];
+            document.getElementById('main-title').innerHTML = lang.title.replace('Full', '<span class="text-accent">Full</span>').replace('Completo', '<span class="text-accent">Completo</span>');
+            document.getElementById('detected-ip-title').textContent = lang.detectedIpTitle;
+            document.getElementById('search-title').textContent = lang.searchToolTitle;
+            document.getElementById('ip-search-input').placeholder = lang.searchPlaceholder;
+            document.getElementById('ip-search-button').textContent = lang.searchButton;
+            document.getElementById('geo-details-title').textContent = lang.geoDetailsTitle;
+            document.getElementById('geo-warning-title').textContent = lang.geoWarningTitle;
+            document.getElementById('geo-warning-text').textContent = lang.geoWarningText;
+            document.getElementById('edu-section-title').textContent = lang.eduTitle;
+            document.getElementById('edu-win-desc').textContent = lang.eduWinDesc;
+            document.getElementById('edu-linux-desc').textContent = lang.eduLinuxDesc;
+            document.getElementById('edu-footer-note').innerHTML = lang.eduFooter;
+            document.getElementById('footer-privacy-text').textContent = lang.footerPrivacy;
+            document.getElementById('privacy-policy-link').textContent = lang.privacyPolicy;
+            applyTheme();
+        }
+
+        function renderGeoDetails(data, ip) {
+            const lang = languageMap[currentLang];
+            const isDark = currentTheme === 'dark';
+            const display = document.getElementById('geo-display');
+            if (!data) return;
+            currentGeoData = data; currentGeoIp = ip;
             
-            init();
-            translatePage();
+            const cardBg = isDark ? 'bg-gray-700/50' : 'bg-gray-100';
+            const labelColor = isDark ? 'text-gray-400' : 'text-gray-500';
+            const valColor = isDark ? 'text-white' : 'text-gray-800';
+
+            display.className = "grid grid-cols-2 gap-3 w-full text-left mt-4";
+            display.innerHTML = ['country', 'city', 'timezone', 'asn', 'isp'].map(k => `
+                <div class="col-span-2 md:col-span-1 p-3 rounded-lg ${cardBg}">
+                    <span class="block text-xs font-bold uppercase tracking-wider ${labelColor}">${lang[k]}</span>
+                    <span class="font-bold ${valColor}">${data[k] || 'N/A'}</span>
+                </div>
+            `).join('') + `
+                <div class="col-span-2 p-3 rounded-lg border ${data.isProxy || data.isVpn ? 'border-red-500/30 bg-red-500/10' : 'border-green-500/30 bg-green-500/10'}">
+                    <span class="block text-xs font-bold uppercase ${labelColor}">${lang.securityTitle}</span>
+                    <span class="font-bold ${data.isProxy || data.isVpn ? 'text-red-500' : 'text-green-500'}">${data.isProxy || data.isVpn ? lang.detected : lang.isClean}</span>
+                </div>
+            `;
+        }
+
+        async function fetchIPs() {
+            try {
+                const [v4res, v6res] = await Promise.allSettled([
+                    fetch('https://api.ipify.org?format=json').then(r => r.json()),
+                    fetch('https://api6.ipify.org?format=json').then(r => r.json())
+                ]);
+                userIpv4 = v4res.status === 'fulfilled' ? v4res.value.ip : null;
+                userIpv6 = v6res.status === 'fulfilled' ? v6res.value.ip : null;
+                const geoRes = await fetch(`https://ipapi.co/${userIpv4 || userIpv6}/json/`);
+                const geoData = await geoRes.json();
+                renderGeoDetails({ country: geoData.country_name, city: geoData.city, isp: geoData.org, asn: geoData.asn, timezone: geoData.timezone, isProxy: geoData.proxy, isVpn: geoData.vpn }, userIpv4 || userIpv6);
+                updateIpUI();
+            } catch (e) { console.error(e); }
+        }
+
+        document.getElementById('lang-toggle').addEventListener('click', () => { currentLang = currentLang === 'EN' ? 'PT' : 'EN'; translatePage(); });
+        document.getElementById('theme-toggle').addEventListener('click', () => { currentTheme = currentTheme === 'dark' ? 'light' : 'dark'; applyTheme(); });
+        
+        document.getElementById('ip-search-button').addEventListener('click', async () => {
+            const ip = document.getElementById('ip-search-input').value.trim();
+            if(!ip) return;
+            const res = await fetch(`https://ipapi.co/${ip}/json/`);
+            const data = await res.json();
+            renderGeoDetails({ country: data.country_name, city: data.city, isp: data.org, asn: data.asn, timezone: data.timezone, isProxy: data.proxy, isVpn: data.vpn }, ip);
         });
+
+        window.onload = () => { fetchIPs(); translatePage(); };
     </script>
 </body>
 </html>
