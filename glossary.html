@@ -1,43 +1,148 @@
-Glossário CheckMyIP.today: Termos de Rede e IP
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glossário de Termos de Rede - Check My IP Today</title>
+    
+    <!-- Meta Tags para SEO -->
+    <meta name="description" content="Aprenda o que é IPv4, IPv6, ASN, ISP e outros termos fundamentais de rede no nosso glossário completo.">
+    
+    <!-- Scripts de Estilo (Tailwind) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: { 
+                        'primary-dark': '#0f172a', 
+                        'secondary-dark': '#1e293b', 
+                        'accent': '#3b82f6' 
+                    },
+                    fontFamily: { 
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace']
+                    },
+                }
+            }
+        }
+    </script>
 
-Bem-vindo ao nosso glossário técnico. Aqui explicamos de forma simples os conceitos fundamentais que rodeiam o seu endereço IP e a sua ligação à Internet.
+    <style>
+        body { transition: background-color 0.3s, color 0.3s; }
+        .glossary-card { 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+        .glossary-card:hover { 
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+        .dark .glossary-card:hover {
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.3);
+        }
+    </style>
+</head>
+<body class="bg-white text-slate-900 dark:bg-primary-dark dark:text-gray-100 min-h-screen flex flex-col">
 
-1. Endereço IP (Internet Protocol)
+    <!-- Cabeçalho -->
+    <header class="w-full max-w-6xl mx-auto px-6 py-8 flex justify-between items-center">
+        <a href="index.html" class="text-2xl font-extrabold tracking-tight hover:opacity-80 transition-opacity">
+            Check My IP <span class="text-accent italic">Today</span>
+        </a>
+        <a href="index.html" class="bg-gray-100 dark:bg-secondary-dark px-4 py-2 rounded-xl text-sm font-bold text-accent hover:ring-2 ring-accent transition-all">
+            ← Voltar
+        </a>
+    </header>
 
-O "RG" ou "Cartão de Cidadão" do seu dispositivo na rede. É um conjunto de números que identifica de forma única um computador, smartphone ou servidor na Internet, permitindo que os dados cheguem ao destino correto.
+    <!-- Conteúdo Principal -->
+    <main class="flex-grow container mx-auto px-6 py-12 max-w-4xl">
+        <div class="mb-16 text-center">
+            <h1 class="text-4xl md:text-6xl font-black tracking-tighter mb-6 bg-gradient-to-r from-accent to-blue-400 bg-clip-text text-transparent">
+                Glossário de Rede
+            </h1>
+            <p class="text-lg text-slate-500 dark:text-gray-400 max-w-2xl mx-auto">
+                Descomplicamos a tecnologia por trás da sua conexão. Entenda os termos técnicos de forma simples.
+            </p>
+        </div>
 
-2. IPv4 vs. IPv6
+        <div class="grid gap-6">
+            <!-- IP -->
+            <section class="glossary-card bg-gray-50 dark:bg-secondary-dark p-8 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm">
+                <div class="flex items-start gap-4">
+                    <span class="text-3xl">📍</span>
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-3">Endereço IP (Internet Protocol)</h2>
+                        <p class="leading-relaxed text-slate-600 dark:text-gray-400">O endereço IP é como o código postal do seu dispositivo na internet. É um identificador único que permite que a rede saiba exatamente para onde enviar as informações que solicita.</p>
+                    </div>
+                </div>
+            </section>
 
-IPv4: O padrão antigo, composto por 4 blocos de números (ex: 192.168.1.1). Como existem apenas cerca de 4,3 mil milhões de combinações, os endereços esgotaram-se mundialmente.
+            <!-- IPv4 vs IPv6 -->
+            <section class="glossary-card bg-gray-50 dark:bg-secondary-dark p-8 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm">
+                <div class="flex items-start gap-4">
+                    <span class="text-3xl">🌐</span>
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-3">IPv4 vs. IPv6</h2>
+                        <div class="space-y-4 text-slate-600 dark:text-gray-400">
+                            <p><strong class="text-accent">IPv4:</strong> O formato tradicional (ex: 192.168.1.1). Suporta cerca de 4,3 mil milhões de endereços, o que já não é suficiente para a população mundial.</p>
+                            <p><strong class="text-accent">IPv6:</strong> O formato moderno (ex: 2001:0db8...). Criado para oferecer endereços virtualmente infinitos para todos os dispositivos e gadgets do mundo.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-IPv6: O padrão moderno, criado para substituir o IPv4. Utiliza letras e números (ex: 2001:0db8:85a3:0000:0000:8a2e:0370:7334), permitindo uma quantidade quase infinita de endereços (trilhões de trilhões).
+            <!-- ASN -->
+            <section class="glossary-card bg-gray-50 dark:bg-secondary-dark p-8 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm">
+                <div class="flex items-start gap-4">
+                    <span class="text-3xl">🏢</span>
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-3">ASN (Autonomous System Number)</h2>
+                        <p class="leading-relaxed text-slate-600 dark:text-gray-400">Um número de identificação para grandes redes ou grupos de redes geridas por uma única entidade (como o seu fornecedor de internet). Funciona como o "BI" do seu provedor na rede global.</p>
+                    </div>
+                </div>
+            </section>
 
-3. IP Estático vs. IP Dinâmico
+            <!-- Estático vs Dinâmico -->
+            <section class="glossary-card bg-gray-50 dark:bg-secondary-dark p-8 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm">
+                <div class="flex items-start gap-4">
+                    <span class="text-3xl">🔄</span>
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-3">IP Estático vs. Dinâmico</h2>
+                        <p class="leading-relaxed text-slate-600 dark:text-gray-400">Um <strong>IP Estático</strong> nunca muda (útil para servidores). Um <strong>IP Dinâmico</strong> muda periodicamente ou sempre que reinicia o seu router, sendo o padrão para a maioria das residências.</p>
+                    </div>
+                </div>
+            </section>
 
-IP Estático: Um endereço que nunca muda. É comum em servidores de empresas ou sites.
+            <!-- WebRTC -->
+            <section class="glossary-card bg-gray-50 dark:bg-secondary-dark p-8 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm">
+                <div class="flex items-start gap-4">
+                    <span class="text-3xl">🛡️</span>
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-3">WebRTC Leak</h2>
+                        <p class="leading-relaxed text-slate-600 dark:text-gray-400">Ocorre quando o seu navegador revela o seu endereço IP real através de canais de áudio/vídeo, mesmo que esteja a utilizar uma VPN para se esconder.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
 
-IP Dinâmico: Um endereço que muda periodicamente (ou sempre que reinicia o router). É o padrão para a maioria das ligações domésticas.
+        <!-- Call to Action -->
+        <div class="mt-20 p-10 bg-gradient-to-br from-accent/20 to-blue-600/5 rounded-[2rem] border border-accent/20 text-center">
+            <h3 class="text-2xl font-bold mb-4 italic">Ficou com dúvidas?</h3>
+            <p class="mb-8 opacity-80">Volte para a ferramenta principal para testar a sua ligação agora mesmo.</p>
+            <a href="index.html" class="bg-accent hover:bg-blue-600 text-white font-extrabold px-10 py-4 rounded-2xl shadow-xl shadow-accent/30 transition-all transform hover:scale-105 active:scale-95 inline-block">
+                Verificar Meu IP Agora
+            </a>
+        </div>
+    </main>
 
-4. ASN (Autonomous System Number)
+    <!-- Rodapé -->
+    <footer class="py-12 text-center text-slate-400 dark:text-gray-500 text-xs border-t border-gray-200 dark:border-gray-800 mt-12 bg-gray-50/50 dark:bg-white/5">
+        <p class="font-bold mb-1 italic tracking-widest uppercase text-[10px]">CheckMyIP.Today</p>
+        <p>&copy; 2024 Portal Educativo de Diagnóstico de Rede.</p>
+    </footer>
 
-Um número único que identifica um "Sistema Autónomo" na Internet. Grandes empresas (Google, Microsoft) e Provedores de Internet (MEO, NOS, Vodafone) possuem o seu próprio ASN para gerir as suas rotas de tráfego.
-
-5. ISP (Internet Service Provider)
-
-É a empresa que lhe fornece acesso à Internet (Provedor de Serviços de Internet). Exemplos comuns em Portugal e Brasil incluem MEO, Vodafone, NOS, Vivo ou Claro.
-
-6. Localização de IP (Geolocalização)
-
-O processo de estimar a localização física de um IP. Nota: Esta localização aponta geralmente para o centro da cidade ou para a sede do provedor, e não para a porta da sua casa, por questões de privacidade.
-
-7. Proxy e VPN
-
-Proxy: Um servidor que atua como intermediário entre o seu computador e a Internet, ocultando o seu IP real.
-
-VPN (Virtual Private Network): Semelhante ao proxy, mas cria um "túnel" encriptado para os seus dados, oferecendo muito mais segurança e privacidade.
-
-8. WebRTC (Web Real-Time Communication)
-
-Uma tecnologia que permite comunicações de áudio e vídeo diretamente no navegador. Por vezes, o WebRTC pode causar o "vazamento" do seu IP real, mesmo que esteja a usar uma VPN.
-
-Este glossário faz parte da missão do CheckMyIP.today de tornar a rede mais transparente e compreensível para todos.
+</body>
+</html>
