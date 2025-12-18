@@ -155,18 +155,35 @@
         </div>
     </main>
 
-    <footer class="py-12 text-center text-slate-400 dark:text-gray-500 text-[10px] md:text-xs border-t border-gray-200 dark:border-gray-800 mt-12 bg-gray-50/50 dark:bg-white/5">
-    <!-- Estes são os novos links que eu adicionei para o seu SEO -->
-    <div class="flex justify-center gap-4 mb-4">
-        <a href="glossary.html" class="hover:text-accent transition-colors">Network Glossary/a>
+  <!-- Substitua o seu <footer> atual por este no index.html -->
+<footer class="py-12 text-center text-slate-400 dark:text-gray-500 text-[10px] md:text-xs border-t border-gray-200 dark:border-gray-800 mt-12 bg-gray-50/50 dark:bg-white/5">
+    <div class="flex justify-center gap-6 mb-4 font-bold uppercase tracking-widest">
+        <a href="glossary.html" id="footer-glossary" class="hover:text-accent transition-colors">Network Glossary</a>
         <span class="opacity-30">|</span>
-        <a href="ipv6-location.html" class="hover:text-accent transition-colors">Why New York (IPv6)</a>
+        <a href="ipv6-location.html" id="footer-location" class="hover:text-accent transition-colors">Why New York?</a>
     </div>
-    
-    <!-- Este é o texto original que você já tinha -->
-    <p class="font-bold mb-1">CheckMyIP.Today</p>
-    <p>&copy; 2024 Professional Network Diagnostics & Information System.</p>
+    <p class="font-bold mb-1 italic">CheckMyIP.Today</p>
+    <p>&copy; 2024 Professional Network Diagnostics.</p>
 </footer>
+
+<!-- No seu <script> de tradução no index.html, adicione estas linhas: -->
+<script>
+// No objeto de traduções (translations), adicione:
+// en: {
+//    ...
+//    "footer-glossary": "Network Glossary",
+//    "footer-location": "Why New York?"
+// },
+// pt: {
+//    ...
+//    "footer-glossary": "Glossário de Rede",
+//    "footer-location": "Por que São Paulo?"
+// }
+
+// E dentro da sua função updateLanguage(), certifique-se de que estes IDs são atualizados:
+// document.getElementById('footer-glossary').innerText = translations[currentLang]['footer-glossary'];
+// document.getElementById('footer-location').innerText = translations[currentLang]['footer-location'];
+</script>
 
     <script>
         const translations = {
