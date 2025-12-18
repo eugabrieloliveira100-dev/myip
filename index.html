@@ -205,6 +205,8 @@
             <a href="glossary.html" id="footer-glossary" class="hover:text-accent transition-colors">Network Glossary</a>
             <span class="opacity-30">|</span>
             <a href="ipv6-location.html" id="footer-ipv6" class="hover:text-accent transition-colors">Why São Paulo?</a>
+            <span class="opacity-30">|</span>
+            <a href="privacy.html" id="footer-privacy" class="hover:text-accent transition-colors">Privacy Policy</a>
         </div>
         <p class="font-bold mb-1 italic">CheckMyIP.Today</p>
         <p>&copy; 2024 Professional Network Diagnostics.</p>
@@ -225,7 +227,10 @@
                 loading: "Querying global records...",
                 country: "Country", city: "City", isp: "Provider", timezone: "Timezone", asn: "ASN",
                 netInfo: "Network Information", orgInfo: "Organization / Entity", regStatus: "Registration Status", contactInfo: "Abuse & Tech Contacts", security: "Security & Flags",
-                footerGlossary: "Network Glossary", footerIpv6: "Why São Paulo?"
+                footerGlossary: "Network Glossary", 
+                footerIpv6: "Why São Paulo?",
+                footerPrivacy: "Privacy Policy",
+                errorMsg: "Data temporarily unavailable"
             },
             pt: {
                 yourIp: "Seu Endereço IP Público",
@@ -240,7 +245,10 @@
                 loading: "Consultando registros globais...",
                 country: "País", city: "Cidade", isp: "Provedor", timezone: "Fuso Horário", asn: "Número ASN",
                 netInfo: "Informações de Rede", orgInfo: "Organização / Entidade", regStatus: "Status do Registro", contactInfo: "Contatos de Abuso e Técnicos", security: "Segurança e Flags",
-                footerGlossary: "Glossário de Rede", footerIpv6: "Por que São Paulo?"
+                footerGlossary: "Glossário de Rede", 
+                footerIpv6: "Por que São Paulo?",
+                footerPrivacy: "Política de Privacidade",
+                errorMsg: "Dados temporariamente indisponíveis"
             }
         };
 
@@ -259,8 +267,12 @@
             document.getElementById('label-prov-info').innerHTML = `<span class="w-1.5 h-4 bg-blue-400 rounded-full"></span> ${t.provInfo}`;
             document.getElementById('whois-btn').innerText = t.lookup;
             document.getElementById('whois-input').placeholder = currentLang === 'pt' ? "Digite o IP para busca profunda..." : "Enter IP for deep lookup...";
+            
+            // Updates do Footer
             document.getElementById('footer-glossary').innerText = t.footerGlossary;
             document.getElementById('footer-ipv6').innerText = t.footerIpv6;
+            document.getElementById('footer-privacy').innerText = t.footerPrivacy;
+
             if (lastGeoData) renderGeoGrid(lastGeoData);
         }
 
@@ -290,10 +302,28 @@
         async function loadGeo(ip) {
             try {
                 const res = await fetch(`https://ipapi.co/${ip}/json/`);
+                if (!res.ok) throw new Error("API Limit reached");
                 lastGeoData = await res.json();
                 renderGeoGrid(lastGeoData);
                 fetchWhois(ip);
-            } catch (e) { console.error(e); }
+            } catch (e) { 
+                console.warn("Geolocation API Error:", e);
+                renderErrorGrid();
+            }
+        }
+
+        function renderErrorGrid() {
+            const t = translations[currentLang];
+            const msg = `<p class="text-[10px] text-red-400 font-bold">${t.errorMsg}</p>`;
+            document.getElementById('geo-grid').innerHTML = `
+                <div class="bg-white dark:bg-secondary-dark p-4 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">${msg}</div>
+                <div class="bg-white dark:bg-secondary-dark p-4 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">${msg}</div>
+                <div class="bg-white dark:bg-secondary-dark p-4 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">${msg}</div>
+                <div class="bg-white dark:bg-secondary-dark p-4 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">${msg}</div>
+            `;
+            document.getElementById('net-grid').innerHTML = `
+                <div class="bg-white dark:bg-secondary-dark p-5 rounded-2xl border border-gray-100 dark:border-gray-800 h-full flex flex-col justify-center shadow-sm">${msg}</div>
+            `;
         }
 
         function renderGeoGrid(d) {
@@ -340,18 +370,20 @@
             try {
                 // Fetch RDAP (WHOIS moderno)
                 const rdapRes = await fetch(`https://rdap.db.ripe.net/ip/${ip}`);
+                if (!rdapRes.ok) throw new Error("RDAP Not Found");
                 const rdap = await rdapRes.json();
                 
-                // Fetch Geo Adicional (para o IP pesquisado)
-                const geoRes = await fetch(`https://ipapi.co/${ip}/json/`);
-                const geo = await geoRes.json();
+                // Fetch Geo Adicional
+                let geo = {};
+                try {
+                    const geoRes = await fetch(`https://ipapi.co/${ip}/json/`);
+                    geo = await geoRes.json();
+                } catch(e) { console.warn("Whois Geo Fallback"); }
 
                 const network = `${rdap.startAddress} - ${rdap.endAddress}`;
-                const handle = rdap.handle || 'N/A';
                 const status = rdap.status ? rdap.status.join(', ').toUpperCase() : 'N/A';
                 const org = rdap.name || 'N/A';
                 
-                // Extração de contatos de abuso (procurando nas entidades)
                 let abuseEmail = 'Not Found';
                 if(rdap.entities) {
                     rdap.entities.forEach(ent => {
@@ -396,7 +428,7 @@ ${entities}
 
                 term.innerHTML = `<pre class="whitespace-pre-wrap">${output}</pre>`;
             } catch (e) {
-                term.innerHTML = `<div class="text-red-500 font-bold">Error: IP not found in global registry (RDAP).</div>`;
+                term.innerHTML = `<div class="text-red-500 font-bold">Error: Connection failed or IP not found in global registry.</div>`;
             }
         }
 
