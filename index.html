@@ -30,7 +30,8 @@
         "IPv6 Detection",
         "Real-time Geolocation",
         "ISP and ASN identification",
-        "VPN and Proxy Security Check"
+        "VPN and Proxy Security Check",
+        "WebRTC Leak Detection"
       ]
     }
     </script>
@@ -62,6 +63,7 @@
         .dark .loader { border: 4px solid rgba(255, 255, 255, 0.1); border-top: 4px solid #3B82F6; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .terminal-box { background-color: #1a1a1a; color: #d1d1d1; font-family: 'Courier New', Courier, monospace; }
+        .webrtc-tag { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; font-weight: bold; }
     </style>
 </head>
 <body class="bg-primary-dark text-gray-100 min-h-screen flex flex-col font-sans p-4 transition-colors duration-300">
@@ -97,11 +99,11 @@
         <div id="ip-card" class="ip-card w-full max-w-2xl p-6 md:p-10 rounded-xl text-center mb-8">
             
             <!-- IP SEARCH TOOL SECTION -->
-            <div id="ip-search-section" class="p-4 rounded-xl border-2 border-dashed mb-8 border-gray-700/50">
+            <div id="ip-search-section" class="p-4 rounded-xl border-2 border-dashed mb-8">
                 <h3 id="search-title" class="text-lg font-semibold mb-4 text-left">IP Lookup Tool</h3>
                 <div class="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-3">
                     <input id="ip-search-input" type="text" placeholder="Ex: 8.8.8.8" 
-                           class="flex-grow p-3 rounded-lg border focus:ring-accent focus:border-accent bg-gray-900 border-gray-700 text-white">
+                           class="flex-grow p-3 rounded-lg border focus:ring-accent focus:border-accent">
                     <button id="ip-search-button" class="px-6 py-3 bg-accent hover:bg-blue-600 text-white font-semibold rounded-lg shadow-md transition-colors">
                         Lookup
                     </button>
@@ -117,7 +119,7 @@
             <div id="ip-container" class="mb-8 flex flex-col space-y-8 w-full">
                 <div id="ipv4-block" class="p-6 rounded-xl border">
                     <div class="flex justify-between items-center mb-4">
-                        <p class="text-lg font-semibold">IPv4</p>
+                        <p id="ipv4-label" class="text-lg font-semibold">IPv4</p>
                         <button id="copy-ipv4-button" class="flex items-center justify-center px-4 py-2 text-sm bg-accent hover:bg-blue-600 text-white font-medium rounded-lg opacity-0 pointer-events-none transition-all" disabled>
                             <span id="copy-ipv4-text">Copy</span>
                         </button>
@@ -129,13 +131,32 @@
 
                 <div id="ipv6-block" class="p-6 rounded-xl border">
                     <div class="flex justify-between items-center mb-4">
-                        <p class="text-lg font-semibold">IPv6</p>
+                        <p id="ipv6-label" class="text-lg font-semibold">IPv6</p>
                         <button id="copy-ipv6-button" class="flex items-center justify-center px-4 py-2 text-sm bg-accent hover:bg-blue-600 text-white font-medium rounded-lg opacity-0 pointer-events-none transition-all" disabled>
                             <span id="copy-ipv6-text">Copy</span>
                         </button>
                     </div>
                     <div id="ipv6-display" class="min-h-[50px] flex flex-col items-center justify-center">
                         <div class="loader"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WebRTC Leak Section -->
+            <div id="webrtc-section" class="mt-8 p-6 rounded-xl border border-dashed text-left">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 id="webrtc-title" class="text-lg font-bold flex items-center">
+                        🔒 WebRTC Leak Test
+                    </h3>
+                    <div id="webrtc-status-badge" class="webrtc-tag bg-gray-600 text-white">Checking...</div>
+                </div>
+                <p id="webrtc-note" class="text-xs mb-4">
+                    WebRTC is a browser feature that can bypass your VPN and leak your real IP. If "Private/Real IP" matches your VPN IP, you are safe.
+                </p>
+                <div id="webrtc-results" class="space-y-2">
+                    <div id="webrtc-result-box" class="flex justify-between items-center text-sm p-2 rounded">
+                        <span id="webrtc-label-local">Private/Real IP:</span>
+                        <span id="webrtc-local-ip" class="font-mono font-bold text-accent">Detecting...</span>
                     </div>
                 </div>
             </div>
@@ -179,7 +200,7 @@
     </main>
 
     <footer class="text-center py-8 text-xs mt-auto">
-        <p id="footer-privacy-text" class="mb-2 opacity-60">Privacy guaranteed: Your data is not stored.</p>
+        <p id="footer-privacy-text" class="mb-2">Privacy guaranteed: Your data is not stored.</p>
         <p>&copy; 2025 IP Checker. | <a href="#" id="privacy-policy-link" class="underline opacity-50 hover:opacity-100">Privacy Policy</a></p>
     </footer>
 
@@ -209,7 +230,13 @@
                 eduTitle: 'Como checar seu IP via Terminal',
                 eduWinDesc: 'Abra o terminal e digite:',
                 eduLinuxDesc: 'Use estes comandos:',
-                eduFooter: 'Nota: Estes mostram o **IP local**. Para o **público**, use: <code class="bg-gray-800 px-1 rounded text-accent">curl ifconfig.me</code>'
+                eduFooter: 'Nota: Estes mostram o **IP local**. Para o **público**, use: <code class="bg-gray-800 px-1 rounded text-accent">curl ifconfig.me</code>',
+                webrtcTitle: '🔒 Teste de Vazamento WebRTC',
+                webrtcNote: 'O WebRTC é uma função do navegador que pode ignorar a sua VPN e revelar o seu IP real. Se o "IP Privado/Real" for igual ao da sua VPN, está seguro.',
+                webrtcLabel: 'IP Privado/Real:',
+                webrtcSafe: 'SEGURO',
+                webrtcLeaking: 'VAZAMENTO DETETADO',
+                webrtcChecking: 'A verificar...'
             },
             EN: {
                 title: 'Full IP Checker',
@@ -235,7 +262,13 @@
                 eduTitle: 'How to check your IP via Terminal',
                 eduWinDesc: 'Open terminal and type:',
                 eduLinuxDesc: 'Use these commands:',
-                eduFooter: 'Note: These show **local IP**. For **public IP**, use: <code class="bg-gray-800 px-1 rounded text-accent">curl ifconfig.me</code>'
+                eduFooter: 'Note: These show **local IP**. For **public IP**, use: <code class="bg-gray-800 px-1 rounded text-accent">curl ifconfig.me</code>',
+                webrtcTitle: '🔒 WebRTC Leak Test',
+                webrtcNote: 'WebRTC is a browser feature that can bypass your VPN and leak your real IP. If "Private/Real IP" matches your VPN IP, you are safe.',
+                webrtcLabel: 'Private/Real IP:',
+                webrtcSafe: 'SAFE',
+                webrtcLeaking: 'LEAK DETECTED',
+                webrtcChecking: 'Checking...'
             }
         };
 
@@ -251,46 +284,126 @@
             const searchSection = document.getElementById('ip-search-section');
             const searchInput = document.getElementById('ip-search-input');
             const warningNote = document.getElementById('geoip-warning-note');
+            const webrtcSection = document.getElementById('webrtc-section');
+            const webrtcNote = document.getElementById('webrtc-note');
+            const webrtcBox = document.getElementById('webrtc-result-box');
+            const footerPriv = document.getElementById('footer-privacy-text');
             
-            // Core themes
             if (isDark) {
                 body.classList.add('bg-primary-dark', 'text-gray-100');
-                body.classList.remove('bg-gray-50', 'text-gray-900', 'dark');
+                body.classList.remove('bg-gray-50', 'text-gray-900');
                 ipCard.className = "ip-card w-full max-w-2xl p-6 md:p-10 rounded-xl text-center mb-8 bg-secondary-dark border border-gray-700 loaded";
-                eduCard.className = "p-6 md:p-8 rounded-xl bg-secondary-dark border border-gray-700 shadow-2xl";
-                searchSection.classList.add('border-gray-700');
+                eduCard.className = "p-6 md:p-8 rounded-xl bg-secondary-dark border border-gray-700 shadow-2xl text-white";
+                searchSection.className = "p-4 rounded-xl border-2 border-dashed mb-8 border-gray-700";
                 searchInput.className = "flex-grow p-3 rounded-lg border bg-gray-900 border-gray-700 text-white focus:ring-accent";
                 warningNote.className = "mt-6 p-4 rounded-xl border-l-4 bg-yellow-900/30 border-yellow-500 text-yellow-100";
+                webrtcSection.className = "mt-8 p-6 rounded-xl border border-dashed border-gray-700 text-left bg-black/10";
+                webrtcNote.className = "text-xs mb-4 text-gray-400";
+                webrtcBox.className = "flex justify-between items-center text-sm p-2 rounded bg-black/20";
+                footerPriv.className = "mb-2 text-gray-500";
                 
-                // Text Colors (Dark Mode)
                 document.getElementById('search-title').className = "text-lg font-semibold mb-4 text-left text-gray-300";
                 document.getElementById('geo-details-title').className = "text-xl md:text-2xl font-semibold mb-1 text-gray-200";
                 document.getElementById('geo-ip-source-display').className = "text-sm italic text-gray-400";
+                document.getElementById('ipv4-label').className = "text-lg font-semibold text-gray-300";
+                document.getElementById('ipv6-label').className = "text-lg font-semibold text-gray-300";
             } else {
                 body.classList.remove('bg-primary-dark', 'text-gray-100');
                 body.classList.add('bg-gray-50', 'text-gray-900');
                 ipCard.className = "ip-card w-full max-w-2xl p-6 md:p-10 rounded-xl text-center mb-8 bg-white border border-gray-200 shadow-xl loaded";
-                eduCard.className = "p-6 md:p-8 rounded-xl bg-white border border-gray-200 shadow-lg";
-                searchSection.classList.remove('border-gray-700');
-                searchSection.classList.add('border-gray-200');
+                eduCard.className = "p-6 md:p-8 rounded-xl bg-white border border-gray-200 shadow-lg text-gray-800";
+                searchSection.className = "p-4 rounded-xl border-2 border-dashed mb-8 border-gray-200";
                 searchInput.className = "flex-grow p-3 rounded-lg border bg-gray-50 border-gray-300 text-gray-900 focus:ring-accent";
-                warningNote.className = "mt-6 p-4 rounded-xl border-l-4 bg-yellow-50 border-yellow-400 text-yellow-800";
+                warningNote.className = "mt-6 p-4 rounded-xl border-l-4 bg-yellow-50 border-yellow-500 text-yellow-900";
+                webrtcSection.className = "mt-8 p-6 rounded-xl border border-dashed border-gray-300 text-left bg-gray-50";
+                webrtcNote.className = "text-xs mb-4 text-gray-600";
+                webrtcBox.className = "flex justify-between items-center text-sm p-2 rounded bg-white shadow-sm border border-gray-200";
+                footerPriv.className = "mb-2 text-gray-600";
                 
-                // Text Colors (Light Mode) - FIXING THE VISIBILITY
                 document.getElementById('search-title').className = "text-lg font-semibold mb-4 text-left text-gray-700";
                 document.getElementById('geo-details-title').className = "text-xl md:text-2xl font-semibold mb-1 text-gray-800";
                 document.getElementById('geo-ip-source-display').className = "text-sm italic text-gray-500";
+                document.getElementById('ipv4-label').className = "text-lg font-semibold text-gray-700";
+                document.getElementById('ipv6-label').className = "text-lg font-semibold text-gray-700";
             }
 
-            // Blocks (IPv4/IPv6)
             ['ipv4-block', 'ipv6-block'].forEach(id => {
                 const el = document.getElementById(id);
-                el.className = isDark ? 'p-6 rounded-xl bg-gray-800 border border-gray-700' : 'p-6 rounded-xl bg-gray-50 border border-gray-200';
+                el.className = isDark ? 'p-6 rounded-xl bg-gray-800 border border-gray-700' : 'p-6 rounded-xl bg-white border border-gray-200 shadow-sm';
             });
 
             document.getElementById('theme-toggle').innerHTML = isDark ? '🌙' : '☀️';
+            document.getElementById('lang-toggle').className = isDark ? 
+                "px-3 py-1 text-sm font-medium rounded-full transition duration-200 shadow-sm border border-gray-700 bg-secondary-dark hover:bg-gray-700 text-white" :
+                "px-3 py-1 text-sm font-medium rounded-full transition duration-200 shadow-sm border border-gray-300 bg-white hover:bg-gray-100 text-gray-800";
+            document.getElementById('theme-toggle').className = isDark ?
+                "px-3 py-1 text-sm font-medium rounded-full transition duration-200 shadow-sm border border-gray-700 bg-secondary-dark hover:bg-gray-700 text-white" :
+                "px-3 py-1 text-sm font-medium rounded-full transition duration-200 shadow-sm border border-gray-300 bg-white hover:bg-gray-100 text-gray-800";
+
             renderGeoDetails(currentGeoData, currentGeoIp);
             updateIpUI();
+        }
+
+        async function checkWebRTCLeak() {
+            const statusBadge = document.getElementById('webrtc-status-badge');
+            const localIpDisplay = document.getElementById('webrtc-local-ip');
+            const foundIps = new Set();
+            
+            try {
+                const pc = new RTCPeerConnection({
+                    iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+                });
+                pc.createDataChannel("");
+                pc.createOffer().then(offer => pc.setLocalDescription(offer));
+                
+                pc.onicecandidate = (ice) => {
+                    if (!ice || !ice.candidate || !ice.candidate.candidate) {
+                        if (foundIps.size === 0) {
+                            localIpDisplay.textContent = "Protected / Not Found";
+                            statusBadge.className = "webrtc-tag bg-green-500 text-white";
+                            statusBadge.textContent = languageMap[currentLang].webrtcSafe;
+                        }
+                        return;
+                    }
+                    
+                    const candidate = ice.candidate.candidate;
+                    const ipMatch = /([0-9]{1,3}(\.[0-9]{1,3}){3})|([a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/.exec(candidate);
+                    
+                    if (ipMatch) {
+                        const ip = ipMatch[0];
+                        foundIps.add(ip);
+                        localIpDisplay.textContent = Array.from(foundIps).join(', ');
+                        
+                        const isLeaking = Array.from(foundIps).some(detected => 
+                            detected !== userIpv4 && 
+                            detected !== userIpv6 && 
+                            !detected.startsWith('192.168.') && 
+                            !detected.startsWith('10.') && 
+                            !detected.startsWith('172.') &&
+                            !detected.startsWith('fe80:')
+                        );
+                        
+                        if (isLeaking) {
+                            statusBadge.className = "webrtc-tag bg-red-600 text-white";
+                            statusBadge.textContent = languageMap[currentLang].webrtcLeaking;
+                        } else {
+                            statusBadge.className = "webrtc-tag bg-green-600 text-white";
+                            statusBadge.textContent = languageMap[currentLang].webrtcSafe;
+                        }
+                    }
+                };
+                
+                setTimeout(() => {
+                    if (foundIps.size === 0) {
+                        localIpDisplay.textContent = "Not Found";
+                        statusBadge.className = "webrtc-tag bg-green-500 text-white";
+                        statusBadge.textContent = languageMap[currentLang].webrtcSafe;
+                    }
+                }, 4000);
+
+            } catch (e) {
+                localIpDisplay.textContent = "Unsupported";
+            }
         }
 
         function updateIpUI() {
@@ -324,6 +437,9 @@
             document.getElementById('search-title').textContent = lang.searchToolTitle;
             document.getElementById('ip-search-input').placeholder = lang.searchPlaceholder;
             document.getElementById('ip-search-button').textContent = lang.searchButton;
+            document.getElementById('webrtc-title').textContent = lang.webrtcTitle;
+            document.getElementById('webrtc-note').textContent = lang.webrtcNote;
+            document.getElementById('webrtc-label-local').textContent = lang.webrtcLabel;
             document.getElementById('geo-details-title').textContent = lang.geoDetailsTitle;
             document.getElementById('geo-warning-title').textContent = lang.geoWarningTitle;
             document.getElementById('geo-warning-text').textContent = lang.geoWarningText;
@@ -333,6 +449,12 @@
             document.getElementById('edu-footer-note').innerHTML = lang.eduFooter;
             document.getElementById('footer-privacy-text').textContent = lang.footerPrivacy;
             document.getElementById('privacy-policy-link').textContent = lang.privacyPolicy;
+            
+            const badge = document.getElementById('webrtc-status-badge');
+            if(badge.textContent.includes('Check') || badge.textContent.includes('verificar')) {
+                badge.textContent = lang.webrtcChecking;
+            }
+
             applyTheme();
         }
 
@@ -356,7 +478,7 @@
             `).join('') + `
                 <div class="col-span-2 p-3 rounded-lg border ${data.isProxy || data.isVpn ? 'border-red-500/30 bg-red-500/10' : 'border-green-500/30 bg-green-500/10'}">
                     <span class="block text-xs font-bold uppercase ${labelColor}">${lang.securityTitle}</span>
-                    <span class="font-bold ${data.isProxy || data.isVpn ? 'text-red-500' : 'text-green-500'}">${data.isProxy || data.isVpn ? lang.detected : lang.isClean}</span>
+                    <span class="font-bold ${data.isProxy || data.isVpn ? 'text-red-500' : 'text-green-600'}">${data.isProxy || data.isVpn ? lang.detected : lang.isClean}</span>
                 </div>
             `;
         }
@@ -373,6 +495,7 @@
                 const geoData = await geoRes.json();
                 renderGeoDetails({ country: geoData.country_name, city: geoData.city, isp: geoData.org, asn: geoData.asn, timezone: geoData.timezone, isProxy: geoData.proxy, isVpn: geoData.vpn }, userIpv4 || userIpv6);
                 updateIpUI();
+                checkWebRTCLeak();
             } catch (e) { console.error(e); }
         }
 
