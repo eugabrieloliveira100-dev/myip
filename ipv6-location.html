@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Por que meu IPv6 mostra São Paulo? - Check My IP Today</title>
+    <meta name="description" content="Entenda por que a geolocalização do seu IPv6 pode indicar São Paulo ou outras capitais em vez da sua cidade real.">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: { 'primary-dark': '#0f172a', 'secondary-dark': '#1e293b', 'accent': '#3b82f6' },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-white text-slate-900 dark:bg-primary-dark dark:text-gray-100 min-h-screen font-sans">
+
+    <header class="w-full max-w-6xl mx-auto px-6 py-8 flex justify-between items-center border-b border-gray-100 dark:border-gray-800">
+        <a href="index.html" class="text-2xl font-extrabold tracking-tight">Check My IP <span class="text-accent italic">Today</span></a>
+        <a href="index.html" class="text-sm font-bold text-accent hover:underline">← Voltar para o Início</a>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-6 py-16">
+        <article class="prose prose-slate dark:prose-invert lg:prose-xl">
+            <h1 class="text-4xl md:text-5xl font-black mb-8 leading-tight">Por Que Seu IPv6 Mostra São Paulo e Não Sua Cidade?</h1>
+            
+            <p class="text-lg opacity-80 mb-8 italic border-l-4 border-accent pl-4">
+                Se você pesquisou seu endereço IPv6 e o resultado foi "São Paulo" (ou outra grande capital), saiba que isso é a norma e não um erro do sistema.
+            </p>
+
+            <div class="space-y-12">
+                <section>
+                    <h2 class="text-2xl font-bold mb-4 flex items-center gap-2 text-accent">
+                        <span class="bg-accent/10 p-2 rounded-lg">01</span>
+                        Centralização do Registro (O Motivo Principal)
+                    </h2>
+                    <p class="mb-4">Os Provedores de Internet (ISPs) gerenciam a infraestrutura de IPv6 de forma diferente do IPv4. Eles recebem blocos gigantescos de endereços e, na maioria das vezes, registram esses blocos em seus <strong>Pontos de Presença (PoP) principais</strong> ou sedes administrativas.</p>
+                    <p>No Brasil, o principal hub de internet e datacenter de quase todos os provedores está em <strong>São Paulo</strong>. A ferramenta de GeoIP vê onde o bloco foi registrado oficialmente, e não necessariamente o cabo físico que entra na sua casa.</p>
+                </section>
+
+                <section>
+                    <h2 class="text-2xl font-bold mb-4 flex items-center gap-2 text-accent">
+                        <span class="bg-accent/10 p-2 rounded-lg">02</span>
+                        A Natureza Colossal do IPv6
+                    </h2>
+                    <p class="mb-4">Existem cerca de $3.4 \times 10^{38}$ endereços IPv6 disponíveis. É um espaço de endereçamento tão vasto que mapear cada pequena sub-rede para uma rua ou bairro específico é um desafio técnico e de privacidade muito maior do que no IPv4.</p>
+                    <ul class="list-disc pl-6 space-y-2 opacity-90">
+                        <li><strong>Privacidade:</strong> O IPv6 incentiva o uso de endereços temporários para evitar rastreamento persistente.</li>
+                        <li><strong>Novidade:</strong> As bases de dados mundiais ainda estão refinando a precisão do mapeamento para esta nova tecnologia.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2 class="text-2xl font-bold mb-4 flex items-center gap-2 text-accent">
+                        <span class="bg-accent/10 p-2 rounded-lg">03</span>
+                        Ponto de Saída do Provedor
+                    </h2>
+                    <p>Muitas vezes, sua conexão viaja pela rede interna da operadora e só "sai" para a internet pública em um grande roteador central. Para o mundo exterior, você parece estar localizado onde esse roteador central está — quase sempre em capitais como São Paulo, Rio de Janeiro ou Brasília.</p>
+                </section>
+            </div>
+
+            <div class="mt-16 p-8 bg-gray-50 dark:bg-secondary-dark rounded-3xl border border-gray-100 dark:border-gray-800">
+                <h3 class="text-xl font-bold mb-4 text-center">Conclusão</h3>
+                <p class="text-center opacity-80">
+                    Não se preocupe com a sua segurança. Essa divergência de localização é uma característica técnica do protocolo e não afeta a velocidade ou a qualidade da sua navegação.
+                </p>
+                <div class="mt-8 text-center">
+                    <a href="index.html" class="inline-block bg-accent hover:bg-blue-600 text-white font-bold px-10 py-4 rounded-2xl transition-all shadow-lg shadow-accent/20">
+                        Verificar meu IP novamente
+                    </a>
+                </div>
+            </div>
+        </article>
+    </main>
+
+    <footer class="py-12 text-center text-slate-400 dark:text-gray-500 text-xs border-t border-gray-200 dark:border-gray-800 mt-12 bg-gray-50/50 dark:bg-white/5">
+        <p class="font-bold mb-1 italic">CheckMyIP.Today</p>
+        <p>&copy; 2024 Educativo: Entendendo a infraestrutura da internet brasileira.</p>
+    </footer>
+
+</body>
+</html>
