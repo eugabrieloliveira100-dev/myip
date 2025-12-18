@@ -9,6 +9,25 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
+    <!-- Script de detecção RAW -->
+    <script>
+        (async function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('raw')) {
+                try {
+                    const res = await fetch('https://api.ipify.org?format=json');
+                    const data = await res.json();
+                    document.open();
+                    document.write(data.ip);
+                    document.close();
+                } catch (e) {
+                    document.write("Error detecting IP");
+                }
+                return;
+            }
+        })();
+    </script>
+
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-CPDBZNF3CT"></script>
     <script>
@@ -43,10 +62,9 @@
         @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
         
         .terminal-box { font-family: 'Fira Code', monospace; border-radius: 12px; transition: all 0.3s; }
-        .terminal-light { background-color: #f8fafc; color: #334155; border: 1px solid #e2e8f0; }
+        .terminal-light { background-color: #f8fafc; color: #1e293b; border: 1px solid #e2e8f0; shadow: inset 0 1px 2px rgba(0,0,0,0.05); }
         .dark .terminal-dark-box { background-color: #0d1117; color: #e6edf3; border: 1px solid #30363d; }
 
-        /* CORREÇÃO DO SELETOR DE IDIOMAS NO HOVER */
         #lang-selector option {
             background-color: white !important;
             color: #1e293b !important;
@@ -55,7 +73,6 @@
             background-color: #1e293b !important;
             color: #f1f5f9 !important;
         }
-        #lang-selector:focus { outline: none; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); }
     </style>
 </head>
 <body class="bg-white text-slate-900 dark:bg-primary-dark dark:text-gray-100 min-h-screen flex flex-col">
@@ -81,7 +98,7 @@
                 <h3 id="label-whois-title" class="text-xl font-bold px-1 flex items-center gap-2 text-slate-800 dark:text-white">
                     <span class="text-accent">🔍</span> Network & Organization Details
                 </h3>
-                <p id="label-whois-desc" class="text-sm text-slate-500 dark:text-gray-400 px-1">Lookup any IP address for detailed ASN, ISP and WHOIS records.</p>
+                <p id="label-whois-desc" class="text-sm text-slate-600 dark:text-slate-300 px-1 font-medium">Lookup any IP address for detailed ASN, ISP and WHOIS records.</p>
             </div>
             
             <div class="flex flex-col md:flex-row gap-3">
@@ -101,31 +118,31 @@
         <!-- CARD DE IP PRINCIPAL -->
         <div class="bg-white dark:bg-secondary-dark rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
             <div class="p-8 md:p-12 text-center border-b border-gray-100 dark:border-gray-800 bg-gradient-to-b from-transparent to-gray-50 dark:to-primary-dark/5">
-                <h2 id="label-your-ip" class="text-sm font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest mb-6">Your Public IP Address</h2>
+                <h2 id="label-your-ip" class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-6">Your Public IP Address</h2>
                 <div id="ipv4-display" class="text-5xl md:text-8xl font-black tracking-tighter text-accent break-all">
                      <div class="h-20 w-64 mx-auto skeleton rounded-2xl"></div>
                 </div>
-                <p class="text-[10px] font-bold text-slate-400 dark:text-gray-500 mt-2 uppercase tracking-widest">IPv4 Protocol</p>
+                <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-2 uppercase tracking-widest">IPv4 Protocol</p>
                 
                 <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800/50 max-w-sm mx-auto">
-                    <div id="ipv6-display" class="text-xs md:text-base font-mono text-slate-600 dark:text-gray-400 break-all font-bold">
+                    <div id="ipv6-display" class="text-xs md:text-base font-mono text-slate-700 dark:text-slate-300 break-all font-bold">
                         <div class="h-5 w-56 mx-auto skeleton rounded mt-2"></div>
                     </div>
-                    <p class="text-[9px] font-bold text-slate-400 dark:text-gray-500 mt-1 uppercase tracking-widest">IPv6 Protocol</p>
+                    <p class="text-[9px] font-bold text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-widest">IPv6 Protocol</p>
                 </div>
             </div>
 
             <!-- GRID DE INFORMAÇÕES -->
             <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8 bg-gray-50/50 dark:bg-primary-dark/20">
                 <div id="geo-details" class="space-y-4">
-                    <h3 id="label-loc-info" class="font-bold flex items-center gap-2 text-sm uppercase text-slate-400 dark:text-gray-500"><span class="w-1.5 h-4 bg-accent rounded-full"></span> Location Info</h3>
+                    <h3 id="label-loc-info" class="font-bold flex items-center gap-2 text-sm uppercase text-slate-500 dark:text-slate-400"><span class="w-1.5 h-4 bg-accent rounded-full"></span> Location Info</h3>
                     <div id="geo-grid" class="grid grid-cols-2 gap-3">
                         <div class="h-12 skeleton rounded-xl"></div><div class="h-12 skeleton rounded-xl"></div>
                         <div class="h-12 skeleton rounded-xl"></div><div class="h-12 skeleton rounded-xl"></div>
                     </div>
                 </div>
                 <div id="network-details" class="space-y-4">
-                    <h3 id="label-prov-info" class="font-bold flex items-center gap-2 text-sm uppercase text-slate-400 dark:text-gray-500"><span class="w-1.5 h-4 bg-blue-400 rounded-full"></span> Provider Info</h3>
+                    <h3 id="label-prov-info" class="font-bold flex items-center gap-2 text-sm uppercase text-slate-500 dark:text-slate-400"><span class="w-1.5 h-4 bg-blue-400 rounded-full"></span> Provider Info</h3>
                     <div id="net-grid" class="space-y-3">
                         <div class="h-28 skeleton rounded-xl"></div>
                     </div>
@@ -133,58 +150,65 @@
             </div>
         </div>
 
-        <!-- GUIDE TERMINAL -->
-        <div class="bg-gray-50 dark:bg-secondary-dark rounded-3xl p-8 space-y-6 border border-gray-100 dark:border-none">
-            <h3 id="label-terminal-title" class="text-lg font-bold flex items-center gap-2 text-slate-800 dark:text-white">💻 Check IP via Terminal</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div class="space-y-2">
-                    <p class="text-[10px] font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest px-1">Linux / macOS / Unix</p>
-                    <div class="terminal-box terminal-light dark:terminal-dark-box p-4 text-xs flex justify-between items-center group">
+        <!-- SEÇÃO TERMINAL (REINTEGRADA) -->
+        <section class="bg-gray-100 dark:bg-secondary-dark rounded-3xl p-8 space-y-6 border border-gray-200 dark:border-none shadow-sm">
+            <h3 id="label-terminal-check" class="text-lg font-bold flex items-center gap-2 text-slate-800 dark:text-white">💻 Check IP via Terminal</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-3">
+                    <p class="text-[10px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-widest px-1">Linux / macOS / Unix</p>
+                    <div class="terminal-box terminal-light dark:terminal-dark-box p-4 text-xs flex justify-between items-center">
                         <code class="font-bold">curl ifconfig.me</code>
                         <button onclick="copyToClipboard('curl ifconfig.me')" class="text-accent font-black px-2 hover:scale-110 transition-transform">Copy</button>
                     </div>
                 </div>
-                <div class="space-y-2">
-                    <p class="text-[10px] font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest px-1">Windows (PowerShell)</p>
-                    <div class="terminal-box terminal-light dark:terminal-dark-box p-4 text-xs flex justify-between items-center group">
+                <div class="space-y-3">
+                    <p class="text-[10px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-widest px-1">Windows (PowerShell)</p>
+                    <div class="terminal-box terminal-light dark:terminal-dark-box p-4 text-xs flex justify-between items-center">
                         <code class="font-bold">curl.exe ifconfig.me</code>
                         <button onclick="copyToClipboard('curl.exe ifconfig.me')" class="text-accent font-black px-2 hover:scale-110 transition-transform">Copy</button>
                     </div>
                 </div>
             </div>
+        </section>
+
+        <!-- GUIDE TERMINAL & RAW WIDGET -->
+        <div class="bg-gray-100 dark:bg-secondary-dark rounded-3xl p-8 space-y-6 border border-gray-200 dark:border-none shadow-sm">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <h3 id="label-terminal-tools" class="text-lg font-bold flex items-center gap-2 text-slate-800 dark:text-white">🛠️ Developer Tools</h3>
+                <div class="bg-accent/20 text-accent dark:bg-accent/10 text-accent text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter">API Lite Enabled</div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="space-y-2">
+                    <p class="text-[10px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-widest px-1">Raw IP Text (For Scripts)</p>
+                    <div class="terminal-box terminal-light dark:terminal-dark-box p-4 text-xs flex justify-between items-center group">
+                        <code class="font-bold">checkmyip.today?raw</code>
+                        <button onclick="copyToClipboard('https://checkmyip.today?raw')" class="text-accent font-black px-2 hover:scale-110 transition-transform">Copy URL</button>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <p class="text-[10px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-widest px-1">Direct CLI Check</p>
+                    <div class="terminal-box terminal-light dark:terminal-dark-box p-4 text-xs flex justify-between items-center group">
+                        <code class="font-bold">curl checkmyip.today?raw</code>
+                        <button onclick="copyToClipboard('curl checkmyip.today?raw')" class="text-accent font-black px-2 hover:scale-110 transition-transform">Copy</button>
+                    </div>
+                </div>
+            </div>
+            <p id="label-raw-desc" class="text-[11px] text-slate-700 dark:text-slate-200 font-medium leading-relaxed">
+                Adding <code class="font-bold bg-gray-200 dark:bg-gray-700 px-1 rounded text-accent">?raw</code> to the URL returns only the IP address as plain text, ideal for automation scripts.
+            </p>
         </div>
     </main>
 
-  <!-- Substitua o seu <footer> atual por este no index.html -->
-<!-- Substitua o seu <footer> atual por este no index.html -->
-<footer class="py-12 text-center text-slate-400 dark:text-gray-500 text-[10px] md:text-xs border-t border-gray-200 dark:border-gray-800 mt-12 bg-gray-50/50 dark:bg-white/5">
-    <div class="flex justify-center gap-6 mb-4 font-bold uppercase tracking-widest">
-        <a href="glossary.html" id="footer-glossary" class="hover:text-accent transition-colors">Network Glossary</a>
-        <span class="opacity-30">|</span>
-        
-    </div>
-    <p class="font-bold mb-1 italic">CheckMyIP.Today</p>
-    <p>&copy; 2024 Professional Network Diagnostics.</p>
-</footer>
-
-<!-- No seu <script> de tradução no index.html, adicione estas linhas: -->
-<script>
-// No objeto de traduções (translations), adicione:
-// en: {
-//    ...
-//    "footer-glossary": "Network Glossary",
-//    "footer-location": "Why New York?"
-// },
-// pt: {
-//    ...
-//    "footer-glossary": "Glossário de Rede",
-//    "footer-location": "Por que São Paulo?"
-// }
-
-// E dentro da sua função updateLanguage(), certifique-se de que estes IDs são atualizados:
-// document.getElementById('footer-glossary').innerText = translations[currentLang]['footer-glossary'];
-// document.getElementById('footer-location').innerText = translations[currentLang]['footer-location'];
-</script>
+    <footer class="py-12 text-center text-slate-500 dark:text-slate-400 text-[10px] md:text-xs border-t border-gray-200 dark:border-gray-800 mt-12 bg-gray-50/50 dark:bg-white/5">
+        <div class="flex justify-center gap-6 mb-4 font-bold uppercase tracking-widest">
+            <a href="glossary.html" id="footer-glossary" class="hover:text-accent transition-colors">Network Glossary</a>
+            <span class="opacity-30">|</span>
+            <a href="ipv6-location.html" id="footer-ipv6" class="hover:text-accent transition-colors">Why São Paulo?</a>
+        </div>
+        <p class="font-bold mb-1 italic">CheckMyIP.Today</p>
+        <p>&copy; 2024 Professional Network Diagnostics.</p>
+    </footer>
 
     <script>
         const translations = {
@@ -194,11 +218,14 @@
                 whoisDesc: "Lookup any IP address for detailed ASN, ISP and WHOIS records.",
                 locInfo: "Location Info",
                 provInfo: "Provider Info",
-                terminalTitle: "Check IP via Terminal",
+                terminalCheck: "Check IP via Terminal",
+                terminalTools: "Developer Tools",
+                rawDesc: "Adding <code class='font-bold bg-gray-200 dark:bg-gray-700 px-1 rounded text-accent'>?raw</code> to the URL returns only the IP address as plain text, ideal for automation scripts.",
                 lookup: "Lookup",
                 loading: "Querying global records...",
                 country: "Country", city: "City", isp: "Provider", timezone: "Timezone", asn: "ASN",
-                netInfo: "Network Information", orgInfo: "Organization / Entity", regStatus: "Registration Status", contactInfo: "Contact Information"
+                netInfo: "Network Information", orgInfo: "Organization / Entity", regStatus: "Registration Status", contactInfo: "Contact Information",
+                footerGlossary: "Network Glossary", footerIpv6: "Why São Paulo?"
             },
             pt: {
                 yourIp: "Seu Endereço IP Público",
@@ -206,11 +233,14 @@
                 whoisDesc: "Consulte qualquer endereço IP para obter registros detalhados de ASN, ISP e WHOIS.",
                 locInfo: "Informações de Localização",
                 provInfo: "Informações do Provedor",
-                terminalTitle: "Verificar IP via Terminal",
+                terminalCheck: "Verificar IP via Terminal",
+                terminalTools: "Ferramentas para Desenvolvedores",
+                rawDesc: "Adicionar <code class='font-bold bg-gray-200 dark:bg-gray-700 px-1 rounded text-accent'>?raw</code> à URL retorna apenas o endereço IP em texto puro, ideal para scripts de automação.",
                 lookup: "Consultar",
                 loading: "Consultando registros globais...",
                 country: "País", city: "Cidade", isp: "Provedor", timezone: "Fuso Horário", asn: "Número ASN",
-                netInfo: "Informações de Rede", orgInfo: "Organização / Entidade", regStatus: "Status do Registro", contactInfo: "Informações de Contato"
+                netInfo: "Informações de Rede", orgInfo: "Organização / Entidade", regStatus: "Status do Registro", contactInfo: "Informações de Contato",
+                footerGlossary: "Glossário de Rede", footerIpv6: "Por que São Paulo?"
             }
         };
 
@@ -222,11 +252,15 @@
             document.getElementById('label-your-ip').innerText = t.yourIp;
             document.getElementById('label-whois-title').innerHTML = `<span class="text-accent">🔍</span> ${t.whoisTitle}`;
             document.getElementById('label-whois-desc').innerText = t.whoisDesc;
-            document.getElementById('label-terminal-title').innerText = `💻 ${t.terminalTitle}`;
+            document.getElementById('label-terminal-check').innerText = `💻 ${t.terminalCheck}`;
+            document.getElementById('label-terminal-tools').innerText = `🛠️ ${t.terminalTools}`;
+            document.getElementById('label-raw-desc').innerHTML = t.rawDesc;
             document.getElementById('label-loc-info').innerHTML = `<span class="w-1.5 h-4 bg-accent rounded-full"></span> ${t.locInfo}`;
             document.getElementById('label-prov-info').innerHTML = `<span class="w-1.5 h-4 bg-blue-400 rounded-full"></span> ${t.provInfo}`;
             document.getElementById('whois-btn').innerText = t.lookup;
             document.getElementById('whois-input').placeholder = currentLang === 'pt' ? "Digite o IP para busca profunda..." : "Enter IP for deep lookup...";
+            document.getElementById('footer-glossary').innerText = t.footerGlossary;
+            document.getElementById('footer-ipv6').innerText = t.footerIpv6;
             if (lastGeoData) renderGeoGrid(lastGeoData);
         }
 
@@ -266,19 +300,19 @@
             const t = translations[currentLang];
             document.getElementById('geo-grid').innerHTML = `
                 <div class="bg-white dark:bg-secondary-dark p-4 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">
-                    <p class="text-[9px] text-slate-400 dark:text-gray-500 font-bold uppercase tracking-widest mb-1">${t.country}</p>
+                    <p class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-1">${t.country}</p>
                     <p class="font-bold text-sm truncate text-slate-800 dark:text-gray-200">${d.country_name || 'N/A'}</p>
                 </div>
                 <div class="bg-white dark:bg-secondary-dark p-4 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">
-                    <p class="text-[9px] text-slate-400 dark:text-gray-500 font-bold uppercase tracking-widest mb-1">${t.city}</p>
+                    <p class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-1">${t.city}</p>
                     <p class="font-bold text-sm truncate text-slate-800 dark:text-gray-200">${d.city || 'N/A'}</p>
                 </div>
                 <div class="bg-white dark:bg-secondary-dark p-4 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">
-                    <p class="text-[9px] text-slate-400 dark:text-gray-500 font-bold uppercase tracking-widest mb-1">${t.timezone}</p>
+                    <p class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-1">${t.timezone}</p>
                     <p class="font-bold text-[10px] truncate text-slate-800 dark:text-gray-200">${d.timezone || 'N/A'}</p>
                 </div>
                 <div class="bg-white dark:bg-secondary-dark p-4 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">
-                    <p class="text-[9px] text-slate-400 dark:text-gray-500 font-bold uppercase tracking-widest mb-1">LAT/LONG</p>
+                    <p class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-1">LAT/LONG</p>
                     <p class="font-bold text-[10px] text-slate-800 dark:text-gray-200">${d.latitude}, ${d.longitude}</p>
                 </div>
             `;
@@ -286,11 +320,11 @@
             document.getElementById('net-grid').innerHTML = `
                 <div class="bg-white dark:bg-secondary-dark p-5 rounded-2xl border border-gray-100 dark:border-gray-800 h-full flex flex-col justify-center shadow-sm">
                     <div>
-                        <p class="text-[9px] text-slate-400 dark:text-gray-500 font-bold uppercase tracking-widest mb-1">${t.isp}</p>
+                        <p class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-1">${t.isp}</p>
                         <p class="font-bold text-base text-accent leading-tight">${d.org || 'N/A'}</p>
                     </div>
                     <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
-                        <p class="text-[9px] text-slate-400 dark:text-gray-500 font-bold uppercase tracking-widest mb-1">${t.asn}</p>
+                        <p class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-1">${t.asn}</p>
                         <p class="font-mono text-xs font-bold text-slate-700 dark:text-gray-300">${d.asn || 'N/A'}</p>
                     </div>
                 </div>
@@ -301,20 +335,16 @@
             const term = document.getElementById('whois-terminal');
             const t = translations[currentLang];
             term.classList.remove('hidden');
-            term.innerHTML = `<div class="flex items-center gap-2"><div class="h-2 w-2 bg-accent rounded-full animate-ping"></div> ${t.loading}</div>`;
+            term.innerHTML = `<div class="flex items-center gap-2 text-slate-700 dark:text-slate-200 font-bold"><div class="h-2 w-2 bg-accent rounded-full animate-ping"></div> ${t.loading}</div>`;
             
             try {
-                // RDAP provides more structured data than legacy Whois
                 const res = await fetch(`https://rdap.db.ripe.net/ip/${ip}`);
                 const data = await res.json();
                 
-                // Extracting structured sections
                 const network = `${data.startAddress} - ${data.endAddress}`;
                 const handle = data.handle || 'N/A';
                 const status = data.status ? data.status.join(', ').toUpperCase() : 'N/A';
                 const org = data.name || 'N/A';
-                
-                // Entities (Contacts)
                 const entities = data.entities ? data.entities.map(e => `[${e.roles?.join('/') || 'ENTITY'}] ${e.handle}`).join('\n') : 'No contacts listed';
 
                 const output = `
@@ -345,7 +375,7 @@ ${entities}
 
                 term.innerHTML = `<pre class="whitespace-pre-wrap">${output}</pre>`;
             } catch (e) {
-                term.innerHTML = `<div class="text-red-500 font-bold">Error: Unable to fetch deep whois records for ${ip}. The IP might be private or the database is unreachable.</div>`;
+                term.innerHTML = `<div class="text-red-500 font-bold">Error: Unable to fetch records.</div>`;
             }
         }
 
