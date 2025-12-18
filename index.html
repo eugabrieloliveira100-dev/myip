@@ -82,6 +82,11 @@
         .copy-btn {
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
         }
+        .terminal-box {
+            background-color: #1a1a1a;
+            color: #d1d1d1;
+            font-family: 'Courier New', Courier, monospace;
+        }
     </style>
 </head>
 <body class="bg-primary-dark text-gray-100 min-h-screen flex flex-col font-sans p-4">
@@ -113,33 +118,33 @@
     </header>
 
     <!-- Main Content -->
-    <main class="flex-grow flex justify-center py-8">
-        <div id="ip-card" class="ip-card w-full max-w-2xl p-6 md:p-10 rounded-xl text-center">
+    <main class="flex-grow flex flex-col items-center py-8">
+        <div id="ip-card" class="ip-card w-full max-w-2xl p-6 md:p-10 rounded-xl text-center mb-8">
             
             <!-- IP SEARCH TOOL SECTION -->
             <div id="ip-search-section" class="p-4 rounded-xl border-2 border-dashed mb-8">
-                <h3 id="search-title" class="text-lg font-semibold mb-4 text-left">IP Lookup Tool</h3>
+                <h3 id="search-title" class="text-lg font-semibold mb-4 text-left text-gray-300">IP Lookup Tool</h3>
                 <div class="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-3">
                     <input id="ip-search-input" type="text" placeholder="Ex: 8.8.8.8 or 2001:4860:4860::8888" 
-                           class="flex-grow p-3 rounded-lg border focus:ring-accent focus:border-accent"
+                           class="flex-grow p-3 rounded-lg border focus:ring-accent focus:border-accent bg-gray-900 border-gray-700 text-white"
                            aria-label="Enter an IP address to lookup">
                     <button id="ip-search-button" 
                             class="px-6 py-3 bg-accent hover:bg-blue-600 text-white font-semibold rounded-lg shadow-md transition-colors duration-200">
                         Lookup
                     </button>
                 </div>
-                <p id="search-message" class="text-sm mt-3 text-left hidden"></p>
+                <p id="search-message" class="text-sm mt-3 text-left hidden text-gray-400"></p>
             </div>
 
 
-            <h2 id="detected-ip-title" class="text-xl md:text-2xl font-semibold mb-8 pt-4 border-t">
+            <h2 id="detected-ip-title" class="text-xl md:text-2xl font-semibold mb-8 pt-4 border-t border-gray-700">
                 Your Detected IP Address
             </h2>
 
             <!-- IP Container -->
             <div id="ip-container" class="mb-8 flex flex-col space-y-8 w-full">
                 
-                <div id="ipv4-block" class="p-6 rounded-xl">
+                <div id="ipv4-block" class="p-6 rounded-xl bg-gray-800 border border-gray-700">
                     <div class="flex justify-between items-center mb-4">
                         <p class="text-lg font-semibold">IPv4</p>
                         <button id="copy-ipv4-button" class="copy-btn flex items-center justify-center px-4 py-2 text-sm bg-accent hover:bg-blue-600 text-white font-medium rounded-lg shadow-md transition-all duration-200 opacity-0 pointer-events-none" disabled>
@@ -149,11 +154,11 @@
                     </div>
                     <div id="ipv4-display" class="min-h-[50px] flex flex-col items-center justify-center text-center">
                         <div class="loader" role="status" aria-label="Loading IPv4"></div>
-                        <p id="ipv4-status" class="mt-2 text-sm">Detecting...</p>
+                        <p id="ipv4-status" class="mt-2 text-sm text-gray-500">Detecting...</p>
                     </div>
                 </div>
 
-                <div id="ipv6-block" class="p-6 rounded-xl">
+                <div id="ipv6-block" class="p-6 rounded-xl bg-gray-800 border border-gray-700">
                     <div class="flex justify-between items-center mb-4">
                         <p class="text-lg font-semibold">IPv6</p>
                         <button id="copy-ipv6-button" class="copy-btn flex items-center justify-center px-4 py-2 text-sm bg-accent hover:bg-blue-600 text-white font-medium rounded-lg shadow-md transition-all duration-200 opacity-0 pointer-events-none" disabled>
@@ -163,15 +168,15 @@
                     </div>
                     <div id="ipv6-display" class="min-h-[50px] flex flex-col items-center justify-center text-center">
                         <div class="loader" role="status" aria-label="Loading IPv6"></div>
-                        <p id="ipv6-status" class="mt-2 text-sm">Detecting...</p>
+                        <p id="ipv6-status" class="mt-2 text-sm text-gray-500">Detecting...</p>
                     </div>
                 </div>
 
             </div>
 
-            <div id="context-info-card" class="mt-8 pt-6 border-t text-left">
+            <div id="context-info-card" class="mt-8 pt-6 border-t border-gray-700 text-left">
                 <div class="mb-4">
-                    <h2 id="geo-details-title" class="text-xl md:text-2xl font-semibold mb-1">
+                    <h2 id="geo-details-title" class="text-xl md:text-2xl font-semibold mb-1 text-gray-300">
                         Geolocation Details
                     </h2>
                     <p id="geo-ip-source-display" class="text-sm italic text-gray-400">
@@ -185,20 +190,57 @@
                 </div>
             </div>
             
-            <div id="geoip-warning-note" class="mt-6 p-4 rounded-xl border-l-4">
+            <div id="geoip-warning-note" class="mt-6 p-4 rounded-xl border-l-4 bg-yellow-900/30 border-yellow-500 text-yellow-100">
                 <h3 id="geo-warning-title" class="text-base font-semibold mb-1"></h3>
-                <p id="geo-warning-text" class="text-sm"></p>
+                <p id="geo-warning-text" class="text-sm text-yellow-200/90"></p>
             </div>
+        </div>
 
+        <!-- NEW EDUCATIONAL SECTION -->
+        <div class="w-full max-w-2xl mt-4 px-4">
+            <div class="p-6 md:p-8 rounded-xl bg-secondary-dark border border-gray-700/50 shadow-2xl">
+                <h2 id="edu-section-title" class="text-2xl font-bold mb-6 text-accent">How to check your IP via Terminal</h2>
+                
+                <div class="space-y-6">
+                    <!-- Windows -->
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2 flex items-center">
+                            <span class="mr-2">🪟</span> Windows (Command Prompt / PowerShell)
+                        </h3>
+                        <p id="edu-win-desc" class="text-gray-400 text-sm mb-2">Open the terminal and type the following command to see your network adapters:</p>
+                        <div class="terminal-box p-3 rounded-lg text-sm mb-1 select-all">
+                            ipconfig
+                        </div>
+                    </div>
+
+                    <!-- Linux/Mac -->
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2 flex items-center">
+                            <span class="mr-2">🐧</span> Linux / <span class="ml-1 mr-2">🍎</span> macOS
+                        </h3>
+                        <p id="edu-linux-desc" class="text-gray-400 text-sm mb-2">Use these commands to list your network interfaces and addresses:</p>
+                        <div class="terminal-box p-3 rounded-lg text-sm mb-1 select-all">
+                            ip a <span class="text-gray-600"># Modern Linux</span>
+                        </div>
+                        <div class="terminal-box p-3 rounded-lg text-sm select-all">
+                            ifconfig <span class="text-gray-600"># macOS & Legacy Linux</span>
+                        </div>
+                    </div>
+
+                    <p id="edu-footer-note" class="text-xs text-gray-500 italic mt-4">
+                        Note: Terminal commands usually show your **local (private) IP**. To see your **public IP** via terminal, use: <code class="bg-gray-800 px-1 rounded">curl ifconfig.me</code>
+                    </p>
+                </div>
+            </div>
         </div>
     </main>
 
     <!-- Footer -->
     <footer class="text-center py-4 text-xs mt-auto">
-        <div class="h-10 rounded-lg flex items-center justify-center mb-4 max-w-xl mx-auto">
-            <p id="footer-privacy-text" class="text-sm italic">Privacy guaranteed: Your data is not stored.</p>
+        <div class="h-10 rounded-lg flex items-center justify-center mb-4 max-w-xl mx-auto bg-gray-800/30 border border-gray-700/50">
+            <p id="footer-privacy-text" class="text-sm italic text-gray-500">Privacy guaranteed: Your data is not stored.</p>
         </div>
-        &copy; 2025 IP Checker. | <a href="#" id="privacy-policy-link" class="hover:text-gray-300">Privacy Policy</a>
+        &copy; 2025 IP Checker. | <a href="#" id="privacy-policy-link" class="hover:text-gray-300 text-gray-700">Privacy Policy</a>
     </footer>
 
     <script>
@@ -248,6 +290,10 @@
                 privacyPolicy: 'Política de Privacidade',
                 geoWarningTitle: '⚠️ Nota sobre a Precisão da Geolocalização',
                 geoWarningText: 'A precisão da geolocalização por IP é uma estimativa. Endereços **IPv6** frequentemente apontam para o PoP (Ponto de Presença) principal do provedor (ex: São Paulo), e não para sua localização exata. Seu IPv4 é geralmente mais preciso.',
+                eduTitle: 'Como checar seu IP via Terminal',
+                eduWinDesc: 'Abra o terminal e digite o comando abaixo para ver seus adaptadores de rede:',
+                eduLinuxDesc: 'Use estes comandos para listar suas interfaces e endereços:',
+                eduFooter: 'Nota: Comandos de terminal geralmente mostram seu **IP local (privado)**. Para ver seu **IP público**, use: curl ifconfig.me'
             },
             EN: {
                 title: 'Full IP Checker',
@@ -294,6 +340,10 @@
                 privacyPolicy: 'Privacy Policy',
                 geoWarningTitle: '⚠️ Geolocation Accuracy Note',
                 geoWarningText: 'IP geolocation accuracy is an estimate. **IPv6** addresses frequently point to the provider’s main PoP (Point of Presence) (e.g., New York), not your exact physical location. Your IPv4 is generally more precise.',
+                eduTitle: 'How to check your IP via Terminal',
+                eduWinDesc: 'Open the terminal and type the following command to see your network adapters:',
+                eduLinuxDesc: 'Use these commands to list your network interfaces and addresses:',
+                eduFooter: 'Note: Terminal commands usually show your **local (private) IP**. To see your **public IP** via terminal, use: curl ifconfig.me'
             }
         };
 
@@ -367,109 +417,30 @@
             const ipv4Display = document.getElementById('ipv4-display');
             const copyIpv4Button = document.getElementById('copy-ipv4-button');
             const copyIpv4Text = document.getElementById('copy-ipv4-text');
-            const ipv4StatusText = document.getElementById('ipv4-status');
-            const ipv4Block = document.getElementById('ipv4-block');
             const ipv6Display = document.getElementById('ipv6-display');
             const copyIpv6Button = document.getElementById('copy-ipv6-button');
             const copyIpv6Text = document.getElementById('copy-ipv6-text');
-            const ipv6StatusText = document.getElementById('ipv6-status');
-            const ipv6Block = document.getElementById('ipv6-block');
             const geoDisplay = document.getElementById('geo-display');
-            const geoStatusLoadingText = document.getElementById('geo-status-loading');
-            const contextInfoCard = document.getElementById('context-info-card');
             const geoIpSourceDisplay = document.getElementById('geo-ip-source-display');
-            const geoDetailsTitle = document.getElementById('geo-details-title');
-            const geoWarningNote = document.getElementById('geoip-warning-note');
-            const geoWarningTitle = document.getElementById('geo-warning-title');
-            const geoWarningText = document.getElementById('geo-warning-text');
             const body = document.body;
             const mainTitle = document.getElementById('main-title');
             const detectedIpTitle = document.getElementById('detected-ip-title');
             const footerPrivacyText = document.getElementById('footer-privacy-text');
             const privacyPolicyLink = document.getElementById('privacy-policy-link');
-            const footerContainer = document.querySelector('footer > div');
             const copyAllIcon = document.getElementById('copy-all-icon');
             const ipSearchInput = document.getElementById('ip-search-input');
             const ipSearchButton = document.getElementById('ip-search-button');
-            const ipSearchSection = document.getElementById('ip-search-section');
             const searchMessage = document.getElementById('search-message');
 
             const copyIconSvg = `<path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />`;
             const checkIconSvg = `<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />`;
 
-            function applyThemeClasses(element, role) {
-                const darkClasses = {
-                    body: 'bg-primary-dark text-gray-100',
-                    card: 'bg-secondary-dark border border-gray-700/50 shadow-2xl',
-                    innerBlock: 'bg-gray-800 border border-gray-700 transition-shadow hover:shadow-lg',
-                    geoCard: 'bg-gray-700/50',
-                    footerBox: 'bg-gray-800/30 border border-gray-700/50',
-                    toggleButton: 'bg-gray-700 hover:bg-gray-600 text-gray-100 border border-gray-600',
-                    title: 'text-white',
-                    subtitle: 'text-gray-300',
-                    text: 'text-gray-100',
-                    statusText: 'text-gray-500',
-                    statusLoading: 'text-gray-400',
-                    footerText: 'text-gray-500',
-                    link: 'hover:text-gray-300',
-                    border: 'border-gray-700',
-                    searchBorder: 'border-gray-700/50',
-                    searchInput: 'bg-gray-900 border-gray-700 text-white placeholder-gray-500',
-                    searchMessage: 'text-gray-300',
-                    geoWarningNote: 'bg-yellow-900/30 border-yellow-500 text-yellow-100', 
-                    geoWarningText: 'text-yellow-200/90',
-                    geoWarningTitle: 'text-yellow-100'
-                };
-                const lightClasses = {
-                    body: 'bg-gray-100 text-gray-900',
-                    card: 'bg-white border border-gray-300 shadow-xl',
-                    innerBlock: 'bg-gray-200 border border-gray-300 transition-shadow hover:shadow-md',
-                    geoCard: 'bg-gray-300',
-                    footerBox: 'bg-gray-300/50 border border-gray-300',
-                    toggleButton: 'bg-white hover:bg-gray-100 text-gray-800 border border-gray-300',
-                    title: 'text-gray-900',
-                    subtitle: 'text-gray-700',
-                    text: 'text-gray-900',
-                    statusText: 'text-gray-600',
-                    statusLoading: 'text-gray-500',
-                    footerText: 'text-gray-700',
-                    link: 'hover:text-gray-700',
-                    border: 'border-gray-300',
-                    searchBorder: 'border-gray-300',
-                    searchInput: 'bg-white border-gray-300 text-gray-900 placeholder-gray-400',
-                    searchMessage: 'text-gray-700',
-                    geoWarningNote: 'bg-yellow-100 border-yellow-600 text-yellow-800',
-                    geoWarningText: 'text-yellow-800',
-                    geoWarningTitle: 'text-yellow-900'
-                };
-                const classes = currentTheme === 'dark' ? darkClasses : lightClasses;
-                element.className = element.className.split(' ').filter(c => !Object.values(darkClasses).join(' ').includes(c) && !Object.values(lightClasses).join(' ').includes(c)).join(' ');
-                element.classList.add(...classes[role].split(' '));
-            }
-
             function applyTheme() {
-                applyThemeClasses(body, 'body');
-                applyThemeClasses(ipCard, 'card');
-                applyThemeClasses(ipv4Block, 'innerBlock');
-                applyThemeClasses(ipv6Block, 'innerBlock');
-                applyThemeClasses(ipSearchSection, 'searchBorder');
-                applyThemeClasses(ipSearchInput, 'searchInput');
-                applyThemeClasses(searchMessage, 'searchMessage');
-                applyThemeClasses(geoWarningNote, 'geoWarningNote');
-                applyThemeClasses(geoWarningTitle, 'geoWarningTitle');
-                applyThemeClasses(geoWarningText, 'geoWarningText');
-                applyThemeClasses(contextInfoCard, 'border');
-                applyThemeClasses(mainTitle, 'title');
-                applyThemeClasses(detectedIpTitle, 'subtitle');
-                applyThemeClasses(document.getElementById('search-title'), 'subtitle');
-                applyThemeClasses(geoDetailsTitle, 'subtitle');
-                applyThemeClasses(geoIpSourceDisplay, 'statusLoading');
-                applyThemeClasses(footerContainer, 'footerBox');
-                applyThemeClasses(footerPrivacyText, 'footerText');
-                applyThemeClasses(privacyPolicyLink, 'link');
-                applyThemeClasses(langToggleButton, 'toggleButton');
-                applyThemeClasses(themeToggleButton, 'toggleButton');
-                themeToggleButton.innerHTML = currentTheme === 'dark' ? '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.041A6.99 6.99 0 0110 2a8 8 0 000 16 7.99 7.99 0 007.293-4.959z" /></svg>' : '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 14.95a1 1 0 101.414 1.414l.707-.707a1 1 0 00-1.414-1.414l-.707.707zm1.414-8.486l-.707-.707a1 1 0 011.414-1.414l.707.707a1 1 0 01-1.414 1.414zM3 11a1 1 0 100-2H2a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>';
+                const isDark = currentTheme === 'dark';
+                body.className = isDark ? 'bg-primary-dark text-gray-100 min-h-screen flex flex-col font-sans p-4' : 'bg-gray-100 text-gray-900 min-h-screen flex flex-col font-sans p-4';
+                
+                themeToggleButton.innerHTML = isDark ? '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.041A6.99 6.99 0 0110 2a8 8 0 000 16 7.99 7.99 0 007.293-4.959z" /></svg>' : '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 14.95a1 1 0 101.414 1.414l.707-.707a1 1 0 00-1.414-1.414l-.707.707zm1.414-8.486l-.707-.707a1 1 0 011.414-1.414l.707.707a1 1 0 01-1.414 1.414zM3 11a1 1 0 100-2H2a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>';
+                
                 updateIpBlock(userIpv4, ipv4Display, copyIpv4Button, copyIpv4Text, languageMap[currentLang].copy, 'text-3xl md:text-5xl');
                 updateIpBlock(userIpv6, ipv6Display, copyIpv6Button, copyIpv6Text, languageMap[currentLang].copy, 'text-xl md:text-3xl');
                 renderGeoDetails(currentGeoData, currentGeoIp);
@@ -486,11 +457,18 @@
                 document.getElementById('search-title').textContent = lang.searchToolTitle;
                 ipSearchInput.placeholder = lang.searchPlaceholder;
                 ipSearchButton.textContent = lang.searchButton;
-                geoDetailsTitle.textContent = lang.geoDetailsTitle;
-                geoWarningTitle.textContent = lang.geoWarningTitle;
-                geoWarningText.textContent = lang.geoWarningText;
+                document.getElementById('geo-details-title').textContent = lang.geoDetailsTitle;
+                document.getElementById('geo-warning-title').textContent = lang.geoWarningTitle;
+                document.getElementById('geo-warning-text').textContent = lang.geoWarningText;
                 footerPrivacyText.textContent = lang.footerPrivacy;
                 privacyPolicyLink.textContent = lang.privacyPolicy;
+                
+                // Trans Educational
+                document.getElementById('edu-section-title').textContent = lang.eduTitle;
+                document.getElementById('edu-win-desc').textContent = lang.eduWinDesc;
+                document.getElementById('edu-linux-desc').textContent = lang.eduLinuxDesc;
+                document.getElementById('edu-footer-note').innerHTML = lang.eduFooter;
+
                 applyTheme();
             }
             
@@ -557,10 +535,10 @@
                 }
                 const isRisky = data.isProxy || data.isVpn || data.isTor;
                 geoDisplay.innerHTML = `
-                    <div class="grid grid-cols-2 gap-4 text-sm md:text-base">
-                        ${['country', 'city', 'timezone', 'asn', 'isp'].map(k => `<div class="col-span-2 flex flex-col p-3 ${currentTheme === 'dark' ? 'bg-gray-700/50' : 'bg-gray-300'} rounded-lg"><span class="font-medium opacity-70">${lang[k]}</span><span class="font-extrabold">${data[k] || 'N/A'}</span></div>`).join('')}
+                    <div class="grid grid-cols-2 gap-4 text-sm md:text-base w-full">
+                        ${['country', 'city', 'timezone', 'asn', 'isp'].map(k => `<div class="col-span-2 flex flex-col p-3 ${currentTheme === 'dark' ? 'bg-gray-700/50' : 'bg-gray-200'} rounded-lg"><span class="font-medium opacity-70">${lang[k]}</span><span class="font-extrabold">${data[k] || 'N/A'}</span></div>`).join('')}
                     </div>
-                    <div class="mt-8 p-4 rounded-lg border ${isRisky ? 'border-red-500/50 bg-red-900/10' : 'border-green-500/50 bg-green-900/10'}">
+                    <div class="mt-8 p-4 rounded-lg border w-full ${isRisky ? 'border-red-500/50 bg-red-900/10' : 'border-green-500/50 bg-green-900/10'}">
                         <h3 class="font-bold mb-2">${lang.securityTitle}</h3>
                         <p>${isRisky ? lang.detected : lang.isClean}</p>
                     </div>
