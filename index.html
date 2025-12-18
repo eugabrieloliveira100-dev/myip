@@ -84,12 +84,15 @@
             </div>
         </div>
         
-        <div class="absolute top-4 right-4 md:top-6 md:right-6 flex space-x-2">
-            <button id="lang-toggle" class="px-3 py-1 text-sm font-medium rounded-full transition duration-200 shadow-sm border border-gray-700 bg-secondary-dark hover:bg-gray-700 text-white">
-                EN / PT
-            </button>
+        <div class="absolute top-4 right-4 md:top-6 md:right-6 flex flex-wrap justify-end gap-2">
+            <select id="lang-selector" class="px-3 py-1 text-sm font-medium rounded-full transition duration-200 shadow-sm border border-gray-700 bg-secondary-dark text-white outline-none cursor-pointer">
+                <option value="EN">English</option>
+                <option value="PT">Português</option>
+                <option value="ID">Indonesia</option>
+                <option value="VN">Tiếng Việt</option>
+            </select>
             <button id="theme-toggle" class="px-3 py-1 text-sm font-medium rounded-full transition duration-200 shadow-sm border border-gray-700 bg-secondary-dark hover:bg-gray-700 text-white">
-                <!-- Icon -->
+                🌙
             </button>
         </div>
     </header>
@@ -166,7 +169,7 @@
                     <h2 id="geo-details-title" class="text-xl md:text-2xl font-semibold mb-1">Geolocation Details</h2>
                     <p id="geo-ip-source-display" class="text-sm italic">Querying details...</p>
                 </div>
-                <div id="geo-display" class="flex flex-col items-center justify-center h-24">
+                <div id="geo-display" class="flex flex-col items-center justify-center min-h-[100px]">
                     <div class="loader mb-2"></div>
                 </div>
             </div>
@@ -269,6 +272,70 @@
                 webrtcSafe: 'SAFE',
                 webrtcLeaking: 'LEAK DETECTED',
                 webrtcChecking: 'Checking...'
+            },
+            ID: {
+                title: 'Pemeriksa IP Lengkap',
+                detectedIpTitle: 'Alamat IP Anda Terdeteksi',
+                geoDetailsTitle: 'Detail Geolokasi',
+                searchToolTitle: 'Alat Pencarian IP',
+                searchPlaceholder: 'Contoh: 8.8.8.8',
+                searchButton: 'Cari',
+                copy: 'Salin',
+                copied: 'Tersalin!',
+                notDetected: 'Tidak Terdeteksi',
+                copyAll: 'Salin Semua',
+                country: 'Negara', city: 'Kota', timezone: 'Zona Waktu', asn: 'ASN', isp: 'Penyedia (ISP)',
+                securityTitle: 'Keamanan', isClean: 'Koneksi Aman', detected: 'Ya (Risiko)',
+                searchInvalid: 'IP tidak valid.',
+                sourceMyIp: 'Menampilkan detail Anda...',
+                sourceSearchedIp: 'Detail untuk:',
+                errorGeo: 'Gagal mengambil lokasi.',
+                footerPrivacy: 'Privasi terjamin: Data Anda tidak disimpan.',
+                privacyPolicy: 'Kebijakan Privasi',
+                geoWarningTitle: '⚠️ Akurasi Geolokasi',
+                geoWarningText: 'Akurasi IP adalah perkiraan. IPv6 sering merujuk ke kantor pusat penyedia, sementara IPv4 biasanya lebih tepat.',
+                eduTitle: 'Cara cek IP via Terminal',
+                eduWinDesc: 'Buka terminal dan ketik:',
+                eduLinuxDesc: 'Gunakan perintah ini:',
+                eduFooter: 'Catatan: Ini menunjukkan **IP lokal**. Untuk **IP publik**, gunakan: <code class="bg-gray-800 px-1 rounded text-accent">curl ifconfig.me</code>',
+                webrtcTitle: '🔒 Uji Kebocoran WebRTC',
+                webrtcNote: 'WebRTC adalah fitur browser yang dapat melewati VPN Anda dan membocorkan IP asli Anda. Jika "IP Pribadi/Asli" cocok dengan IP VPN Anda, Anda aman.',
+                webrtcLabel: 'IP Pribadi/Asli:',
+                webrtcSafe: 'AMAN',
+                webrtcLeaking: 'KEBOCORAN TERDETEKSI',
+                webrtcChecking: 'Memeriksa...'
+            },
+            VN: {
+                title: 'Công Cụ Kiểm Tra IP',
+                detectedIpTitle: 'Địa Chỉ IP Của Bạn',
+                geoDetailsTitle: 'Chi Tiết Vị Trí',
+                searchToolTitle: 'Tra Cứu IP',
+                searchPlaceholder: 'Ví dụ: 8.8.8.8',
+                searchButton: 'Tra Cứu',
+                copy: 'Sao Chép',
+                copied: 'Đã Chép!',
+                notDetected: 'Không Tìm Thấy',
+                copyAll: 'Chép Tất Cả',
+                country: 'Quốc Gia', city: 'Thành Phố', timezone: 'Múi Giờ', asn: 'ASN', isp: 'Nhà Mạng (ISP)',
+                securityTitle: 'Bảo Mật', isClean: 'Kết Nối Sạch', detected: 'Có (Rủi Ro)',
+                searchInvalid: 'IP không hợp lệ.',
+                sourceMyIp: 'Đang truy vấn...',
+                sourceSearchedIp: 'Chi tiết cho:',
+                errorGeo: 'Không thể lấy vị trí.',
+                footerPrivacy: 'Quyền riêng tư được đảm bảo: Dữ liệu không được lưu trữ.',
+                privacyPolicy: 'Chính Sách Bảo Mật',
+                geoWarningTitle: '⚠️ Độ Chính Xác Vị Trí',
+                geoWarningText: 'Vị trí IP chỉ là ước tính. IPv6 thường chỉ về trụ sở nhà mạng, trong khi IPv4 thường chính xác hơn.',
+                eduTitle: 'Cách kiểm tra IP qua Terminal',
+                eduWinDesc: 'Mở terminal và gõ:',
+                eduLinuxDesc: 'Sử dụng lệnh sau:',
+                eduFooter: 'Lưu ý: Các lệnh này hiển thị **IP nội bộ**. Với **IP công cộng**, hãy dùng: <code class="bg-gray-800 px-1 rounded text-accent">curl ifconfig.me</code>',
+                webrtcTitle: '🔒 Kiểm Tra Rò Rỉ WebRTC',
+                webrtcNote: 'WebRTC là tính năng trình duyệt có thể bỏ qua VPN và làm lộ IP thật. Nếu "IP Riêng Tư/Thật" khớp với IP VPN, bạn an toàn.',
+                webrtcLabel: 'IP Riêng Tư/Thật:',
+                webrtcSafe: 'AN TOÀN',
+                webrtcLeaking: 'PHÁT HIỆN RÒ RỈ',
+                webrtcChecking: 'Đang kiểm tra...'
             }
         };
 
@@ -333,9 +400,10 @@
             });
 
             document.getElementById('theme-toggle').innerHTML = isDark ? '🌙' : '☀️';
-            document.getElementById('lang-toggle').className = isDark ? 
-                "px-3 py-1 text-sm font-medium rounded-full transition duration-200 shadow-sm border border-gray-700 bg-secondary-dark hover:bg-gray-700 text-white" :
-                "px-3 py-1 text-sm font-medium rounded-full transition duration-200 shadow-sm border border-gray-300 bg-white hover:bg-gray-100 text-gray-800";
+            const langSelect = document.getElementById('lang-selector');
+            langSelect.className = isDark ? 
+                "px-3 py-1 text-sm font-medium rounded-full transition duration-200 shadow-sm border border-gray-700 bg-secondary-dark text-white outline-none cursor-pointer" :
+                "px-3 py-1 text-sm font-medium rounded-full transition duration-200 shadow-sm border border-gray-300 bg-white text-gray-800 outline-none cursor-pointer";
             document.getElementById('theme-toggle').className = isDark ?
                 "px-3 py-1 text-sm font-medium rounded-full transition duration-200 shadow-sm border border-gray-700 bg-secondary-dark hover:bg-gray-700 text-white" :
                 "px-3 py-1 text-sm font-medium rounded-full transition duration-200 shadow-sm border border-gray-300 bg-white hover:bg-gray-100 text-gray-800";
@@ -432,7 +500,9 @@
 
         function translatePage() {
             const lang = languageMap[currentLang];
-            document.getElementById('main-title').innerHTML = lang.title.replace('Full', '<span class="text-accent">Full</span>').replace('Completo', '<span class="text-accent">Completo</span>');
+            const titleSpan = `<span class="text-accent">Checker</span>`;
+            document.getElementById('main-title').innerHTML = lang.title.includes('IP') ? lang.title.replace('IP', 'IP ' + titleSpan) : lang.title + ' ' + titleSpan;
+            
             document.getElementById('detected-ip-title').textContent = lang.detectedIpTitle;
             document.getElementById('search-title').textContent = lang.searchToolTitle;
             document.getElementById('ip-search-input').placeholder = lang.searchPlaceholder;
@@ -451,7 +521,7 @@
             document.getElementById('privacy-policy-link').textContent = lang.privacyPolicy;
             
             const badge = document.getElementById('webrtc-status-badge');
-            if(badge.textContent.includes('Check') || badge.textContent.includes('verificar')) {
+            if(badge.textContent.includes('Check') || badge.textContent.includes('verificar') || badge.textContent.includes('Memeriksa') || badge.textContent.includes('kiểm tra')) {
                 badge.textContent = lang.webrtcChecking;
             }
 
@@ -499,8 +569,15 @@
             } catch (e) { console.error(e); }
         }
 
-        document.getElementById('lang-toggle').addEventListener('click', () => { currentLang = currentLang === 'EN' ? 'PT' : 'EN'; translatePage(); });
-        document.getElementById('theme-toggle').addEventListener('click', () => { currentTheme = currentTheme === 'dark' ? 'light' : 'dark'; applyTheme(); });
+        document.getElementById('lang-selector').addEventListener('change', (e) => { 
+            currentLang = e.target.value; 
+            translatePage(); 
+        });
+
+        document.getElementById('theme-toggle').addEventListener('click', () => { 
+            currentTheme = currentTheme === 'dark' ? 'light' : 'dark'; 
+            applyTheme(); 
+        });
         
         document.getElementById('ip-search-button').addEventListener('click', async () => {
             const ip = document.getElementById('ip-search-input').value.trim();
