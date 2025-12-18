@@ -1,148 +1,139 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark">
+<html lang="en-US" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Glossário de Termos de Rede - Check My IP Today</title>
+    <title>Network Terms Glossary - Check My IP Today</title>
     
-    <!-- Meta Tags para SEO -->
-    <meta name="description" content="Aprenda o que é IPv4, IPv6, ASN, ISP e outros termos fundamentais de rede no nosso glossário completo.">
-    
-    <!-- Scripts de Estilo (Tailwind) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
-                    colors: { 
-                        'primary-dark': '#0f172a', 
-                        'secondary-dark': '#1e293b', 
-                        'accent': '#3b82f6' 
-                    },
-                    fontFamily: { 
-                        sans: ['Inter', 'sans-serif'],
-                        mono: ['Fira Code', 'monospace']
-                    },
+                    colors: { 'primary-dark': '#0f172a', 'secondary-dark': '#1e293b', 'accent': '#3b82f6' },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
                 }
             }
         }
     </script>
 
     <style>
-        body { transition: background-color 0.3s, color 0.3s; }
-        .glossary-card { 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-        }
-        .glossary-card:hover { 
-            transform: translateY(-4px);
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-        }
-        .dark .glossary-card:hover {
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.3);
-        }
+        body { transition: background-color 0.3s; }
+        .glossary-card { transition: all 0.3s ease; }
+        .glossary-card:hover { transform: translateY(-2px); }
     </style>
 </head>
-<body class="bg-white text-slate-900 dark:bg-primary-dark dark:text-gray-100 min-h-screen flex flex-col">
+<body class="bg-white text-slate-900 dark:bg-primary-dark dark:text-gray-100 min-h-screen flex flex-col font-sans">
 
-    <!-- Cabeçalho -->
+    <!-- Cabeçalho com Seletor de Idioma -->
     <header class="w-full max-w-6xl mx-auto px-6 py-8 flex justify-between items-center">
-        <a href="index.html" class="text-2xl font-extrabold tracking-tight hover:opacity-80 transition-opacity">
-            Check My IP <span class="text-accent italic">Today</span>
-        </a>
-        <a href="index.html" class="bg-gray-100 dark:bg-secondary-dark px-4 py-2 rounded-xl text-sm font-bold text-accent hover:ring-2 ring-accent transition-all">
-            ← Voltar
-        </a>
+        <a href="index.html" class="text-2xl font-extrabold tracking-tight">Check My IP <span class="text-accent italic">Today</span></a>
+        
+        <div class="flex items-center gap-4">
+            <select id="lang-selector" class="bg-gray-100 dark:bg-secondary-dark border-none rounded-lg px-3 py-2 text-sm font-bold focus:ring-2 ring-accent outline-none cursor-pointer">
+                <option value="en">EN-US 🇺🇸</option>
+                <option value="pt">PT-BR 🇧🇷</option>
+            </select>
+            <a href="index.html" class="text-sm font-bold text-accent hover:underline" data-i18n="back">← Back</a>
+        </div>
     </header>
 
-    <!-- Conteúdo Principal -->
-    <main class="flex-grow container mx-auto px-6 py-12 max-w-4xl">
-        <div class="mb-16 text-center">
-            <h1 class="text-4xl md:text-6xl font-black tracking-tighter mb-6 bg-gradient-to-r from-accent to-blue-400 bg-clip-text text-transparent">
-                Glossário de Rede
-            </h1>
-            <p class="text-lg text-slate-500 dark:text-gray-400 max-w-2xl mx-auto">
-                Descomplicamos a tecnologia por trás da sua conexão. Entenda os termos técnicos de forma simples.
-            </p>
+    <main class="flex-grow max-w-4xl mx-auto px-6 py-12">
+        <header class="mb-12">
+            <h1 class="text-4xl font-black mb-4" data-i18n="title">Network Terms Glossary</h1>
+            <p class="text-lg text-slate-500 dark:text-gray-400" data-i18n="subtitle">Understand the technical concepts behind your connection.</p>
+        </header>
+
+        <div id="glossary-content" class="grid gap-6">
+            <!-- Os cards serão gerados pelo JavaScript -->
         </div>
 
-        <div class="grid gap-6">
-            <!-- IP -->
-            <section class="glossary-card bg-gray-50 dark:bg-secondary-dark p-8 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm">
-                <div class="flex items-start gap-4">
-                    <span class="text-3xl">📍</span>
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-3">Endereço IP (Internet Protocol)</h2>
-                        <p class="leading-relaxed text-slate-600 dark:text-gray-400">O endereço IP é como o código postal do seu dispositivo na internet. É um identificador único que permite que a rede saiba exatamente para onde enviar as informações que solicita.</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- IPv4 vs IPv6 -->
-            <section class="glossary-card bg-gray-50 dark:bg-secondary-dark p-8 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm">
-                <div class="flex items-start gap-4">
-                    <span class="text-3xl">🌐</span>
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-3">IPv4 vs. IPv6</h2>
-                        <div class="space-y-4 text-slate-600 dark:text-gray-400">
-                            <p><strong class="text-accent">IPv4:</strong> O formato tradicional (ex: 192.168.1.1). Suporta cerca de 4,3 mil milhões de endereços, o que já não é suficiente para a população mundial.</p>
-                            <p><strong class="text-accent">IPv6:</strong> O formato moderno (ex: 2001:0db8...). Criado para oferecer endereços virtualmente infinitos para todos os dispositivos e gadgets do mundo.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ASN -->
-            <section class="glossary-card bg-gray-50 dark:bg-secondary-dark p-8 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm">
-                <div class="flex items-start gap-4">
-                    <span class="text-3xl">🏢</span>
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-3">ASN (Autonomous System Number)</h2>
-                        <p class="leading-relaxed text-slate-600 dark:text-gray-400">Um número de identificação para grandes redes ou grupos de redes geridas por uma única entidade (como o seu fornecedor de internet). Funciona como o "BI" do seu provedor na rede global.</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Estático vs Dinâmico -->
-            <section class="glossary-card bg-gray-50 dark:bg-secondary-dark p-8 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm">
-                <div class="flex items-start gap-4">
-                    <span class="text-3xl">🔄</span>
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-3">IP Estático vs. Dinâmico</h2>
-                        <p class="leading-relaxed text-slate-600 dark:text-gray-400">Um <strong>IP Estático</strong> nunca muda (útil para servidores). Um <strong>IP Dinâmico</strong> muda periodicamente ou sempre que reinicia o seu router, sendo o padrão para a maioria das residências.</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- WebRTC -->
-            <section class="glossary-card bg-gray-50 dark:bg-secondary-dark p-8 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm">
-                <div class="flex items-start gap-4">
-                    <span class="text-3xl">🛡️</span>
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-3">WebRTC Leak</h2>
-                        <p class="leading-relaxed text-slate-600 dark:text-gray-400">Ocorre quando o seu navegador revela o seu endereço IP real através de canais de áudio/vídeo, mesmo que esteja a utilizar uma VPN para se esconder.</p>
-                    </div>
-                </div>
-            </section>
-        </div>
-
-        <!-- Call to Action -->
-        <div class="mt-20 p-10 bg-gradient-to-br from-accent/20 to-blue-600/5 rounded-[2rem] border border-accent/20 text-center">
-            <h3 class="text-2xl font-bold mb-4 italic">Ficou com dúvidas?</h3>
-            <p class="mb-8 opacity-80">Volte para a ferramenta principal para testar a sua ligação agora mesmo.</p>
-            <a href="index.html" class="bg-accent hover:bg-blue-600 text-white font-extrabold px-10 py-4 rounded-2xl shadow-xl shadow-accent/30 transition-all transform hover:scale-105 active:scale-95 inline-block">
-                Verificar Meu IP Agora
-            </a>
+        <div class="mt-12 p-8 bg-accent/10 border border-accent/20 rounded-3xl text-center">
+            <h3 class="font-bold mb-2" data-i18n="cta-title">Need to check your status now?</h3>
+            <p class="text-sm opacity-80 mb-4" data-i18n="cta-desc">See your IP and location in real-time.</p>
+            <a href="index.html" class="inline-block bg-accent hover:bg-blue-600 text-white font-bold px-8 py-3 rounded-xl transition-all" data-i18n="cta-btn">Go to Tool</a>
         </div>
     </main>
 
-    <!-- Rodapé -->
     <footer class="py-12 text-center text-slate-400 dark:text-gray-500 text-xs border-t border-gray-200 dark:border-gray-800 mt-12 bg-gray-50/50 dark:bg-white/5">
-        <p class="font-bold mb-1 italic tracking-widest uppercase text-[10px]">CheckMyIP.Today</p>
-        <p>&copy; 2024 Portal Educativo de Diagnóstico de Rede.</p>
+        <p class="font-bold mb-1 italic">CheckMyIP.Today</p>
+        <p>&copy; 2024 Professional Network Diagnostics.</p>
     </footer>
 
+    <script>
+        const translations = {
+            en: {
+                title: "Network Terms Glossary",
+                subtitle: "Understand the technical concepts behind your connection.",
+                back: "← Back",
+                "cta-title": "Need to check your status now?",
+                "cta-desc": "See your IP and location in real-time.",
+                "cta-btn": "Go to Tool",
+                terms: [
+                    { t: "IP Address", d: "The unique identifier for your device on the network, allowing data to be sent and received." },
+                    { t: "IPv4 vs IPv6", d: "IPv4 is the old standard (e.g., 1.1.1.1). IPv6 is the modern standard (e.g., 2001:db8...), necessary due to the world running out of addresses." },
+                    { t: "ASN (Autonomous System Number)", d: "A number identifying large networks managed by a single organization, such as your internet provider." },
+                    { t: "Static vs Dynamic IP", d: "Static is an IP that never changes (ideal for servers). Dynamic changes periodically (standard for homes)." },
+                    { t: "WebRTC", d: "Technology for real-time communication. It can cause real IP leaks even when using a VPN." },
+                    { t: "ISP (Internet Service Provider)", d: "The company that provides your internet connection (e.g., Comcast, AT&T, Vodafone)." }
+                ]
+            },
+            pt: {
+                title: "Glossário de Termos de Rede",
+                subtitle: "Entenda os conceitos técnicos por trás da sua conexão.",
+                back: "← Voltar",
+                "cta-title": "Precisa verificar seu status agora?",
+                "cta-desc": "Veja seu IP e localização em tempo real.",
+                "cta-btn": "Ir para a Ferramenta",
+                terms: [
+                    { t: "Endereço IP", d: "O identificador único do seu dispositivo na rede, permitindo o envio e recebimento de dados." },
+                    { t: "IPv4 vs IPv6", d: "O IPv4 é o padrão antigo (ex: 1.1.1.1). O IPv6 é o padrão moderno (ex: 2001:db8...), necessário devido ao esgotamento de endereços no mundo." },
+                    { t: "ASN (Autonomous System Number)", d: "Um número que identifica grandes redes gerenciadas por uma única organização, como o seu provedor de internet." },
+                    { t: "IP Estático vs Dinâmico", d: "Estático é um IP que nunca muda (ideal para servidores). Dinâmico muda periodicamente (padrão residencial)." },
+                    { t: "WebRTC", d: "Tecnologia para comunicação em tempo real. Pode causar vazamentos de IP real mesmo usando VPN." },
+                    { t: "ISP (Internet Service Provider)", d: "A empresa que fornece a sua conexão à internet (ex: Vivo, MEO, Vodafone)." }
+                ]
+            }
+        };
+
+        // Definimos o Inglês como idioma inicial
+        let currentLang = 'en';
+
+        function updateLanguage() {
+            // Atualizar o atributo lang do HTML para acessibilidade
+            document.documentElement.lang = currentLang === 'en' ? 'en-US' : 'pt-BR';
+
+            // Traduzir elementos fixos baseados no atributo data-i18n
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                el.innerText = translations[currentLang][key];
+            });
+
+            // Gerar os cartões do glossário dinamicamente
+            const container = document.getElementById('glossary-content');
+            container.innerHTML = '';
+            translations[currentLang].terms.forEach(item => {
+                const section = document.createElement('section');
+                section.className = "glossary-card bg-gray-50 dark:bg-secondary-dark p-6 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm";
+                section.innerHTML = `
+                    <h2 class="text-xl font-bold text-accent mb-2">${item.t}</h2>
+                    <p class="leading-relaxed opacity-90">${item.d}</p>
+                `;
+                container.appendChild(section);
+            });
+        }
+
+        // Listener para o seletor de idioma
+        document.getElementById('lang-selector').addEventListener('change', (e) => {
+            currentLang = e.target.value;
+            updateLanguage();
+        });
+
+        // Inicializar a página com o idioma definido (EN)
+        updateLanguage();
+    </script>
 </body>
 </html>
