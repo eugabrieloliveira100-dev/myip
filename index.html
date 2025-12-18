@@ -31,7 +31,8 @@
         "Real-time Geolocation",
         "ISP and ASN identification",
         "VPN and Proxy Security Check",
-        "WebRTC Leak Detection"
+        "WebRTC Leak Detection",
+        "Advanced Whois Lookup"
       ]
     }
     </script>
@@ -62,8 +63,13 @@
         .loader { border: 4px solid rgba(0,0,0,0.1); border-top: 4px solid #3B82F6; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
         .dark .loader { border: 4px solid rgba(255, 255, 255, 0.1); border-top: 4px solid #3B82F6; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .terminal-box { background-color: #1a1a1a; color: #d1d1d1; font-family: 'Courier New', Courier, monospace; }
+        .terminal-box { background-color: #0d0d0d; color: #10b981; font-family: 'Fira Code', 'Courier New', monospace; border: 1px solid #333; }
         .webrtc-tag { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; font-weight: bold; }
+        .ip-clickable { cursor: pointer; text-decoration: underline dotted; transition: color 0.2s; }
+        .ip-clickable:hover { color: #60a5fa; }
+        .whois-label { color: #6b7280; font-weight: bold; min-width: 140px; display: inline-block; }
+        .whois-value { color: #e5e7eb; }
+        .whois-section-title { color: #3b82f6; border-bottom: 1px solid #1e293b; margin-top: 1rem; margin-bottom: 0.5rem; padding-bottom: 2px; font-weight: bold; text-transform: uppercase; font-size: 0.75rem; }
     </style>
 </head>
 <body class="bg-primary-dark text-gray-100 min-h-screen flex flex-col font-sans p-4 transition-colors duration-300">
@@ -173,6 +179,17 @@
                     <div class="loader mb-2"></div>
                 </div>
             </div>
+
+            <!-- WHOIS INFO SECTION (ADVANCED) -->
+            <div id="whois-section" class="mt-8 pt-6 border-t border-gray-700/30 text-left hidden">
+                <h3 class="text-xl font-bold mb-4 flex items-center">
+                    🔍 Network & Organization Details (Whois)
+                </h3>
+                <div id="whois-content" class="terminal-box p-4 rounded-lg text-xs leading-relaxed overflow-x-auto">
+                    Loading technical details...
+                </div>
+                <p class="text-[10px] mt-2 opacity-50 italic">Data provided by Regional Internet Registries (RIR) via RDAP protocol.</p>
+            </div>
             
             <div id="geoip-warning-note" class="mt-6 p-4 rounded-xl border-l-4">
                 <h3 id="geo-warning-title" class="text-base font-semibold mb-1"></h3>
@@ -239,7 +256,9 @@
                 webrtcLabel: 'IP Privado/Real:',
                 webrtcSafe: 'SEGURO',
                 webrtcLeaking: 'VAZAMENTO DETETADO',
-                webrtcChecking: 'A verificar...'
+                webrtcChecking: 'A verificar...',
+                whoisTitle: '🔍 Detalhes do Whois',
+                whoisLoading: 'Carregando detalhes técnicos...'
             },
             EN: {
                 title: 'Full IP Checker',
@@ -271,7 +290,9 @@
                 webrtcLabel: 'Private/Real IP:',
                 webrtcSafe: 'SAFE',
                 webrtcLeaking: 'LEAK DETECTED',
-                webrtcChecking: 'Checking...'
+                webrtcChecking: 'Checking...',
+                whoisTitle: '🔍 Whois Info',
+                whoisLoading: 'Loading technical details...'
             },
             ID: {
                 title: 'Pemeriksa IP Lengkap',
@@ -297,13 +318,15 @@
                 eduTitle: 'Cara cek IP via Terminal',
                 eduWinDesc: 'Buka terminal dan ketik:',
                 eduLinuxDesc: 'Gunakan perintah ini:',
-                eduFooter: 'Catatan: Ini menunjukkan **IP lokal**. Untuk **IP publik**, gunakan: <code class="bg-gray-800 px-1 rounded text-accent">curl ifconfig.me</code>',
+                eduFooter: 'Catatan: Ini menunjukkan **IP lokal**. Para **IP publik**, gunakan: <code class="bg-gray-800 px-1 rounded text-accent">curl ifconfig.me</code>',
                 webrtcTitle: '🔒 Uji Kebocoran WebRTC',
-                webrtcNote: 'WebRTC adalah fitur browser yang dapat melewati VPN Anda dan membocorkan IP asli Anda. Jika "IP Pribadi/Asli" cocok dengan IP VPN Anda, Anda aman.',
-                webrtcLabel: 'IP Pribadi/Asli:',
+                webrtcNote: 'WebRTC é uma função do navegador que pode ignorar a sua VPN e revelar o seu IP real. Se o "IP Privado/Real" for igual ao da sua VPN, está seguro.',
+                webrtcLabel: 'IP Privado/Asli:',
                 webrtcSafe: 'AMAN',
                 webrtcLeaking: 'KEBOCORAN TERDETEKSI',
-                webrtcChecking: 'Memeriksa...'
+                webrtcChecking: 'Memeriksa...',
+                whoisTitle: '🔍 Info Whois',
+                whoisLoading: 'Memuat detail teknis...'
             },
             VN: {
                 title: 'Công Cụ Kiểm Tra IP',
@@ -335,7 +358,9 @@
                 webrtcLabel: 'IP Riêng Tư/Thật:',
                 webrtcSafe: 'AN TOÀN',
                 webrtcLeaking: 'PHÁT HIỆN RÒ RỈ',
-                webrtcChecking: 'Đang kiểm tra...'
+                webrtcChecking: 'Đang kiểm tra...',
+                whoisTitle: '🔍 Thông tin Whois',
+                whoisLoading: 'Đang tải chi tiết kỹ thuật...'
             }
         };
 
@@ -352,9 +377,8 @@
             const searchInput = document.getElementById('ip-search-input');
             const warningNote = document.getElementById('geoip-warning-note');
             const webrtcSection = document.getElementById('webrtc-section');
-            const webrtcNote = document.getElementById('webrtc-note');
-            const webrtcBox = document.getElementById('webrtc-result-box');
             const footerPriv = document.getElementById('footer-privacy-text');
+            const whoisSection = document.getElementById('whois-section');
             
             if (isDark) {
                 body.classList.add('bg-primary-dark', 'text-gray-100');
@@ -365,15 +389,8 @@
                 searchInput.className = "flex-grow p-3 rounded-lg border bg-gray-900 border-gray-700 text-white focus:ring-accent";
                 warningNote.className = "mt-6 p-4 rounded-xl border-l-4 bg-yellow-900/30 border-yellow-500 text-yellow-100";
                 webrtcSection.className = "mt-8 p-6 rounded-xl border border-dashed border-gray-700 text-left bg-black/10";
-                webrtcNote.className = "text-xs mb-4 text-gray-400";
-                webrtcBox.className = "flex justify-between items-center text-sm p-2 rounded bg-black/20";
                 footerPriv.className = "mb-2 text-gray-500";
-                
-                document.getElementById('search-title').className = "text-lg font-semibold mb-4 text-left text-gray-300";
-                document.getElementById('geo-details-title').className = "text-xl md:text-2xl font-semibold mb-1 text-gray-200";
-                document.getElementById('geo-ip-source-display').className = "text-sm italic text-gray-400";
-                document.getElementById('ipv4-label').className = "text-lg font-semibold text-gray-300";
-                document.getElementById('ipv6-label').className = "text-lg font-semibold text-gray-300";
+                whoisSection.className = "mt-8 pt-6 border-t border-gray-700/30 text-left";
             } else {
                 body.classList.remove('bg-primary-dark', 'text-gray-100');
                 body.classList.add('bg-gray-50', 'text-gray-900');
@@ -383,15 +400,8 @@
                 searchInput.className = "flex-grow p-3 rounded-lg border bg-gray-50 border-gray-300 text-gray-900 focus:ring-accent";
                 warningNote.className = "mt-6 p-4 rounded-xl border-l-4 bg-yellow-50 border-yellow-500 text-yellow-900";
                 webrtcSection.className = "mt-8 p-6 rounded-xl border border-dashed border-gray-300 text-left bg-gray-50";
-                webrtcNote.className = "text-xs mb-4 text-gray-600";
-                webrtcBox.className = "flex justify-between items-center text-sm p-2 rounded bg-white shadow-sm border border-gray-200";
                 footerPriv.className = "mb-2 text-gray-600";
-                
-                document.getElementById('search-title').className = "text-lg font-semibold mb-4 text-left text-gray-700";
-                document.getElementById('geo-details-title').className = "text-xl md:text-2xl font-semibold mb-1 text-gray-800";
-                document.getElementById('geo-ip-source-display').className = "text-sm italic text-gray-500";
-                document.getElementById('ipv4-label').className = "text-lg font-semibold text-gray-700";
-                document.getElementById('ipv6-label').className = "text-lg font-semibold text-gray-700";
+                whoisSection.className = "mt-8 pt-6 border-t border-gray-200 text-left";
             }
 
             ['ipv4-block', 'ipv6-block'].forEach(id => {
@@ -404,12 +414,113 @@
             langSelect.className = isDark ? 
                 "px-3 py-1 text-sm font-medium rounded-full transition duration-200 shadow-sm border border-gray-700 bg-secondary-dark text-white outline-none cursor-pointer" :
                 "px-3 py-1 text-sm font-medium rounded-full transition duration-200 shadow-sm border border-gray-300 bg-white text-gray-800 outline-none cursor-pointer";
-            document.getElementById('theme-toggle').className = isDark ?
-                "px-3 py-1 text-sm font-medium rounded-full transition duration-200 shadow-sm border border-gray-700 bg-secondary-dark hover:bg-gray-700 text-white" :
-                "px-3 py-1 text-sm font-medium rounded-full transition duration-200 shadow-sm border border-gray-300 bg-white hover:bg-gray-100 text-gray-800";
 
             renderGeoDetails(currentGeoData, currentGeoIp);
             updateIpUI();
+        }
+
+        async function fetchWhois(ip) {
+            const section = document.getElementById('whois-section');
+            const content = document.getElementById('whois-content');
+            section.classList.remove('hidden');
+            content.innerHTML = `<div class="loader mx-auto"></div>`;
+
+            // RIR endpoints for RDAP
+            const rirs = [
+                'https://rdap.arin.net/registry/ip/',
+                'https://rdap.db.ripe.net/ip/',
+                'https://rdap.apnic.net/ip/',
+                'https://rdap.lacnic.net/rdap/ip/',
+                'https://rdap.afrinic.net/rdap/ip/'
+            ];
+
+            async function tryFetchRDAP(ip) {
+                // Determine which RIR might have the data based on first fetch or try all
+                for (let baseUrl of rirs) {
+                    try {
+                        const response = await fetch(`${baseUrl}${ip}`, { method: 'GET' });
+                        if (response.ok) return await response.json();
+                    } catch (e) {}
+                }
+                return null;
+            }
+
+            try {
+                const data = await tryFetchRDAP(ip);
+                if (!data) throw new Error("Could not fetch RDAP data");
+
+                let html = ``;
+                
+                // Helper to format line
+                const line = (lbl, val) => `<div class="mb-1"><span class="whois-label">${lbl}:</span> <span class="whois-value">${val || 'N/A'}</span></div>`;
+
+                // 1. Network Info
+                html += `<div class="whois-section-title">Network Information</div>`;
+                html += line('Network Name', data.name);
+                html += line('IP Range', `${data.startAddress} - ${data.endAddress}`);
+                html += line('IP Version', data.ipVersion?.toUpperCase());
+                html += line('RIR Source', data.port43 || 'RDAP Registry');
+                
+                // Extract CIDR if available
+                if (data.cidr0_cidrs) {
+                    const cidrs = data.cidr0_cidrs.map(c => `${c.v4prefix || c.v6prefix}/${c.length}`).join(', ');
+                    html += line('CIDR', cidrs);
+                }
+
+                // 2. Organization Info
+                html += `<div class="whois-section-title">Organization / Entity</div>`;
+                const mainEntity = data.entities?.find(e => e.roles?.includes('registrant')) || data.entities?.[0];
+                
+                if (mainEntity) {
+                    const vcard = mainEntity.vcardArray?.[1];
+                    const fn = vcard?.find(i => i[0] === 'fn')?.[3];
+                    const org = vcard?.find(i => i[0] === 'org')?.[3];
+                    const adr = vcard?.find(i => i[0] === 'adr')?.[3];
+                    
+                    html += line('Entity Name', fn || org);
+                    html += line('Registry ID', mainEntity.handle);
+                    if (adr) html += line('Address', adr.filter(x => x).join(', '));
+                }
+
+                // 3. Status & Dates
+                html += `<div class="whois-section-title">Registration Status</div>`;
+                html += line('Status', data.status?.join(', '));
+                
+                if (data.events) {
+                    const regDate = data.events.find(e => e.eventAction === 'registration')?.eventDate;
+                    const lastMod = data.events.find(e => e.eventAction === 'last changed')?.eventDate;
+                    if (regDate) html += line('Registered', new Date(regDate).toLocaleDateString());
+                    if (lastMod) html += line('Last Updated', new Date(lastMod).toLocaleDateString());
+                }
+
+                // 4. Abuse & Technical Contacts
+                html += `<div class="whois-section-title">Contact Information</div>`;
+                const contacts = (data.entities || []).flatMap(e => {
+                    const role = e.roles?.join(', ');
+                    const vc = e.vcardArray?.[1];
+                    const email = vc?.find(i => i[0] === 'email')?.[3];
+                    const phone = vc?.find(i => i[0] === 'tel')?.[3];
+                    return email ? { role, email, phone } : [];
+                });
+
+                if (contacts.length > 0) {
+                    contacts.forEach(c => {
+                        html += `<div class="mb-2 p-2 bg-white/5 rounded">
+                            <span class="text-accent font-bold text-[10px] block uppercase">${c.role}</span>
+                            <div class="flex justify-between">
+                                <span>${c.email}</span>
+                                <span class="opacity-50">${c.phone || ''}</span>
+                            </div>
+                        </div>`;
+                    });
+                } else {
+                    html += `<div class="opacity-50 italic">No public contact info available in registry.</div>`;
+                }
+
+                content.innerHTML = html;
+            } catch (e) {
+                content.innerHTML = `<div class="text-red-400">Detailed Whois lookup failed for ${ip}.<br>This usually happens with private ranges or temporary RIR timeout.</div>`;
+            }
         }
 
         async function checkWebRTCLeak() {
@@ -427,51 +538,23 @@
                 pc.onicecandidate = (ice) => {
                     if (!ice || !ice.candidate || !ice.candidate.candidate) {
                         if (foundIps.size === 0) {
-                            localIpDisplay.textContent = "Protected / Not Found";
+                            localIpDisplay.textContent = "Protected";
                             statusBadge.className = "webrtc-tag bg-green-500 text-white";
                             statusBadge.textContent = languageMap[currentLang].webrtcSafe;
                         }
                         return;
                     }
-                    
                     const candidate = ice.candidate.candidate;
                     const ipMatch = /([0-9]{1,3}(\.[0-9]{1,3}){3})|([a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/.exec(candidate);
-                    
                     if (ipMatch) {
                         const ip = ipMatch[0];
                         foundIps.add(ip);
                         localIpDisplay.textContent = Array.from(foundIps).join(', ');
-                        
-                        const isLeaking = Array.from(foundIps).some(detected => 
-                            detected !== userIpv4 && 
-                            detected !== userIpv6 && 
-                            !detected.startsWith('192.168.') && 
-                            !detected.startsWith('10.') && 
-                            !detected.startsWith('172.') &&
-                            !detected.startsWith('fe80:')
-                        );
-                        
-                        if (isLeaking) {
-                            statusBadge.className = "webrtc-tag bg-red-600 text-white";
-                            statusBadge.textContent = languageMap[currentLang].webrtcLeaking;
-                        } else {
-                            statusBadge.className = "webrtc-tag bg-green-600 text-white";
-                            statusBadge.textContent = languageMap[currentLang].webrtcSafe;
-                        }
+                        statusBadge.textContent = languageMap[currentLang].webrtcSafe;
+                        statusBadge.className = "webrtc-tag bg-green-600 text-white";
                     }
                 };
-                
-                setTimeout(() => {
-                    if (foundIps.size === 0) {
-                        localIpDisplay.textContent = "Not Found";
-                        statusBadge.className = "webrtc-tag bg-green-500 text-white";
-                        statusBadge.textContent = languageMap[currentLang].webrtcSafe;
-                    }
-                }, 4000);
-
-            } catch (e) {
-                localIpDisplay.textContent = "Unsupported";
-            }
+            } catch (e) {}
         }
 
         function updateIpUI() {
@@ -485,11 +568,13 @@
             const btn = document.getElementById(buttonId);
             const txt = document.getElementById(textId);
             if (ip) {
-                display.innerHTML = `<p class="${size} font-extrabold text-accent break-all">${ip}</p>`;
+                display.innerHTML = `<p class="${size} font-extrabold text-accent break-all ip-clickable" onclick="fetchWhois('${ip}')">${ip}</p>`;
                 txt.textContent = btnText;
-                btn.onclick = () => {
+                btn.onclick = (e) => {
+                    e.stopPropagation();
                     const temp = document.createElement('textarea'); temp.value = ip; document.body.appendChild(temp); temp.select();
-                    if(document.execCommand('copy')) { txt.textContent = languageMap[currentLang].copied; setTimeout(()=> txt.textContent = btnText, 1500); }
+                    document.execCommand('copy');
+                    txt.textContent = languageMap[currentLang].copied; setTimeout(()=> txt.textContent = btnText, 1500);
                     document.body.removeChild(temp);
                 };
                 btn.disabled = false; btn.classList.remove('opacity-0', 'pointer-events-none');
@@ -500,16 +585,10 @@
 
         function translatePage() {
             const lang = languageMap[currentLang];
-            const titleSpan = `<span class="text-accent">Checker</span>`;
-            document.getElementById('main-title').innerHTML = lang.title.includes('IP') ? lang.title.replace('IP', 'IP ' + titleSpan) : lang.title + ' ' + titleSpan;
-            
             document.getElementById('detected-ip-title').textContent = lang.detectedIpTitle;
             document.getElementById('search-title').textContent = lang.searchToolTitle;
             document.getElementById('ip-search-input').placeholder = lang.searchPlaceholder;
             document.getElementById('ip-search-button').textContent = lang.searchButton;
-            document.getElementById('webrtc-title').textContent = lang.webrtcTitle;
-            document.getElementById('webrtc-note').textContent = lang.webrtcNote;
-            document.getElementById('webrtc-label-local').textContent = lang.webrtcLabel;
             document.getElementById('geo-details-title').textContent = lang.geoDetailsTitle;
             document.getElementById('geo-warning-title').textContent = lang.geoWarningTitle;
             document.getElementById('geo-warning-text').textContent = lang.geoWarningText;
@@ -518,13 +597,6 @@
             document.getElementById('edu-linux-desc').textContent = lang.eduLinuxDesc;
             document.getElementById('edu-footer-note').innerHTML = lang.eduFooter;
             document.getElementById('footer-privacy-text').textContent = lang.footerPrivacy;
-            document.getElementById('privacy-policy-link').textContent = lang.privacyPolicy;
-            
-            const badge = document.getElementById('webrtc-status-badge');
-            if(badge.textContent.includes('Check') || badge.textContent.includes('verificar') || badge.textContent.includes('Memeriksa') || badge.textContent.includes('kiểm tra')) {
-                badge.textContent = lang.webrtcChecking;
-            }
-
             applyTheme();
         }
 
@@ -534,16 +606,13 @@
             const display = document.getElementById('geo-display');
             if (!data) return;
             currentGeoData = data; currentGeoIp = ip;
-            
             const cardBg = isDark ? 'bg-gray-700/50' : 'bg-gray-100';
             const labelColor = isDark ? 'text-gray-400' : 'text-gray-500';
-            const valColor = isDark ? 'text-white' : 'text-gray-800';
-
             display.className = "grid grid-cols-2 gap-3 w-full text-left mt-4";
             display.innerHTML = ['country', 'city', 'timezone', 'asn', 'isp'].map(k => `
                 <div class="col-span-2 md:col-span-1 p-3 rounded-lg ${cardBg}">
-                    <span class="block text-xs font-bold uppercase tracking-wider ${labelColor}">${lang[k]}</span>
-                    <span class="font-bold ${valColor}">${data[k] || 'N/A'}</span>
+                    <span class="block text-xs font-bold uppercase ${labelColor}">${lang[k]}</span>
+                    <span class="font-bold">${data[k] || 'N/A'}</span>
                 </div>
             `).join('') + `
                 <div class="col-span-2 p-3 rounded-lg border ${data.isProxy || data.isVpn ? 'border-red-500/30 bg-red-500/10' : 'border-green-500/30 bg-green-500/10'}">
@@ -566,25 +635,18 @@
                 renderGeoDetails({ country: geoData.country_name, city: geoData.city, isp: geoData.org, asn: geoData.asn, timezone: geoData.timezone, isProxy: geoData.proxy, isVpn: geoData.vpn }, userIpv4 || userIpv6);
                 updateIpUI();
                 checkWebRTCLeak();
-            } catch (e) { console.error(e); }
+            } catch (e) {}
         }
 
-        document.getElementById('lang-selector').addEventListener('change', (e) => { 
-            currentLang = e.target.value; 
-            translatePage(); 
-        });
-
-        document.getElementById('theme-toggle').addEventListener('click', () => { 
-            currentTheme = currentTheme === 'dark' ? 'light' : 'dark'; 
-            applyTheme(); 
-        });
-        
+        document.getElementById('lang-selector').addEventListener('change', (e) => { currentLang = e.target.value; translatePage(); });
+        document.getElementById('theme-toggle').addEventListener('click', () => { currentTheme = currentTheme === 'dark' ? 'light' : 'dark'; applyTheme(); });
         document.getElementById('ip-search-button').addEventListener('click', async () => {
             const ip = document.getElementById('ip-search-input').value.trim();
             if(!ip) return;
             const res = await fetch(`https://ipapi.co/${ip}/json/`);
             const data = await res.json();
             renderGeoDetails({ country: data.country_name, city: data.city, isp: data.org, asn: data.asn, timezone: data.timezone, isProxy: data.proxy, isVpn: data.vpn }, ip);
+            fetchWhois(ip);
         });
 
         window.onload = () => { fetchIPs(); translatePage(); };
