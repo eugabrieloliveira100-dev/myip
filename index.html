@@ -150,7 +150,7 @@
             </div>
         </div>
 
-        <!-- SEÇÃO TERMINAL (REINTEGRADA) -->
+        <!-- SEÇÃO TERMINAL -->
         <section class="bg-gray-100 dark:bg-secondary-dark rounded-3xl p-8 space-y-6 border border-gray-200 dark:border-none shadow-sm">
             <h3 id="label-terminal-check" class="text-lg font-bold flex items-center gap-2 text-slate-800 dark:text-white">💻 Check IP via Terminal</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -171,7 +171,7 @@
             </div>
         </section>
 
-        <!-- GUIDE TERMINAL & RAW WIDGET -->
+        <!-- DEVELOPER TOOLS -->
         <div class="bg-gray-100 dark:bg-secondary-dark rounded-3xl p-8 space-y-6 border border-gray-200 dark:border-none shadow-sm">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <h3 id="label-terminal-tools" class="text-lg font-bold flex items-center gap-2 text-slate-800 dark:text-white">🛠️ Developer Tools</h3>
@@ -224,7 +224,7 @@
                 lookup: "Lookup",
                 loading: "Querying global records...",
                 country: "Country", city: "City", isp: "Provider", timezone: "Timezone", asn: "ASN",
-                netInfo: "Network Information", orgInfo: "Organization / Entity", regStatus: "Registration Status", contactInfo: "Contact Information",
+                netInfo: "Network Information", orgInfo: "Organization / Entity", regStatus: "Registration Status", contactInfo: "Abuse & Tech Contacts", security: "Security & Flags",
                 footerGlossary: "Network Glossary", footerIpv6: "Why São Paulo?"
             },
             pt: {
@@ -239,7 +239,7 @@
                 lookup: "Consultar",
                 loading: "Consultando registros globais...",
                 country: "País", city: "Cidade", isp: "Provedor", timezone: "Fuso Horário", asn: "Número ASN",
-                netInfo: "Informações de Rede", orgInfo: "Organização / Entidade", regStatus: "Status do Registro", contactInfo: "Informações de Contato",
+                netInfo: "Informações de Rede", orgInfo: "Organização / Entidade", regStatus: "Status do Registro", contactInfo: "Contatos de Abuso e Técnicos", security: "Segurança e Flags",
                 footerGlossary: "Glossário de Rede", footerIpv6: "Por que São Paulo?"
             }
         };
@@ -338,44 +338,65 @@
             term.innerHTML = `<div class="flex items-center gap-2 text-slate-700 dark:text-slate-200 font-bold"><div class="h-2 w-2 bg-accent rounded-full animate-ping"></div> ${t.loading}</div>`;
             
             try {
-                const res = await fetch(`https://rdap.db.ripe.net/ip/${ip}`);
-                const data = await res.json();
+                // Fetch RDAP (WHOIS moderno)
+                const rdapRes = await fetch(`https://rdap.db.ripe.net/ip/${ip}`);
+                const rdap = await rdapRes.json();
                 
-                const network = `${data.startAddress} - ${data.endAddress}`;
-                const handle = data.handle || 'N/A';
-                const status = data.status ? data.status.join(', ').toUpperCase() : 'N/A';
-                const org = data.name || 'N/A';
-                const entities = data.entities ? data.entities.map(e => `[${e.roles?.join('/') || 'ENTITY'}] ${e.handle}`).join('\n') : 'No contacts listed';
+                // Fetch Geo Adicional (para o IP pesquisado)
+                const geoRes = await fetch(`https://ipapi.co/${ip}/json/`);
+                const geo = await geoRes.json();
+
+                const network = `${rdap.startAddress} - ${rdap.endAddress}`;
+                const handle = rdap.handle || 'N/A';
+                const status = rdap.status ? rdap.status.join(', ').toUpperCase() : 'N/A';
+                const org = rdap.name || 'N/A';
+                
+                // Extração de contatos de abuso (procurando nas entidades)
+                let abuseEmail = 'Not Found';
+                if(rdap.entities) {
+                    rdap.entities.forEach(ent => {
+                        if(ent.vcardArray) {
+                            const vcard = ent.vcardArray[1];
+                            const emailEntry = vcard.find(v => v[0] === 'email');
+                            if(emailEntry) abuseEmail = emailEntry[3];
+                        }
+                    });
+                }
+
+                const entities = rdap.entities ? rdap.entities.map(e => `[${e.roles?.join('/') || 'ENTITY'}] ${e.handle}`).join('\n') : 'No contacts listed';
 
                 const output = `
 [ ${t.netInfo.toUpperCase()} ]
 -----------------------------------------------------------
-RANGE:    ${network}
-HANDLE:   ${handle}
-VERSION:  IP${data.ipVersion || 'v4'}
-PARENT:   ${data.parentHandle || 'ROOT'}
+RANGE:       ${network}
+HOSTNAME:    ${geo.hostname || 'No reverse DNS record'}
+VERSION:     IP${rdap.ipVersion || 'v4'}
+ASN:         ${geo.asn || 'N/A'}
+ORGANIZATION:${geo.org || org}
 
-[ ${t.orgInfo.toUpperCase()} ]
+[ ${t.security.toUpperCase()} ]
 -----------------------------------------------------------
-ENTITY:   ${org}
-NAME:     ${data.type || 'ALLOCATED'}
-COUNTRY:  ${data.country || 'N/A'}
+COUNTRY:     ${geo.country_name || 'N/A'} (${geo.country_code || '??'})
+PROXY/VPN:   ${geo.proxy ? '⚠️ YES' : 'NO'}
+MOBILE:      ${geo.is_mobile ? 'YES' : 'NO'}
+ABUSE EMAIL: ${abuseEmail}
 
 [ ${t.regStatus.toUpperCase()} ]
 -----------------------------------------------------------
-STATUS:   ${status}
-SOURCE:   ${data.port43 || 'RDAP SERVICE'}
+STATUS:      ${status}
+ALLOCATED:   ${geo.asn_organization || 'N/A'}
+POSTAL CODE: ${geo.postal || 'N/A'}
 
 [ ${t.contactInfo.toUpperCase()} ]
 -----------------------------------------------------------
 ${entities}
 
 -----------------------------------------------------------
->> QUERY COMPLETED FOR: ${ip}`;
+>> REMOTE LOOKUP FINISHED FOR: ${ip}`;
 
                 term.innerHTML = `<pre class="whitespace-pre-wrap">${output}</pre>`;
             } catch (e) {
-                term.innerHTML = `<div class="text-red-500 font-bold">Error: Unable to fetch records.</div>`;
+                term.innerHTML = `<div class="text-red-500 font-bold">Error: IP not found in global registry (RDAP).</div>`;
             }
         }
 
