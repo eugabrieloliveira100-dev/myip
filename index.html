@@ -75,12 +75,12 @@
         }
     </style>
 </head>
-<body class="bg-white text-slate-900 dark:bg-primary-dark dark:text-gray-100 min-h-screen flex flex-col">
+<body class="bg-white text-slate-900 dark:bg-primary-dark dark:text-gray-100 min-h-screen flex flex-col font-sans">
 
     <header class="w-full max-w-6xl mx-auto px-6 py-8 flex justify-between items-center">
         <h1 class="text-2xl font-extrabold tracking-tight">Check My IP <span class="text-accent italic">Today</span></h1>
         <div class="flex items-center gap-4">
-            <select id="lang-selector" class="bg-gray-100 dark:bg-secondary-dark border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-700 dark:text-gray-200 cursor-pointer transition-colors">
+            <select id="lang-selector" class="bg-gray-100 dark:bg-secondary-dark border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-700 dark:text-gray-200 cursor-pointer transition-colors outline-none focus:ring-2 ring-accent/50">
                 <option value="en">English</option>
                 <option value="pt">Português</option>
             </select>
@@ -92,34 +92,11 @@
 
     <main class="flex-grow container mx-auto px-4 py-6 max-w-4xl space-y-8">
         
-        <!-- SEÇÃO WHOIS AVANÇADA -->
-        <section class="space-y-4">
-            <div class="flex flex-col gap-1">
-                <h3 id="label-whois-title" class="text-xl font-bold px-1 flex items-center gap-2 text-slate-800 dark:text-white">
-                    <span class="text-accent">🔍</span> Network & Organization Details
-                </h3>
-                <p id="label-whois-desc" class="text-sm text-slate-600 dark:text-slate-300 px-1 font-medium">Lookup any IP address for detailed ASN, ISP and WHOIS records.</p>
-            </div>
-            
-            <div class="flex flex-col md:flex-row gap-3">
-                <div class="relative flex-grow">
-                    <input id="whois-input" type="text" placeholder="Enter IP for deep lookup..." 
-                        class="w-full bg-gray-50 dark:bg-secondary-dark border border-gray-200 dark:border-gray-700 rounded-2xl px-6 py-4 text-lg outline-none focus:ring-4 ring-accent/20 transition-all shadow-md text-slate-900 dark:text-white font-mono">
-                </div>
-                <button id="whois-btn" class="bg-accent hover:bg-blue-600 text-white font-bold px-8 py-4 rounded-2xl shadow-lg transition-all transform active:scale-95">
-                    Lookup
-                </button>
-            </div>
-            
-            <div id="whois-terminal" class="terminal-box terminal-light dark:terminal-dark-box p-6 text-[11px] md:text-xs leading-relaxed overflow-x-auto min-h-[100px] hidden shadow-inner border">
-            </div>
-        </section>
-
-        <!-- CARD DE IP PRINCIPAL -->
+        <!-- CARD DE IP PRINCIPAL - AGORA NO TOPO -->
         <div class="bg-white dark:bg-secondary-dark rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
             <div class="p-8 md:p-12 text-center border-b border-gray-100 dark:border-gray-800 bg-gradient-to-b from-transparent to-gray-50 dark:to-primary-dark/5">
                 <h2 id="label-your-ip" class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-6">Your Public IP Address</h2>
-                <div id="ipv4-display" class="text-5xl md:text-8xl font-black tracking-tighter text-accent break-all">
+                <div id="ipv4-display" class="text-5xl md:text-8xl font-black tracking-tighter text-accent break-all leading-tight">
                      <div class="h-20 w-64 mx-auto skeleton rounded-2xl"></div>
                 </div>
                 <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-2 uppercase tracking-widest">IPv4 Protocol</p>
@@ -132,23 +109,50 @@
                 </div>
             </div>
 
-            <!-- GRID DE INFORMAÇÕES -->
+            <!-- GRID DE INFORMAÇÕES GEOGRÁFICAS -->
             <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8 bg-gray-50/50 dark:bg-primary-dark/20">
                 <div id="geo-details" class="space-y-4">
-                    <h3 id="label-loc-info" class="font-bold flex items-center gap-2 text-sm uppercase text-slate-500 dark:text-slate-400"><span class="w-1.5 h-4 bg-accent rounded-full"></span> Location Info</h3>
+                    <h3 id="label-loc-info" class="font-bold flex items-center gap-2 text-sm uppercase text-slate-500 dark:text-slate-400">
+                        <span class="w-1.5 h-4 bg-accent rounded-full"></span> Location Info
+                    </h3>
                     <div id="geo-grid" class="grid grid-cols-2 gap-3">
                         <div class="h-12 skeleton rounded-xl"></div><div class="h-12 skeleton rounded-xl"></div>
                         <div class="h-12 skeleton rounded-xl"></div><div class="h-12 skeleton rounded-xl"></div>
                     </div>
                 </div>
                 <div id="network-details" class="space-y-4">
-                    <h3 id="label-prov-info" class="font-bold flex items-center gap-2 text-sm uppercase text-slate-500 dark:text-slate-400"><span class="w-1.5 h-4 bg-blue-400 rounded-full"></span> Provider Info</h3>
+                    <h3 id="label-prov-info" class="font-bold flex items-center gap-2 text-sm uppercase text-slate-500 dark:text-slate-400">
+                        <span class="w-1.5 h-4 bg-blue-400 rounded-full"></span> Provider Info
+                    </h3>
                     <div id="net-grid" class="space-y-3">
                         <div class="h-28 skeleton rounded-xl"></div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- SEÇÃO WHOIS AVANÇADA - MOVIDA PARA BAIXO -->
+        <section class="space-y-4 bg-gray-100/50 dark:bg-secondary-dark/30 p-6 rounded-3xl border border-dashed border-gray-300 dark:border-gray-700">
+            <div class="flex flex-col gap-1">
+                <h3 id="label-whois-title" class="text-xl font-bold px-1 flex items-center gap-2 text-slate-800 dark:text-white">
+                    <span class="text-accent">🔍</span> Network & Organization Details
+                </h3>
+                <p id="label-whois-desc" class="text-sm text-slate-600 dark:text-slate-300 px-1 font-medium">Lookup any IP address for detailed ASN, ISP and WHOIS records.</p>
+            </div>
+            
+            <div class="flex flex-col md:flex-row gap-3">
+                <div class="relative flex-grow">
+                    <input id="whois-input" type="text" placeholder="Enter IP for deep lookup..." 
+                        class="w-full bg-white dark:bg-secondary-dark border border-gray-200 dark:border-gray-700 rounded-2xl px-6 py-4 text-lg outline-none focus:ring-4 ring-accent/20 transition-all shadow-md text-slate-900 dark:text-white font-mono">
+                </div>
+                <button id="whois-btn" class="bg-accent hover:bg-blue-600 text-white font-bold px-8 py-4 rounded-2xl shadow-lg transition-all transform active:scale-95">
+                    Lookup
+                </button>
+            </div>
+            
+            <div id="whois-terminal" class="terminal-box terminal-light dark:terminal-dark-box p-6 text-[11px] md:text-xs leading-relaxed overflow-x-auto min-h-[100px] hidden shadow-inner border">
+            </div>
+        </section>
 
         <!-- SEÇÃO TERMINAL -->
         <section class="bg-gray-100 dark:bg-secondary-dark rounded-3xl p-8 space-y-6 border border-gray-200 dark:border-none shadow-sm">
@@ -204,8 +208,6 @@
         <div class="flex justify-center gap-6 mb-4 font-bold uppercase tracking-widest">
             <a href="glossary.html" id="footer-glossary" class="hover:text-accent transition-colors">Network Glossary</a>
             <span class="opacity-30">|</span>
-            <a href="ipv6-location.html" id="footer-ipv6" class="hover:text-accent transition-colors">Why São Paulo?</a>
-            <span class="opacity-30">|</span>
             <a href="privacy.html" id="footer-privacy" class="hover:text-accent transition-colors">Privacy Policy</a>
         </div>
         <p class="font-bold mb-1 italic">CheckMyIP.Today</p>
@@ -228,7 +230,6 @@
                 country: "Country", city: "City", isp: "Provider", timezone: "Timezone", asn: "ASN",
                 netInfo: "Network Information", orgInfo: "Organization / Entity", regStatus: "Registration Status", contactInfo: "Abuse & Tech Contacts", security: "Security & Flags",
                 footerGlossary: "Network Glossary", 
-                footerIpv6: "Why São Paulo?",
                 footerPrivacy: "Privacy Policy",
                 errorMsg: "Data temporarily unavailable"
             },
@@ -246,7 +247,6 @@
                 country: "País", city: "Cidade", isp: "Provedor", timezone: "Fuso Horário", asn: "Número ASN",
                 netInfo: "Informações de Rede", orgInfo: "Organização / Entidade", regStatus: "Status do Registro", contactInfo: "Contatos de Abuso e Técnicos", security: "Segurança e Flags",
                 footerGlossary: "Glossário de Rede", 
-                footerIpv6: "Por que São Paulo?",
                 footerPrivacy: "Política de Privacidade",
                 errorMsg: "Dados temporariamente indisponíveis"
             }
@@ -268,9 +268,7 @@
             document.getElementById('whois-btn').innerText = t.lookup;
             document.getElementById('whois-input').placeholder = currentLang === 'pt' ? "Digite o IP para busca profunda..." : "Enter IP for deep lookup...";
             
-            // Updates do Footer
             document.getElementById('footer-glossary').innerText = t.footerGlossary;
-            document.getElementById('footer-ipv6').innerText = t.footerIpv6;
             document.getElementById('footer-privacy').innerText = t.footerPrivacy;
 
             if (lastGeoData) renderGeoGrid(lastGeoData);
@@ -368,12 +366,10 @@
             term.innerHTML = `<div class="flex items-center gap-2 text-slate-700 dark:text-slate-200 font-bold"><div class="h-2 w-2 bg-accent rounded-full animate-ping"></div> ${t.loading}</div>`;
             
             try {
-                // Fetch RDAP (WHOIS moderno)
                 const rdapRes = await fetch(`https://rdap.db.ripe.net/ip/${ip}`);
                 if (!rdapRes.ok) throw new Error("RDAP Not Found");
                 const rdap = await rdapRes.json();
                 
-                // Fetch Geo Adicional
                 let geo = {};
                 try {
                     const geoRes = await fetch(`https://ipapi.co/${ip}/json/`);
