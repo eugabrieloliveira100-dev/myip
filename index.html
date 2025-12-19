@@ -92,7 +92,7 @@
 
     <main class="flex-grow container mx-auto px-4 py-6 max-w-4xl space-y-8">
         
-        <!-- CARD DE IP PRINCIPAL - AGORA NO TOPO -->
+        <!-- CARD DE IP PRINCIPAL -->
         <div class="bg-white dark:bg-secondary-dark rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
             <div class="p-8 md:p-12 text-center border-b border-gray-100 dark:border-gray-800 bg-gradient-to-b from-transparent to-gray-50 dark:to-primary-dark/5">
                 <h2 id="label-your-ip" class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-6">Your Public IP Address</h2>
@@ -131,7 +131,38 @@
             </div>
         </div>
 
-        <!-- SEÇÃO WHOIS AVANÇADA - MOVIDA PARA BAIXO -->
+        <!-- WEBRTC LEAK TEST SECTION -->
+        <section class="bg-white dark:bg-secondary-dark rounded-3xl p-8 border border-gray-200 dark:border-gray-800 shadow-sm space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 id="label-webrtc-title" class="text-lg font-bold flex items-center gap-2 text-slate-800 dark:text-white">
+                    🛡️ WebRTC Leak Test
+                </h3>
+                <span id="webrtc-status-badge" class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">Scanning...</span>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-gray-50 dark:bg-primary-dark/30 p-4 rounded-2xl border border-gray-100 dark:border-gray-800">
+                    <p class="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Detected WebRTC IPs</p>
+                    <div id="webrtc-ips" class="font-mono text-sm font-bold text-accent break-all">
+                        Detecting...
+                    </div>
+                </div>
+                <div class="bg-gray-50 dark:bg-primary-dark/30 p-4 rounded-2xl border border-gray-100 dark:border-gray-800">
+                    <p class="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Leak Status</p>
+                    <div id="webrtc-status-text" class="text-sm font-bold text-slate-700 dark:text-gray-300 italic">
+                        Checking browser vulnerability...
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 bg-blue-50 dark:bg-accent/5 rounded-2xl border border-blue-100 dark:border-accent/10">
+                <p id="label-webrtc-note" class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed italic">
+                    <strong>Note:</strong> WebRTC is a technology that allows real-time communication in the browser. This test checks if your real IP is "leaking" through the browser, even when using a VPN or Proxy.
+                </p>
+            </div>
+        </section>
+
+        <!-- SEÇÃO WHOIS AVANÇADA -->
         <section class="space-y-4 bg-gray-100/50 dark:bg-secondary-dark/30 p-6 rounded-3xl border border-dashed border-gray-300 dark:border-gray-700">
             <div class="flex flex-col gap-1">
                 <h3 id="label-whois-title" class="text-xl font-bold px-1 flex items-center gap-2 text-slate-800 dark:text-white">
@@ -231,7 +262,13 @@
                 netInfo: "Network Information", orgInfo: "Organization / Entity", regStatus: "Registration Status", contactInfo: "Abuse & Tech Contacts", security: "Security & Flags",
                 footerGlossary: "Network Glossary", 
                 footerPrivacy: "Privacy Policy",
-                errorMsg: "Data temporarily unavailable"
+                errorMsg: "Data temporarily unavailable",
+                webrtcTitle: "🛡️ WebRTC Leak Test",
+                webrtcNote: "<strong>Note:</strong> WebRTC is a technology that allows real-time communication in the browser. This test checks if your real IP is 'leaking' through the browser, even when using a VPN or Proxy.",
+                webrtcSafe: "No Leak Detected",
+                webrtcLeaking: "Potential Leak Detected",
+                webrtcScanning: "Scanning...",
+                webrtcIpTitle: "Detected WebRTC IPs"
             },
             pt: {
                 yourIp: "Seu Endereço IP Público",
@@ -248,12 +285,19 @@
                 netInfo: "Informações de Rede", orgInfo: "Organização / Entidade", regStatus: "Status do Registro", contactInfo: "Contatos de Abuso e Técnicos", security: "Segurança e Flags",
                 footerGlossary: "Glossário de Rede", 
                 footerPrivacy: "Política de Privacidade",
-                errorMsg: "Dados temporariamente indisponíveis"
+                errorMsg: "Dados temporariamente indisponíveis",
+                webrtcTitle: "🛡️ Teste de Vazamento WebRTC",
+                webrtcNote: "<strong>Nota explicativa:</strong> O WebRTC é uma tecnologia que permite comunicação em tempo real no navegador. Este teste verifica se o seu IP real está 'vazando' através do navegador, mesmo quando você está usando uma VPN ou Proxy, o que pode comprometer sua privacidade.",
+                webrtcSafe: "Nenhum Vazamento Detectado",
+                webrtcLeaking: "Potencial Vazamento Detectado",
+                webrtcScanning: "Escaneando...",
+                webrtcIpTitle: "IPs WebRTC Detectados"
             }
         };
 
         let currentLang = 'en';
         let lastGeoData = null;
+        let publicIpv4 = "";
 
         function updateLanguage() {
             const t = translations[currentLang];
@@ -268,6 +312,9 @@
             document.getElementById('whois-btn').innerText = t.lookup;
             document.getElementById('whois-input').placeholder = currentLang === 'pt' ? "Digite o IP para busca profunda..." : "Enter IP for deep lookup...";
             
+            document.getElementById('label-webrtc-title').innerText = t.webrtcTitle;
+            document.getElementById('label-webrtc-note').innerHTML = t.webrtcNote;
+
             document.getElementById('footer-glossary').innerText = t.footerGlossary;
             document.getElementById('footer-privacy').innerText = t.footerPrivacy;
 
@@ -287,6 +334,7 @@
                 const v4 = v4res.status === 'fulfilled' ? v4res.value.ip : 'Not Detected';
                 const v6 = v6res.status === 'fulfilled' ? v6res.value.ip : 'Not Detected';
 
+                publicIpv4 = v4; // Save for WebRTC check
                 ipv4Disp.innerHTML = v4 !== 'Not Detected' ? `<span class="text-accent">${v4}</span>` : `<span class="text-slate-300 dark:text-gray-700 text-3xl">N/A</span>`;
                 ipv6Disp.innerText = v6;
 
@@ -294,8 +342,81 @@
                 if (mainIp !== 'Not Detected') {
                     loadGeo(mainIp);
                 }
+                
+                // Trigger WebRTC test after IP is known
+                startWebRTCTest();
             } catch (e) { ipv4Disp.innerText = "Error"; }
         }
+
+        // --- WebRTC Leak Detection Logic ---
+        function startWebRTCTest() {
+            const t = translations[currentLang];
+            const ipList = document.getElementById('webrtc-ips');
+            const statusText = document.getElementById('webrtc-status-text');
+            const badge = document.getElementById('webrtc-status-badge');
+            
+            const detectedIps = new Set();
+            
+            const RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
+            if (!RTCPeerConnection) {
+                statusText.innerText = "WebRTC not supported by browser.";
+                return;
+            }
+
+            const pc = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
+            pc.createDataChannel("");
+            pc.createOffer().then(offer => pc.setLocalDescription(offer));
+            
+            pc.onicecandidate = (ice) => {
+                if (!ice || !ice.candidate || !ice.candidate.candidate) {
+                    // ICE gathering finished
+                    finishWebRTCScan(detectedIps);
+                    return;
+                }
+                
+                const ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3}|([a-f0-9]{1,4}(:[a-f0-9]{1,4}){7}))/g;
+                const match = ice.candidate.candidate.match(ipRegex);
+                if (match) {
+                    match.forEach(ip => detectedIps.add(ip));
+                }
+            };
+
+            // Timeout safety
+            setTimeout(() => finishWebRTCScan(detectedIps), 4000);
+        }
+
+        function finishWebRTCScan(ips) {
+            const t = translations[currentLang];
+            const ipDisplay = document.getElementById('webrtc-ips');
+            const statusText = document.getElementById('webrtc-status-text');
+            const badge = document.getElementById('webrtc-status-badge');
+            
+            if (ips.size === 0) {
+                ipDisplay.innerText = "None detected";
+                statusText.innerText = t.webrtcSafe;
+                badge.innerText = "Secure";
+                badge.className = "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400";
+                return;
+            }
+
+            const ipArray = Array.from(ips);
+            ipDisplay.innerText = ipArray.join(', ');
+            
+            // Logic: if we detect a private IP (192.168, 10.x) while on VPN, it's a "leak"
+            // For now, simpler: if multiple IPs found, flag as potential leak
+            const isLeaking = ipArray.length > 1;
+            
+            if (isLeaking) {
+                badge.innerText = "Warning";
+                badge.className = "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
+                statusText.innerHTML = `<span class="text-red-500">${t.webrtcLeaking}</span>`;
+            } else {
+                badge.innerText = "Safe";
+                badge.className = "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400";
+                statusText.innerText = t.webrtcSafe;
+            }
+        }
+        // --- End WebRTC ---
 
         async function loadGeo(ip) {
             try {
