@@ -1,555 +1,313 @@
 <!DOCTYPE html>
-<html lang="en-US" class="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Check My IP Today - IP Lookup & Whois Tool</title>
-    
-    <link rel="preconnect" href="https://api.ipify.org">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    
-    <!-- Script de detecção RAW -->
-    <script>
-        (async function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('raw')) {
-                try {
-                    const res = await fetch('https://api.ipify.org?format=json');
-                    const data = await res.json();
-                    document.open();
-                    document.write(data.ip);
-                    document.close();
-                } catch (e) {
-                    document.write("Error detecting IP");
-                }
-                return;
-            }
-        })();
-    </script>
-
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CPDBZNF3CT"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-CPDBZNF3CT');
-    </script>
-
+    <title>Check My IP Today - Global Lookup</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-    
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: { 'primary-dark': '#0f172a', 'secondary-dark': '#1e293b', 'accent': '#3b82f6' },
-                    fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['Fira Code', 'monospace'] },
-                }
-            }
-        }
-    </script>
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { font-display: swap; }
-        body { transition: background-color 0.3s, color 0.3s; }
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
         
-        .skeleton { background: linear-gradient(90deg, #e2e8f0 25%, #cbd5e1 50%, #e2e8f0 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
-        .dark .skeleton { background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%); background-size: 200% 100%; }
-        
-        @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-        
-        .terminal-box { font-family: 'Fira Code', monospace; border-radius: 12px; transition: all 0.3s; }
-        .terminal-light { background-color: #f8fafc; color: #1e293b; border: 1px solid #e2e8f0; shadow: inset 0 1px 2px rgba(0,0,0,0.05); }
-        .dark .terminal-dark-box { background-color: #0d1117; color: #e6edf3; border: 1px solid #30363d; }
-
-        #lang-selector option {
-            background-color: white !important;
-            color: #1e293b !important;
+        :root {
+            --bg-deep: #020617;
+            --accent: #3b82f6;
         }
-        .dark #lang-selector option {
-            background-color: #1e293b !important;
-            color: #f1f5f9 !important;
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: var(--bg-deep);
+            color: #f1f5f9;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            width: 100%;
+        }
+
+        .vertical-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .scanner-line {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            animation: scan 3s infinite linear;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        .webrtc-tag {
+            background: rgba(234, 179, 8, 0.1);
+            color: #eab308;
+            border: 1px solid rgba(234, 179, 8, 0.2);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .explanation-text {
+            color: #cbd5e1;
+            font-size: 13px;
+            line-height: 1.6;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
     </style>
 </head>
-<body class="bg-white text-slate-900 dark:bg-primary-dark dark:text-gray-100 min-h-screen flex flex-col font-sans">
+<body>
 
-    <header class="w-full max-w-6xl mx-auto px-6 py-8 flex justify-between items-center">
-        <h1 class="text-2xl font-extrabold tracking-tight">Check My IP <span class="text-accent italic">Today</span></h1>
-        <div class="flex items-center gap-4">
-            <select id="lang-selector" class="bg-gray-100 dark:bg-secondary-dark border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-700 dark:text-gray-200 cursor-pointer transition-colors outline-none focus:ring-2 ring-accent/50">
-                <option value="en">English</option>
-                <option value="pt">Português</option>
-            </select>
-            <button id="theme-toggle" class="p-2.5 rounded-lg bg-gray-100 dark:bg-secondary-dark hover:ring-2 ring-accent transition-all text-slate-700 dark:text-gray-200">
-                <svg id="theme-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg>
-            </button>
-        </div>
-    </header>
-
-    <main class="flex-grow container mx-auto px-4 py-6 max-w-4xl space-y-8">
+    <div class="vertical-stack">
         
-        <!-- CARD DE IP PRINCIPAL -->
-        <div class="bg-white dark:bg-secondary-dark rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-            <div class="p-8 md:p-12 text-center border-b border-gray-100 dark:border-gray-800 bg-gradient-to-b from-transparent to-gray-50 dark:to-primary-dark/5">
-                <h2 id="label-your-ip" class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-6">Your Public IP Address</h2>
-                <div id="ipv4-display" class="text-5xl md:text-8xl font-black tracking-tighter text-accent break-all leading-tight">
-                     <div class="h-20 w-64 mx-auto skeleton rounded-2xl"></div>
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-900/50 p-6 rounded-3xl border border-white/5">
+            <div>
+                <h1 class="text-2xl font-extrabold tracking-tight">CHECKMYIP.<span class="text-blue-500">TODAY</span></h1>
+                <p class="text-slate-500 text-xs font-mono mt-1">ADVANCED NETWORK DISCOVERY ENGINE</p>
+            </div>
+            <div id="global-status" class="flex items-center gap-3 bg-black/30 px-4 py-2 rounded-full border border-white/10">
+                <span class="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
+                <span id="status-text" class="text-xs font-bold uppercase tracking-widest text-slate-300">SYSTEM READY</span>
+            </div>
+        </header>
+
+        <!-- Your Public IP Address Section -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-[20px]">
+            <div class="glass-card p-8 rounded-3xl relative overflow-hidden">
+                <div class="scanner-line absolute w-full top-0 left-0 opacity-20"></div>
+                <div class="flex justify-between items-start mb-6">
+                    <span class="bg-blue-500/10 text-blue-400 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">Your Public IP Address</span>
+                    <i class="fas fa-network-wired text-blue-500/50"></i>
                 </div>
-                <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-2 uppercase tracking-widest">IPv4 Protocol</p>
-                
-                <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800/50 max-w-sm mx-auto">
-                    <div id="ipv6-display" class="text-xs md:text-base font-mono text-slate-700 dark:text-slate-300 break-all font-bold">
-                        <div class="h-5 w-56 mx-auto skeleton rounded mt-2"></div>
-                    </div>
-                    <p class="text-[9px] font-bold text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-widest">IPv6 Protocol</p>
+                <h2 class="text-slate-500 text-sm font-semibold mb-2">IPv4 PROTOCOL</h2>
+                <div id="ipv4-display" class="text-3xl md:text-5xl font-black tracking-tighter text-white truncate">Detecting...</div>
+                <div class="mt-6">
+                    <button onclick="copyContent('ipv4-display')" class="text-xs bg-slate-800 hover:bg-slate-700 p-2 px-4 rounded-xl transition-all"><i class="far fa-copy mr-2"></i>Copy IPv4</button>
                 </div>
             </div>
 
-            <!-- GRID DE INFORMAÇÕES GEOGRÁFICAS -->
-            <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8 bg-gray-50/50 dark:bg-primary-dark/20">
-                <div id="geo-details" class="space-y-4">
-                    <h3 id="label-loc-info" class="font-bold flex items-center gap-2 text-sm uppercase text-slate-500 dark:text-slate-400">
-                        <span class="w-1.5 h-4 bg-accent rounded-full"></span> Location Info
-                    </h3>
-                    <div id="geo-grid" class="grid grid-cols-2 gap-3">
-                        <div class="h-12 skeleton rounded-xl"></div><div class="h-12 skeleton rounded-xl"></div>
-                        <div class="h-12 skeleton rounded-xl"></div><div class="h-12 skeleton rounded-xl"></div>
-                    </div>
+            <div class="glass-card p-8 rounded-3xl relative overflow-hidden">
+                <div class="flex justify-between items-start mb-6">
+                    <span class="bg-purple-500/10 text-purple-400 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">Your Public IP Address</span>
+                    <i class="fas fa-globe-americas text-purple-500/50"></i>
                 </div>
-                <div id="network-details" class="space-y-4">
-                    <h3 id="label-prov-info" class="font-bold flex items-center gap-2 text-sm uppercase text-slate-500 dark:text-slate-400">
-                        <span class="w-1.5 h-4 bg-blue-400 rounded-full"></span> Provider Info
-                    </h3>
-                    <div id="net-grid" class="space-y-3">
-                        <div class="h-28 skeleton rounded-xl"></div>
-                    </div>
+                <h2 class="text-slate-500 text-sm font-semibold mb-2">IPv6 PROTOCOL</h2>
+                <div id="ipv6-display" class="text-2xl md:text-4xl font-black tracking-tighter text-slate-600 truncate">Not Detected</div>
+                <div class="mt-6">
+                    <button onclick="copyContent('ipv6-display')" class="text-xs bg-slate-800 hover:bg-slate-700 p-2 px-4 rounded-xl transition-all"><i class="far fa-copy mr-2"></i>Copy IPv6</button>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- WEBRTC LEAK TEST SECTION -->
-        <section class="bg-white dark:bg-secondary-dark rounded-3xl p-8 border border-gray-200 dark:border-gray-800 shadow-sm space-y-4">
-            <div class="flex items-center justify-between">
-                <h3 id="label-webrtc-title" class="text-lg font-bold flex items-center gap-2 text-slate-800 dark:text-white">
-                    🛡️ WebRTC Leak Test
+        <!-- Location Info & Provider Info -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-[20px]">
+            <div class="glass-card p-6 rounded-3xl">
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-6 flex items-center">
+                    <i class="fas fa-map-marker-alt mr-2 text-blue-500"></i> Location Info
                 </h3>
-                <span id="webrtc-status-badge" class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">Scanning...</span>
+                <div class="space-y-4">
+                    <div class="flex justify-between border-b border-white/5 pb-2">
+                        <span class="text-slate-400 text-sm">City</span>
+                        <span id="info-city" class="text-white font-bold text-sm">---</span>
+                    </div>
+                    <div class="flex justify-between border-b border-white/5 pb-2">
+                        <span class="text-slate-400 text-sm">Region</span>
+                        <span id="info-region" class="text-white font-bold text-sm">---</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400 text-sm">Country</span>
+                        <span id="info-country" class="text-white font-bold text-sm">---</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card p-6 rounded-3xl">
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-6 flex items-center">
+                    <i class="fas fa-server mr-2 text-blue-500"></i> PROVIDER INFO
+                </h3>
+                <div class="space-y-4">
+                    <div class="flex flex-col gap-1">
+                        <span class="text-slate-400 text-xs">Internet Service Provider (ISP)</span>
+                        <span id="info-isp" class="text-white font-bold text-sm truncate">Loading...</span>
+                    </div>
+                    <div class="flex justify-between pt-2">
+                        <span class="text-slate-400 text-sm">Organization</span>
+                        <span id="info-org" class="text-white font-bold text-sm truncate max-w-[150px]">---</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- WebRTC Leak Test Section -->
+        <section class="glass-card p-6 rounded-3xl border-l-4 border-l-yellow-500/50">
+            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center">
+                🛡️ WebRTC Leak Test
+            </h3>
+            <div class="flex flex-wrap gap-2 min-h-[40px] items-center" id="webrtc-ips">
+                <span class="text-[10px] text-slate-500 font-mono animate-pulse">Initializing WebRTC scan...</span>
+            </div>
+            
+            <div class="explanation-text">
+                <p><strong>About this test:</strong> WebRTC is a technology that enables real-time communication in your browser. However, it can reveal ("leak") your true IP addresses even if you are using a VPN. The numbers above represent your unique network identifiers: <strong>IPv4</strong> (e.g., 186.x.x.x) and <strong>IPv6</strong> (long format) are your public internet addresses, while other numbers may indicate your local interface or network routes. If you see your real IP here while using a VPN, your privacy might be exposed.</p>
+            </div>
+        </section>
+
+        <!-- Network & Organization Details -->
+        <section class="glass-card p-8 rounded-3xl bg-gradient-to-br from-slate-900 to-black border border-blue-500/20">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+                <div>
+                    <h2 class="text-xl font-bold mb-2">🔍 Network & Organization Details</h2>
+                    <p class="text-slate-400 text-sm">Lookup any IP address for detailed ASN, ISP and WHOIS records.</p>
+                </div>
+                <div class="flex flex-col gap-2 w-full md:w-auto">
+                    <span class="text-[10px] text-slate-500 font-bold uppercase tracking-widest ml-1">Analyze Specific IP</span>
+                    <div class="flex bg-white/5 border border-white/10 rounded-2xl overflow-hidden focus-within:border-blue-500 transition-all">
+                        <input type="text" id="ip-search-input" placeholder="Ex: 1.1.1.1" class="bg-transparent border-none outline-none px-4 py-3 text-sm text-white w-full md:w-64 font-mono">
+                        <button id="lookup-btn" onclick="performLookup()" class="bg-blue-600 hover:bg-blue-500 text-white px-6 transition-all">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-gray-50 dark:bg-primary-dark/30 p-4 rounded-2xl border border-gray-100 dark:border-gray-800">
-                    <p class="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Detected WebRTC IPs</p>
-                    <div id="webrtc-ips" class="font-mono text-sm font-bold text-accent break-all">
-                        Detecting...
-                    </div>
+                <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
+                    <span class="text-[10px] uppercase text-slate-500 block mb-1">Autonomous System (ASN)</span>
+                    <span id="info-asn" class="text-blue-400 font-mono font-bold">---</span>
                 </div>
-                <div class="bg-gray-50 dark:bg-primary-dark/30 p-4 rounded-2xl border border-gray-100 dark:border-gray-800">
-                    <p class="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Leak Status</p>
-                    <div id="webrtc-status-text" class="text-sm font-bold text-slate-700 dark:text-gray-300 italic">
-                        Checking browser vulnerability...
-                    </div>
-                </div>
-            </div>
-
-            <div class="p-4 bg-blue-50 dark:bg-accent/5 rounded-2xl border border-blue-100 dark:border-accent/10">
-                <p id="label-webrtc-note" class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed italic">
-                    <strong>Note:</strong> WebRTC is a technology that allows real-time communication in the browser. This test checks if your real IP is "leaking" through the browser, even when using a VPN or Proxy.
-                </p>
-            </div>
-        </section>
-
-        <!-- SEÇÃO WHOIS AVANÇADA -->
-        <section class="space-y-4 bg-gray-100/50 dark:bg-secondary-dark/30 p-6 rounded-3xl border border-dashed border-gray-300 dark:border-gray-700">
-            <div class="flex flex-col gap-1">
-                <h3 id="label-whois-title" class="text-xl font-bold px-1 flex items-center gap-2 text-slate-800 dark:text-white">
-                    <span class="text-accent">🔍</span> Network & Organization Details
-                </h3>
-                <p id="label-whois-desc" class="text-sm text-slate-600 dark:text-slate-300 px-1 font-medium">Lookup any IP address for detailed ASN, ISP and WHOIS records.</p>
-            </div>
-            
-            <div class="flex flex-col md:flex-row gap-3">
-                <div class="relative flex-grow">
-                    <input id="whois-input" type="text" placeholder="Enter IP for deep lookup..." 
-                        class="w-full bg-white dark:bg-secondary-dark border border-gray-200 dark:border-gray-700 rounded-2xl px-6 py-4 text-lg outline-none focus:ring-4 ring-accent/20 transition-all shadow-md text-slate-900 dark:text-white font-mono">
-                </div>
-                <button id="whois-btn" class="bg-accent hover:bg-blue-600 text-white font-bold px-8 py-4 rounded-2xl shadow-lg transition-all transform active:scale-95">
-                    Lookup
-                </button>
-            </div>
-            
-            <div id="whois-terminal" class="terminal-box terminal-light dark:terminal-dark-box p-6 text-[11px] md:text-xs leading-relaxed overflow-x-auto min-h-[100px] hidden shadow-inner border">
-            </div>
-        </section>
-
-        <!-- SEÇÃO TERMINAL -->
-        <section class="bg-gray-100 dark:bg-secondary-dark rounded-3xl p-8 space-y-6 border border-gray-200 dark:border-none shadow-sm">
-            <h3 id="label-terminal-check" class="text-lg font-bold flex items-center gap-2 text-slate-800 dark:text-white">💻 Check IP via Terminal</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-3">
-                    <p class="text-[10px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-widest px-1">Linux / macOS / Unix</p>
-                    <div class="terminal-box terminal-light dark:terminal-dark-box p-4 text-xs flex justify-between items-center">
-                        <code class="font-bold">curl ifconfig.me</code>
-                        <button onclick="copyToClipboard('curl ifconfig.me')" class="text-accent font-black px-2 hover:scale-110 transition-transform">Copy</button>
-                    </div>
-                </div>
-                <div class="space-y-3">
-                    <p class="text-[10px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-widest px-1">Windows (PowerShell)</p>
-                    <div class="terminal-box terminal-light dark:terminal-dark-box p-4 text-xs flex justify-between items-center">
-                        <code class="font-bold">curl.exe ifconfig.me</code>
-                        <button onclick="copyToClipboard('curl.exe ifconfig.me')" class="text-accent font-black px-2 hover:scale-110 transition-transform">Copy</button>
-                    </div>
+                <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
+                    <span class="text-[10px] uppercase text-slate-500 block mb-1">Hostname / IP Searched</span>
+                    <span id="info-hostname" class="text-white font-mono text-xs truncate block">---</span>
                 </div>
             </div>
         </section>
 
-        <!-- DEVELOPER TOOLS -->
-        <div class="bg-gray-100 dark:bg-secondary-dark rounded-3xl p-8 space-y-6 border border-gray-200 dark:border-none shadow-sm">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <h3 id="label-terminal-tools" class="text-lg font-bold flex items-center gap-2 text-slate-800 dark:text-white">🛠️ Developer Tools</h3>
-                <div class="bg-accent/20 text-accent dark:bg-accent/10 text-accent text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter">API Lite Enabled</div>
+        <!-- Developer Tools -->
+        <section class="glass-card p-6 rounded-3xl border border-dashed border-white/10 mb-8">
+            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center">
+                🛠️ Developer Tools
+            </h3>
+            <div class="flex flex-wrap gap-3">
+                <button onclick="initSequence()" class="bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold py-2 px-4 rounded-xl transition-all">RE-SCAN</button>
+                <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-700 text-white text-[10px] font-bold py-2 px-4 rounded-xl transition-all">EXPORT PDF</button>
             </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div class="space-y-2">
-                    <p class="text-[10px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-widest px-1">Raw IP Text (For Scripts)</p>
-                    <div class="terminal-box terminal-light dark:terminal-dark-box p-4 text-xs flex justify-between items-center group">
-                        <code class="font-bold">checkmyip.today?raw</code>
-                        <button onclick="copyToClipboard('https://checkmyip.today?raw')" class="text-accent font-black px-2 hover:scale-110 transition-transform">Copy URL</button>
-                    </div>
-                </div>
-                <div class="space-y-2">
-                    <p class="text-[10px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-widest px-1">Direct CLI Check</p>
-                    <div class="terminal-box terminal-light dark:terminal-dark-box p-4 text-xs flex justify-between items-center group">
-                        <code class="font-bold">curl checkmyip.today?raw</code>
-                        <button onclick="copyToClipboard('curl checkmyip.today?raw')" class="text-accent font-black px-2 hover:scale-110 transition-transform">Copy</button>
-                    </div>
-                </div>
-            </div>
-            <p id="label-raw-desc" class="text-[11px] text-slate-700 dark:text-slate-200 font-medium leading-relaxed">
-                Adding <code class="font-bold bg-gray-200 dark:bg-gray-700 px-1 rounded text-accent">?raw</code> to the URL returns only the IP address as plain text, ideal for automation scripts.
-            </p>
-        </div>
-    </main>
+        </section>
 
-    <footer class="py-12 text-center text-slate-500 dark:text-slate-400 text-[10px] md:text-xs border-t border-gray-200 dark:border-gray-800 mt-12 bg-gray-50/50 dark:bg-white/5">
-        <div class="flex justify-center gap-6 mb-4 font-bold uppercase tracking-widest">
-            <a href="glossary.html" id="footer-glossary" class="hover:text-accent transition-colors">Network Glossary</a>
-            <span class="opacity-30">|</span>
-            <a href="privacy.html" id="footer-privacy" class="hover:text-accent transition-colors">Privacy Policy</a>
-        </div>
-        <p class="font-bold mb-1 italic">CheckMyIP.Today</p>
-        <p>&copy; 2024 Professional Network Diagnostics.</p>
-    </footer>
+    </div>
 
     <script>
-        const translations = {
-            en: {
-                yourIp: "Your Public IP Address",
-                whoisTitle: "Network & Organization Details",
-                whoisDesc: "Lookup any IP address for detailed ASN, ISP and WHOIS records.",
-                locInfo: "Location Info",
-                provInfo: "Provider Info",
-                terminalCheck: "Check IP via Terminal",
-                terminalTools: "Developer Tools",
-                rawDesc: "Adding <code class='font-bold bg-gray-200 dark:bg-gray-700 px-1 rounded text-accent'>?raw</code> to the URL returns only the IP address as plain text, ideal for automation scripts.",
-                lookup: "Lookup",
-                loading: "Querying global records...",
-                country: "Country", city: "City", isp: "Provider", timezone: "Timezone", asn: "ASN",
-                netInfo: "Network Information", orgInfo: "Organization / Entity", regStatus: "Registration Status", contactInfo: "Abuse & Tech Contacts", security: "Security & Flags",
-                footerGlossary: "Network Glossary", 
-                footerPrivacy: "Privacy Policy",
-                errorMsg: "Data temporarily unavailable",
-                webrtcTitle: "🛡️ WebRTC Leak Test",
-                webrtcNote: "<strong>Note:</strong> WebRTC is a technology that allows real-time communication in the browser. This test checks if your real IP is 'leaking' through the browser, even when using a VPN or Proxy.",
-                webrtcSafe: "No Leak Detected",
-                webrtcLeaking: "Potential Leak Detected",
-                webrtcScanning: "Scanning...",
-                webrtcIpTitle: "Detected WebRTC IPs"
-            },
-            pt: {
-                yourIp: "Seu Endereço IP Público",
-                whoisTitle: "Detalhes de Rede e Organização",
-                whoisDesc: "Consulte qualquer endereço IP para obter registros detalhados de ASN, ISP e WHOIS.",
-                locInfo: "Informações de Localização",
-                provInfo: "Informações do Provedor",
-                terminalCheck: "Verificar IP via Terminal",
-                terminalTools: "Ferramentas para Desenvolvedores",
-                rawDesc: "Adicionar <code class='font-bold bg-gray-200 dark:bg-gray-700 px-1 rounded text-accent'>?raw</code> à URL retorna apenas o endereço IP em texto puro, ideal para scripts de automação.",
-                lookup: "Consultar",
-                loading: "Consultando registros globais...",
-                country: "País", city: "Cidade", isp: "Provedor", timezone: "Fuso Horário", asn: "Número ASN",
-                netInfo: "Informações de Rede", orgInfo: "Organização / Entidade", regStatus: "Status do Registro", contactInfo: "Contatos de Abuso e Técnicos", security: "Segurança e Flags",
-                footerGlossary: "Glossário de Rede", 
-                footerPrivacy: "Política de Privacidade",
-                errorMsg: "Dados temporariamente indisponíveis",
-                webrtcTitle: "🛡️ Teste de Vazamento WebRTC",
-                webrtcNote: "<strong>Nota explicativa:</strong> O WebRTC é uma tecnologia que permite comunicação em tempo real no navegador. Este teste verifica se o seu IP real está 'vazando' através do navegador, mesmo quando você está usando uma VPN ou Proxy, o que pode comprometer sua privacidade.",
-                webrtcSafe: "Nenhum Vazamento Detectado",
-                webrtcLeaking: "Potencial Vazamento Detectado",
-                webrtcScanning: "Escaneando...",
-                webrtcIpTitle: "IPs WebRTC Detectados"
-            }
-        };
-
-        let currentLang = 'en';
-        let lastGeoData = null;
-        let publicIpv4 = "";
-
-        function updateLanguage() {
-            const t = translations[currentLang];
-            document.getElementById('label-your-ip').innerText = t.yourIp;
-            document.getElementById('label-whois-title').innerHTML = `<span class="text-accent">🔍</span> ${t.whoisTitle}`;
-            document.getElementById('label-whois-desc').innerText = t.whoisDesc;
-            document.getElementById('label-terminal-check').innerText = `💻 ${t.terminalCheck}`;
-            document.getElementById('label-terminal-tools').innerText = `🛠️ ${t.terminalTools}`;
-            document.getElementById('label-raw-desc').innerHTML = t.rawDesc;
-            document.getElementById('label-loc-info').innerHTML = `<span class="w-1.5 h-4 bg-accent rounded-full"></span> ${t.locInfo}`;
-            document.getElementById('label-prov-info').innerHTML = `<span class="w-1.5 h-4 bg-blue-400 rounded-full"></span> ${t.provInfo}`;
-            document.getElementById('whois-btn').innerText = t.lookup;
-            document.getElementById('whois-input').placeholder = currentLang === 'pt' ? "Digite o IP para busca profunda..." : "Enter IP for deep lookup...";
-            
-            document.getElementById('label-webrtc-title').innerText = t.webrtcTitle;
-            document.getElementById('label-webrtc-note').innerHTML = t.webrtcNote;
-
-            document.getElementById('footer-glossary').innerText = t.footerGlossary;
-            document.getElementById('footer-privacy').innerText = t.footerPrivacy;
-
-            if (lastGeoData) renderGeoGrid(lastGeoData);
-        }
-
-        async function fetchMainData() {
-            const ipv4Disp = document.getElementById('ipv4-display');
-            const ipv6Disp = document.getElementById('ipv6-display');
-
-            try {
-                const [v4res, v6res] = await Promise.allSettled([
-                    fetch('https://api.ipify.org?format=json').then(r => r.json()),
-                    fetch('https://api64.ipify.org?format=json').then(r => r.json())
-                ]);
-
-                const v4 = v4res.status === 'fulfilled' ? v4res.value.ip : 'Not Detected';
-                const v6 = v6res.status === 'fulfilled' ? v6res.value.ip : 'Not Detected';
-
-                publicIpv4 = v4; // Save for WebRTC check
-                ipv4Disp.innerHTML = v4 !== 'Not Detected' ? `<span class="text-accent">${v4}</span>` : `<span class="text-slate-300 dark:text-gray-700 text-3xl">N/A</span>`;
-                ipv6Disp.innerText = v6;
-
-                const mainIp = v4 !== 'Not Detected' ? v4 : v6;
-                if (mainIp !== 'Not Detected') {
-                    loadGeo(mainIp);
-                }
-                
-                // Trigger WebRTC test after IP is known
-                startWebRTCTest();
-            } catch (e) { ipv4Disp.innerText = "Error"; }
-        }
-
-        // --- WebRTC Leak Detection Logic ---
-        function startWebRTCTest() {
-            const t = translations[currentLang];
-            const ipList = document.getElementById('webrtc-ips');
-            const statusText = document.getElementById('webrtc-status-text');
-            const badge = document.getElementById('webrtc-status-badge');
-            
-            const detectedIps = new Set();
-            
-            const RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
-            if (!RTCPeerConnection) {
-                statusText.innerText = "WebRTC not supported by browser.";
-                return;
-            }
-
-            const pc = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
-            pc.createDataChannel("");
-            pc.createOffer().then(offer => pc.setLocalDescription(offer));
-            
-            pc.onicecandidate = (ice) => {
-                if (!ice || !ice.candidate || !ice.candidate.candidate) {
-                    // ICE gathering finished
-                    finishWebRTCScan(detectedIps);
-                    return;
-                }
-                
-                const ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3}|([a-f0-9]{1,4}(:[a-f0-9]{1,4}){7}))/g;
-                const match = ice.candidate.candidate.match(ipRegex);
-                if (match) {
-                    match.forEach(ip => detectedIps.add(ip));
-                }
-            };
-
-            // Timeout safety
-            setTimeout(() => finishWebRTCScan(detectedIps), 4000);
-        }
-
-        function finishWebRTCScan(ips) {
-            const t = translations[currentLang];
-            const ipDisplay = document.getElementById('webrtc-ips');
-            const statusText = document.getElementById('webrtc-status-text');
-            const badge = document.getElementById('webrtc-status-badge');
-            
-            if (ips.size === 0) {
-                ipDisplay.innerText = "None detected";
-                statusText.innerText = t.webrtcSafe;
-                badge.innerText = "Secure";
-                badge.className = "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400";
-                return;
-            }
-
-            const ipArray = Array.from(ips);
-            ipDisplay.innerText = ipArray.join(', ');
-            
-            // Logic: if we detect a private IP (192.168, 10.x) while on VPN, it's a "leak"
-            // For now, simpler: if multiple IPs found, flag as potential leak
-            const isLeaking = ipArray.length > 1;
-            
-            if (isLeaking) {
-                badge.innerText = "Warning";
-                badge.className = "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
-                statusText.innerHTML = `<span class="text-red-500">${t.webrtcLeaking}</span>`;
+        function updateAllUIComponents(data) {
+            const isIPv6 = data.ip && data.ip.includes(':');
+            if(isIPv6) {
+                document.getElementById('ipv6-display').innerText = data.ip;
+                document.getElementById('ipv6-display').classList.replace('text-slate-600', 'text-purple-400');
             } else {
-                badge.innerText = "Safe";
-                badge.className = "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400";
-                statusText.innerText = t.webrtcSafe;
+                document.getElementById('ipv4-display').innerText = data.ip || "N/A";
             }
-        }
-        // --- End WebRTC ---
-
-        async function loadGeo(ip) {
-            try {
-                const res = await fetch(`https://ipapi.co/${ip}/json/`);
-                if (!res.ok) throw new Error("API Limit reached");
-                lastGeoData = await res.json();
-                renderGeoGrid(lastGeoData);
-                fetchWhois(ip);
-            } catch (e) { 
-                console.warn("Geolocation API Error:", e);
-                renderErrorGrid();
-            }
+            document.getElementById('info-city').innerText = data.city || "---";
+            document.getElementById('info-region').innerText = data.region || "---";
+            document.getElementById('info-country').innerText = data.country_name || "---";
+            document.getElementById('info-isp').innerText = data.org || "---";
+            document.getElementById('info-org').innerText = data.asn || "---";
+            document.getElementById('info-asn').innerText = data.asn || "---";
+            document.getElementById('info-hostname').innerText = data.ip;
         }
 
-        function renderErrorGrid() {
-            const t = translations[currentLang];
-            const msg = `<p class="text-[10px] text-red-400 font-bold">${t.errorMsg}</p>`;
-            document.getElementById('geo-grid').innerHTML = `
-                <div class="bg-white dark:bg-secondary-dark p-4 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">${msg}</div>
-                <div class="bg-white dark:bg-secondary-dark p-4 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">${msg}</div>
-                <div class="bg-white dark:bg-secondary-dark p-4 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">${msg}</div>
-                <div class="bg-white dark:bg-secondary-dark p-4 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">${msg}</div>
-            `;
-            document.getElementById('net-grid').innerHTML = `
-                <div class="bg-white dark:bg-secondary-dark p-5 rounded-2xl border border-gray-100 dark:border-gray-800 h-full flex flex-col justify-center shadow-sm">${msg}</div>
-            `;
-        }
-
-        function renderGeoGrid(d) {
-            const t = translations[currentLang];
-            document.getElementById('geo-grid').innerHTML = `
-                <div class="bg-white dark:bg-secondary-dark p-4 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">
-                    <p class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-1">${t.country}</p>
-                    <p class="font-bold text-sm truncate text-slate-800 dark:text-gray-200">${d.country_name || 'N/A'}</p>
-                </div>
-                <div class="bg-white dark:bg-secondary-dark p-4 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">
-                    <p class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-1">${t.city}</p>
-                    <p class="font-bold text-sm truncate text-slate-800 dark:text-gray-200">${d.city || 'N/A'}</p>
-                </div>
-                <div class="bg-white dark:bg-secondary-dark p-4 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">
-                    <p class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-1">${t.timezone}</p>
-                    <p class="font-bold text-[10px] truncate text-slate-800 dark:text-gray-200">${d.timezone || 'N/A'}</p>
-                </div>
-                <div class="bg-white dark:bg-secondary-dark p-4 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">
-                    <p class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-1">LAT/LONG</p>
-                    <p class="font-bold text-[10px] text-slate-800 dark:text-gray-200">${d.latitude}, ${d.longitude}</p>
-                </div>
-            `;
-
-            document.getElementById('net-grid').innerHTML = `
-                <div class="bg-white dark:bg-secondary-dark p-5 rounded-2xl border border-gray-100 dark:border-gray-800 h-full flex flex-col justify-center shadow-sm">
-                    <div>
-                        <p class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-1">${t.isp}</p>
-                        <p class="font-bold text-base text-accent leading-tight">${d.org || 'N/A'}</p>
-                    </div>
-                    <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
-                        <p class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-1">${t.asn}</p>
-                        <p class="font-mono text-xs font-bold text-slate-700 dark:text-gray-300">${d.asn || 'N/A'}</p>
-                    </div>
-                </div>
-            `;
-        }
-
-        async function fetchWhois(ip) {
-            const term = document.getElementById('whois-terminal');
-            const t = translations[currentLang];
-            term.classList.remove('hidden');
-            term.innerHTML = `<div class="flex items-center gap-2 text-slate-700 dark:text-slate-200 font-bold"><div class="h-2 w-2 bg-accent rounded-full animate-ping"></div> ${t.loading}</div>`;
+        async function performLookup() {
+            const input = document.getElementById('ip-search-input');
+            const targetIp = input.value.trim();
+            if(!targetIp) return;
             
             try {
-                const rdapRes = await fetch(`https://rdap.db.ripe.net/ip/${ip}`);
-                if (!rdapRes.ok) throw new Error("RDAP Not Found");
-                const rdap = await rdapRes.json();
-                
-                let geo = {};
-                try {
-                    const geoRes = await fetch(`https://ipapi.co/${ip}/json/`);
-                    geo = await geoRes.json();
-                } catch(e) { console.warn("Whois Geo Fallback"); }
-
-                const network = `${rdap.startAddress} - ${rdap.endAddress}`;
-                const status = rdap.status ? rdap.status.join(', ').toUpperCase() : 'N/A';
-                const org = rdap.name || 'N/A';
-                
-                let abuseEmail = 'Not Found';
-                if(rdap.entities) {
-                    rdap.entities.forEach(ent => {
-                        if(ent.vcardArray) {
-                            const vcard = ent.vcardArray[1];
-                            const emailEntry = vcard.find(v => v[0] === 'email');
-                            if(emailEntry) abuseEmail = emailEntry[3];
-                        }
-                    });
+                const response = await fetch(`https://ipapi.co/${targetIp}/json/`);
+                const data = await response.json();
+                if(!data.error) {
+                    updateAllUIComponents(data);
                 }
-
-                const entities = rdap.entities ? rdap.entities.map(e => `[${e.roles?.join('/') || 'ENTITY'}] ${e.handle}`).join('\n') : 'No contacts listed';
-
-                const output = `
-[ ${t.netInfo.toUpperCase()} ]
------------------------------------------------------------
-RANGE:       ${network}
-HOSTNAME:    ${geo.hostname || 'No reverse DNS record'}
-VERSION:     IP${rdap.ipVersion || 'v4'}
-ASN:         ${geo.asn || 'N/A'}
-ORGANIZATION:${geo.org || org}
-
-[ ${t.security.toUpperCase()} ]
------------------------------------------------------------
-COUNTRY:     ${geo.country_name || 'N/A'} (${geo.country_code || '??'})
-PROXY/VPN:   ${geo.proxy ? '⚠️ YES' : 'NO'}
-MOBILE:      ${geo.is_mobile ? 'YES' : 'NO'}
-ABUSE EMAIL: ${abuseEmail}
-
-[ ${t.regStatus.toUpperCase()} ]
------------------------------------------------------------
-STATUS:      ${status}
-ALLOCATED:   ${geo.asn_organization || 'N/A'}
-POSTAL CODE: ${geo.postal || 'N/A'}
-
-[ ${t.contactInfo.toUpperCase()} ]
------------------------------------------------------------
-${entities}
-
------------------------------------------------------------
->> REMOTE LOOKUP FINISHED FOR: ${ip}`;
-
-                term.innerHTML = `<pre class="whitespace-pre-wrap">${output}</pre>`;
-            } catch (e) {
-                term.innerHTML = `<div class="text-red-500 font-bold">Error: Connection failed or IP not found in global registry.</div>`;
+            } catch (err) { 
+                console.error("Network lookup failed."); 
             }
         }
 
-        function copyToClipboard(text) {
+        async function detectMyIP() {
+            try {
+                const res = await fetch('https://api.ipify.org?format=json');
+                const v4 = await res.json();
+                const info = await (await fetch(`https://ipapi.co/${v4.ip}/json/`)).json();
+                updateAllUIComponents(info);
+            } catch (e) { console.error('Main IP detection failed.'); }
+        }
+
+        async function detectIPv6() {
+            try {
+                const res6 = await fetch('https://api6.ipify.org?format=json');
+                const data6 = await res6.json();
+                if(data6.ip.includes(':')) {
+                    const el = document.getElementById('ipv6-display');
+                    el.innerText = data6.ip;
+                    el.classList.replace('text-slate-600', 'text-purple-400');
+                }
+            } catch (e) {}
+        }
+
+        async function runWebRTCScan() {
+            const display = document.getElementById('webrtc-ips');
+            const detectedIps = new Set();
+            const servers = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
+
+            try {
+                const pc = new RTCPeerConnection(servers);
+                pc.createDataChannel("");
+                pc.onicecandidate = (e) => {
+                    if (e.candidate) {
+                        const ipRegex = /([0-9a-f]{1,4}(:[0-9a-f]{1,4}){7}|[0-9]{1,3}(\.[0-9]{1,3}){3})/gi;
+                        const found = e.candidate.candidate.match(ipRegex);
+                        if (found) found.forEach(ip => {
+                            if (!detectedIps.has(ip)) {
+                                detectedIps.add(ip);
+                                renderWebRTC(detectedIps);
+                            }
+                        });
+                    }
+                };
+                const offer = await pc.createOffer();
+                await pc.setLocalDescription(offer);
+                setTimeout(() => { 
+                    if(detectedIps.size === 0) {
+                        display.innerHTML = '<span class="text-green-400 text-[10px]">Secure (No leak detected)</span>';
+                    }
+                }, 4000);
+            } catch (err) { 
+                display.innerHTML = '<span class="text-red-400 text-[10px]">WebRTC Blocked</span>'; 
+            }
+        }
+
+        function renderWebRTC(ipSet) {
+            const display = document.getElementById('webrtc-ips');
+            display.innerHTML = '';
+            ipSet.forEach(ip => {
+                const badge = document.createElement('span');
+                badge.className = 'webrtc-tag font-mono';
+                badge.innerText = ip;
+                display.appendChild(badge);
+            });
+        }
+
+        function copyContent(id) {
+            const text = document.getElementById(id).innerText;
             const el = document.createElement('textarea');
             el.value = text;
             document.body.appendChild(el);
@@ -558,34 +316,14 @@ ${entities}
             document.body.removeChild(el);
         }
 
-        function updateThemeIcon() {
-            const isDark = document.documentElement.classList.contains('dark');
-            const icon = document.getElementById('theme-icon');
-            icon.innerHTML = isDark ? 
-                '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M16.242 16.242l.707.707M7.758 7.758l.707.707M12 5a7 7 0 100 14 7 7 0 000-14z"></path>' : 
-                '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>';
+        function initSequence() {
+            detectMyIP();
+            detectIPv6();
+            runWebRTCScan();
         }
 
-        document.getElementById('lang-selector').onchange = (e) => {
-            currentLang = e.target.value;
-            updateLanguage();
-        };
-
-        document.getElementById('whois-btn').onclick = () => {
-            const val = document.getElementById('whois-input').value.trim();
-            if(val) fetchWhois(val);
-        };
-
-        document.getElementById('theme-toggle').onclick = () => {
-            document.documentElement.classList.toggle('dark');
-            updateThemeIcon();
-        };
-
-        window.onload = () => {
-            updateLanguage();
-            fetchMainData();
-            updateThemeIcon();
-        };
+        document.getElementById('ip-search-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') performLookup(); });
+        window.onload = initSequence;
     </script>
 </body>
 </html>
