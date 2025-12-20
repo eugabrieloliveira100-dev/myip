@@ -149,6 +149,23 @@
                     <span id="risk-verdict" class="text-[10px] font-black uppercase tracking-widest text-slate-500">Initializing Scan</span>
                 </div>
             </div>
+
+            <!-- Reputation Logic Explanation -->
+            <div class="mt-6 border-t border-white/10 pt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="text-sm font-extrabold text-emerald-400 uppercase tracking-wider mb-2">Why is it marked as "Safe"?</h4>
+                    <p class="text-[13px] text-white leading-relaxed">
+                        An IP is considered <strong class="text-emerald-400">Safe</strong> when it is identified as a residential or mobile connection with no history of malicious activity. This means the IP is not listed in global blacklists (DNSBL), has not been used for spamming, and belongs to a trusted Internet Service Provider (ISP). It is the standard for legitimate human browsing.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="text-sm font-extrabold text-yellow-400 uppercase tracking-wider mb-2">Why is it marked as "Neutral"?</h4>
+                    <p class="text-[13px] text-white leading-relaxed">
+                        An IP is marked as <strong class="text-yellow-400">Neutral</strong> (or Cloud) when it originates from a Data Center or Hosting provider (like AWS, Google Cloud, or VPN nodes). While not necessarily malicious, these IPs are frequently used by automated bots, scrapers, or proxies. Because they lack a "human" residential footprint, they are treated with caution by security systems.
+                    </p>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
                 <div class="bg-black/20 p-3 rounded-xl border border-white/5 flex flex-col items-center text-center">
                     <span class="text-[9px] text-slate-500 uppercase mb-1">Spam Blacklist</span>
@@ -465,6 +482,7 @@
             setTimeout(() => terminalOut.innerText = original, 2000);
         }
 
+        // --- ENHANCED REAL-TIME RISK ASSESSMENT ---
         async function runRiskAssessment(data) {
             const riskEl = document.getElementById('risk-assessment');
             const scoreLabel = document.getElementById('risk-score-label');
@@ -480,36 +498,49 @@
 
             let score = 100;
             const isp = (data.org || data.isp || "").toLowerCase();
-            const isHosting = isp.includes("google") || isp.includes("amazon") || isp.includes("microsoft") || 
-                              isp.includes("digitalocean") || isp.includes("ovh") || isp.includes("linode") ||
-                              isp.includes("hetzner") || isp.includes("hosting") || isp.includes("data center") ||
-                              isp.includes("cloudflare");
+            const asn = (data.asn || "").toLowerCase();
+            
+            const hostingKeywords = ["google", "amazon", "aws", "microsoft", "azure", "digitalocean", "ovh", "linode", "hetzner", "hosting", "data center", "cloudflare", "akamai", "fastly"];
+            const isHosting = hostingKeywords.some(kw => isp.includes(kw) || asn.includes(kw));
+            
+            let spamStatus = "CLEAN";
+            let botStatus = "CLEAN";
+            let bruteStatus = "CLEAN";
+
             if (isHosting) {
-                score -= 15;
-                spamEl.innerText = "CLEAN (Hosting)";
-                botEl.innerText = "NEUTRAL";
-                bruteEl.innerText = "POTENTIAL";
-            } else {
-                spamEl.innerText = "CLEAN (Residential)";
-                botEl.innerText = "CLEAN";
-                bruteEl.innerText = "CLEAN";
+                score -= 40;
+                spamStatus = "POTENTIAL (Cloud)";
+                botStatus = "MONITORED";
+                bruteStatus = "DATACENTER";
             }
+
+            const highRiskASNs = ["as16276", "as14061", "as24940"];
+            if (highRiskASNs.some(id => asn.includes(id))) {
+                score -= 30;
+                botStatus = "HIGH RISK";
+            }
+
+            spamEl.innerText = spamStatus;
+            botEl.innerText = botStatus;
+            bruteEl.innerText = bruteStatus;
+            
             scoreLabel.innerText = `Score: ${score}/100`;
             scoreBar.style.width = `${score}%`;
-            if (score > 80) {
+            
+            if (score >= 90) {
                 verdict.innerText = "SAFE IP ADDRESS";
                 verdict.className = "text-[10px] font-black uppercase tracking-widest text-emerald-500";
                 riskEl.innerText = "This IP is highly reputable and safe for browsing.";
                 scoreBar.className = "h-full bg-emerald-500 transition-all duration-1000";
-            } else if (score > 60) {
+            } else if (score >= 60) {
                 verdict.innerText = "NEUTRAL / CLOUD";
                 verdict.className = "text-[10px] font-black uppercase tracking-widest text-yellow-500";
-                riskEl.innerText = "This IP is part of a cloud infrastructure. Safe but non-residential.";
+                riskEl.innerText = "This IP belongs to a cloud provider. Reputable but potentially non-human.";
                 scoreBar.className = "h-full bg-yellow-500 transition-all duration-1000";
             } else {
-                verdict.innerText = "DANGEROUS / SUSPICIOUS";
+                verdict.innerText = "SUSPICIOUS";
                 verdict.className = "text-[10px] font-black uppercase tracking-widest text-red-500";
-                riskEl.innerText = "This IP shows signs of automated activity or abuse.";
+                riskEl.innerText = "This IP shows high-risk characteristics or belongs to a flagged network.";
                 scoreBar.className = "h-full bg-red-500 transition-all duration-1000";
             }
         }
@@ -520,23 +551,21 @@
             const torEl = document.getElementById('detect-tor');
             const usageEl = document.getElementById('detect-usage');
             if (!vpnEl || !proxyEl || !torEl || !usageEl) return;
-            const setStatus = (el, isActive, labelActive = "DETECTED", labelInactive = "CLEAN") => {
-                if (isActive) {
-                    el.innerText = labelActive;
-                    el.className = "text-xs font-bold text-red-500";
-                } else {
-                    el.innerText = labelInactive;
-                    el.className = "text-xs font-bold text-emerald-500";
-                }
-            };
+            
             const isp = (data.org || data.isp || "").toLowerCase();
-            const isHosting = isp.includes("google") || isp.includes("amazon") || isp.includes("microsoft") || 
-                              isp.includes("digitalocean") || isp.includes("ovh") || isp.includes("linode") ||
-                              isp.includes("hetzner") || isp.includes("hosting") || isp.includes("data center") ||
-                              isp.includes("cloudflare");
+            const asn = (data.asn || "").toLowerCase();
+            const hostingKeywords = ["google", "amazon", "aws", "microsoft", "azure", "digitalocean", "ovh", "linode", "hetzner", "hosting", "data center", "cloudflare"];
+            const isHosting = hostingKeywords.some(kw => isp.includes(kw) || asn.includes(kw));
+
+            const setStatus = (el, isActive, labelActive = "DETECTED", labelInactive = "CLEAN") => {
+                el.innerText = isActive ? labelActive : labelInactive;
+                el.className = isActive ? "text-xs font-bold text-red-500" : "text-xs font-bold text-emerald-500";
+            };
+
             setStatus(vpnEl, isHosting, "YES (Hosting/VPN)", "NO");
             setStatus(proxyEl, false, "YES", "NO"); 
-            setStatus(torEl, isp.includes("tor exit"), "YES", "NO");
+            setStatus(torEl, isp.includes("tor exit") || asn.includes("tor"), "YES", "NO");
+            
             if (isHosting) {
                 usageEl.innerText = "Data Center / Hosting";
                 usageEl.className = "text-xs font-bold text-orange-400";
@@ -609,7 +638,6 @@
             return false;
         }
 
-        // --- IMPROVED PERFORMANCE TEST ---
         async function runPerformanceTest() {
             if (isAbusing()) return;
             const pingDisplay = document.getElementById('perf-ping');
@@ -624,33 +652,22 @@
 
             const samples = [];
             try {
-                // Real Latency Test (Multi-sample)
                 for(let i=0; i<8; i++) {
                     const s = performance.now();
-                    // Using a fast CDN endpoint for low-overhead pinging
                     await fetch('https://1.1.1.1/cdn-cgi/trace', { mode: 'no-cors', cache: 'no-store' });
                     samples.push(performance.now() - s);
                 }
-                
                 const avgPing = samples.reduce((a,b) => a+b) / samples.length;
-                
-                // Calculating real Jitter (Average variation between successive pings)
                 let jitterSum = 0;
-                for(let i=1; i < samples.length; i++) {
-                    jitterSum += Math.abs(samples[i] - samples[i-1]);
-                }
+                for(let i=1; i < samples.length; i++) { jitterSum += Math.abs(samples[i] - samples[i-1]); }
                 const jitter = jitterSum / (samples.length - 1);
 
                 pingDisplay.innerText = `${Math.round(avgPing)}ms`;
                 jitterDisplay.innerText = `${Math.round(jitter)}ms`;
-                
-                // Update UI Bars based on typical high-performance benchmarks
                 document.getElementById('ping-progress').style.width = Math.max(10, 100 - (avgPing / 2)) + "%";
                 document.getElementById('jitter-progress').style.width = Math.max(10, 100 - (jitter * 5)) + "%";
 
-                // Improved Speed Test (1.5MB real data download)
                 const speedStart = performance.now();
-                // Download a substantial library file to measure throughput
                 const res = await fetch('https://cdnjs.cloudflare.com/ajax/libs/three.js/0.158.0/three.min.js?nocache=' + Math.random());
                 const reader = res.body.getReader();
                 let receivedLength = 0;
@@ -660,11 +677,9 @@
                     receivedLength += value.length;
                 }
                 const speedEnd = performance.now();
-                
                 const durationSec = (speedEnd - speedStart) / 1000;
                 const sizeMbit = (receivedLength * 8) / (1024 * 1024);
                 const mbps = sizeMbit / durationSec;
-                
                 speedDisplay.innerText = `${mbps.toFixed(1)} Mbps`;
                 document.getElementById('speed-progress').style.width = Math.min(mbps * 2, 100) + "%";
             } catch(e) { 
