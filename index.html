@@ -462,7 +462,7 @@
     </div>
 
     <script>
-        // JS logic updated to fix Performance Analysis
+        // JS logic updated for REAL performance testing
         function identifyIPType(ip) {
             if (!ip) return "Unknown";
             if (ip.includes(':')) return "IPv6 (Internet Protocol Version 6)";
@@ -621,7 +621,7 @@
             return false;
         }
 
-        // FIXED PERFORMANCE ANALYSIS LOGIC
+        // IMPROVED REAL PERFORMANCE ANALYSIS (Empirical Measurement)
         async function runPerformanceTest() {
             if (isAbusing()) return;
             const btn = document.getElementById('btn-perf');
@@ -634,40 +634,54 @@
             const jitterProg = document.getElementById('jitter-progress');
             const speedProg = document.getElementById('speed-progress');
 
-            pingEl.innerText = "Testing...";
-            jitterEl.innerText = "Testing...";
-            speedEl.innerText = "Testing...";
+            pingEl.innerText = "Measuring...";
+            jitterEl.innerText = "Analyzing...";
+            speedEl.innerText = "Transferring...";
 
             const samples = [];
-            const url = 'https://www.google.com/favicon.ico?v=' + Date.now();
+            // Using a large file from a CDN to measure real throughput (cached-busting)
+            const speedTestUrl = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js?cb=' + Date.now();
+            const latencyUrl = 'https://www.google.com/favicon.ico?v=' + Date.now();
 
             try {
-                for(let i=0; i<6; i++) {
+                // 1. LATENCY & JITTER (REAL)
+                for(let i=0; i<8; i++) {
                     const s = performance.now();
-                    await fetch(url, { mode: 'no-cors', cache: 'no-store' });
+                    await fetch(latencyUrl, { mode: 'no-cors', cache: 'no-store' });
                     const duration = performance.now() - s;
-                    if (i > 0) samples.push(duration); // Skip first warm-up sample
-                    await new Promise(r => setTimeout(r, 100));
+                    if (i > 0) samples.push(duration); // Remove warm-up
+                    await new Promise(r => setTimeout(r, 50));
                 }
 
                 const avgPing = samples.reduce((a,b) => a+b) / samples.length;
-                const jitter = Math.abs(samples[samples.length-1] - samples[0]);
                 
-                // Estimate speed based on RTT and a fixed packet size simulation
-                const estimatedMbps = (1 / (avgPing / 1000)) * 2.5; 
+                // Jitter calculation (Standard Deviation of samples)
+                const jitter = Math.sqrt(samples.map(x => Math.pow(x - avgPing, 2)).reduce((a, b) => a + b) / samples.length);
 
+                // 2. REAL DOWNLOAD SPEED (EMPIRICAL)
+                const startTime = performance.now();
+                const response = await fetch(speedTestUrl, { cache: 'no-store' });
+                const blob = await response.blob();
+                const endTime = performance.now();
+                
+                const durationSeconds = (endTime - startTime) / 1000;
+                const sizeBits = blob.size * 8;
+                const speedMbps = (sizeBits / durationSeconds) / (1024 * 1024);
+
+                // Update UI with real values
                 pingEl.innerText = `${Math.round(avgPing)}ms`;
                 jitterEl.innerText = `${Math.round(jitter)}ms`;
-                speedEl.innerText = `${estimatedMbps.toFixed(1)} Mbps (Est.)`;
+                speedEl.innerText = `${speedMbps.toFixed(2)} Mbps`;
 
-                pingProg.style.width = Math.min(100, Math.max(10, 100 - (avgPing / 3))) + "%";
-                jitterProg.style.width = Math.min(100, Math.max(10, 100 - (jitter / 2))) + "%";
-                speedProg.style.width = Math.min(100, (estimatedMbps * 2)) + "%";
+                // Calculate progress bar widths based on ranges
+                pingProg.style.width = Math.min(100, Math.max(5, 100 - (avgPing / 2.5))) + "%";
+                jitterProg.style.width = Math.min(100, Math.max(5, 100 - (jitter * 5))) + "%";
+                speedProg.style.width = Math.min(100, (speedMbps / 100) * 100) + "%";
 
             } catch (e) {
-                pingEl.innerText = "Error";
-                jitterEl.innerText = "Error";
-                speedEl.innerText = "Check Connection";
+                pingEl.innerText = "Blocked";
+                jitterEl.innerText = "Blocked";
+                speedEl.innerText = "Check CORS/Net";
             } finally {
                 btn.disabled = false;
             }
