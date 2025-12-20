@@ -282,6 +282,13 @@
                 </h3>
                 <button id="btn-perf" onclick="runPerformanceTest()" class="text-[10px] bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-full font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed">RE-RUN TEST</button>
             </div>
+
+            <!-- New Logic Description -->
+            <div class="mb-6 px-2">
+                <p class="text-white text-[13px] leading-relaxed">
+                    This section does not measure your raw ISP subscription speed (Bandwidth). Instead, it analyzes <strong>Network Quality</strong> and <strong>Routing Efficiency</strong>. It evaluates how quickly your current IP can establish handshakes with global edge nodes, measuring the stability (Jitter) and responsiveness (Latency) of your connection's path through the internet.
+                </p>
+            </div>
             
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
                 <div>
@@ -300,7 +307,7 @@
                 </div>
                 <div>
                     <div class="flex justify-between mb-2">
-                        <span class="text-[10px] text-slate-500 uppercase">Est. Download</span>
+                        <span class="text-[10px] text-slate-500 uppercase">Route Speed</span>
                         <span id="perf-speed" class="text-xs font-bold text-green-400">---</span>
                     </div>
                     <div class="perf-bar"><div id="speed-progress" class="perf-progress"></div></div>
@@ -313,7 +320,7 @@
                     <div class="text-[11px] text-slate-400 leading-relaxed">
                         <p><strong class="text-blue-400">Latency:</strong> Real measurement based on HTTP response time.</p>
                         <p><strong class="text-purple-400">Jitter:</strong> Latency variance captured during 5 consecutive samples.</p>
-                        <p><strong class="text-green-400">Download Speed:</strong> Transfer rate measured by downloading 150KB of real data.</p>
+                        <p><strong class="text-green-400">Route Speed:</strong> Responsiveness of the specific routing path used by your IP.</p>
                     </div>
                 </div>
             </div>
@@ -462,7 +469,6 @@
     </div>
 
     <script>
-        // JS logic updated for REAL performance testing
         function identifyIPType(ip) {
             if (!ip) return "Unknown";
             if (ip.includes(':')) return "IPv6 (Internet Protocol Version 6)";
@@ -621,7 +627,6 @@
             return false;
         }
 
-        // IMPROVED REAL PERFORMANCE ANALYSIS (Empirical Measurement)
         async function runPerformanceTest() {
             if (isAbusing()) return;
             const btn = document.getElementById('btn-perf');
@@ -639,26 +644,21 @@
             speedEl.innerText = "Transferring...";
 
             const samples = [];
-            // Using a large file from a CDN to measure real throughput (cached-busting)
             const speedTestUrl = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js?cb=' + Date.now();
             const latencyUrl = 'https://www.google.com/favicon.ico?v=' + Date.now();
 
             try {
-                // 1. LATENCY & JITTER (REAL)
                 for(let i=0; i<8; i++) {
                     const s = performance.now();
                     await fetch(latencyUrl, { mode: 'no-cors', cache: 'no-store' });
                     const duration = performance.now() - s;
-                    if (i > 0) samples.push(duration); // Remove warm-up
+                    if (i > 0) samples.push(duration);
                     await new Promise(r => setTimeout(r, 50));
                 }
 
                 const avgPing = samples.reduce((a,b) => a+b) / samples.length;
-                
-                // Jitter calculation (Standard Deviation of samples)
                 const jitter = Math.sqrt(samples.map(x => Math.pow(x - avgPing, 2)).reduce((a, b) => a + b) / samples.length);
 
-                // 2. REAL DOWNLOAD SPEED (EMPIRICAL)
                 const startTime = performance.now();
                 const response = await fetch(speedTestUrl, { cache: 'no-store' });
                 const blob = await response.blob();
@@ -668,12 +668,10 @@
                 const sizeBits = blob.size * 8;
                 const speedMbps = (sizeBits / durationSeconds) / (1024 * 1024);
 
-                // Update UI with real values
                 pingEl.innerText = `${Math.round(avgPing)}ms`;
                 jitterEl.innerText = `${Math.round(jitter)}ms`;
                 speedEl.innerText = `${speedMbps.toFixed(2)} Mbps`;
 
-                // Calculate progress bar widths based on ranges
                 pingProg.style.width = Math.min(100, Math.max(5, 100 - (avgPing / 2.5))) + "%";
                 jitterProg.style.width = Math.min(100, Math.max(5, 100 - (jitter * 5))) + "%";
                 speedProg.style.width = Math.min(100, (speedMbps / 100) * 100) + "%";
