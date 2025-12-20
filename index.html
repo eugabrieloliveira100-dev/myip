@@ -86,40 +86,43 @@
         </header>
 
         <!-- Section 1: Your Public IP Address (IPv4 & IPv6) -->
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <div class="glass-card p-8 rounded-3xl relative overflow-hidden">
-        <div class="flex justify-between items-start mb-4">
-            <span class="bg-blue-500/10 text-blue-400 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">Your Public IP Address</span>
-            <i class="fas fa-shield-alt text-blue-500/30"></i>
-        </div>
-        <h2 class="text-slate-500 text-xs font-bold mb-1 uppercase">IPv4 PROTOCOL</h2>
-        <div id="ipv4-display" class="text-3xl md:text-4xl font-black tracking-tighter text-white font-mono break-all">Detecting...</div>
-    </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="glass-card p-8 rounded-3xl relative overflow-hidden">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="bg-blue-500/10 text-blue-400 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">Your Public IP Address</span>
+                    <i class="fas fa-shield-alt text-blue-500/30"></i>
+                </div>
+                <h2 class="text-slate-500 text-xs font-bold mb-1 uppercase">IPv4 PROTOCOL</h2>
+                <div id="ipv4-display" class="text-3xl md:text-4xl font-black tracking-tighter text-white font-mono break-all">Detecting...</div>
+            </div>
 
-    <div class="glass-card p-8 rounded-3xl relative overflow-hidden">
-        <div class="flex justify-between items-start mb-4">
-            <span class="bg-purple-500/10 text-purple-400 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">Your Public IP Address</span>
-            <i class="fas fa-globe-americas text-purple-500/30"></i>
+            <div class="glass-card p-8 rounded-3xl relative overflow-hidden">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="bg-purple-500/10 text-purple-400 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">Your Public IP Address</span>
+                    <i class="fas fa-globe-americas text-purple-500/30"></i>
+                </div>
+                <h2 class="text-slate-500 text-xs font-bold mb-1 uppercase">IPv6 PROTOCOL</h2>
+                <div id="ipv6-display" class="text-lg md:text-xl lg:text-2xl font-black font-mono text-purple-200 break-all break-words overflow-wrap-anywhere hyphens-auto leading-snug min-h-[3.5rem] transition-all duration-200">
+                    Requesting...
+                </div>
+            </div>
         </div>
-        <h2 class="text-slate-500 text-xs font-bold mb-1 uppercase">IPv6 PROTOCOL</h2>
-        
-        <!-- SOLUÇÃO APLICADA AQUI -->
-        <div id="ipv6-display" class="
-            text-lg md:text-xl lg:text-2xl 
-            font-black font-mono 
-            text-purple-200 
-            break-all break-words 
-            overflow-wrap-anywhere 
-            hyphens-auto 
-            leading-snug 
-            min-h-[3.5rem]
-            transition-all duration-200
-        ">
-            Requesting...
+
+        <!-- NEW SECTION: IP Type Analysis -->
+        <div class="glass-card p-6 rounded-3xl border-l-4 border-l-blue-500">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="bg-blue-500/20 p-2 rounded-lg">
+                        <i class="fas fa-network-wired text-blue-400"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">IP Type Analysis</h3>
+                        <p id="ip-type-text" class="text-sm font-bold text-white">Analyzing protocol family...</p>
+                    </div>
+                </div>
+                <span id="ip-type-badge" class="hidden bg-white/10 text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">Unknown</span>
+            </div>
         </div>
-        <!-- FIM DA SOLUÇÃO -->
-    </div>
-</div>
 
         <!-- Section 2: Performance Analysis -->
         <section class="glass-card p-6 rounded-3xl border-t-2 border-t-blue-500">
@@ -272,9 +275,39 @@
     </div>
 
     <script>
+        // --- IP Type Detection Logic ---
+        function identifyIPType(ip) {
+            if (!ip) return "Unknown";
+            // Check for IPv6 (contains colons)
+            if (ip.includes(':')) {
+                return "IPv6 (Internet Protocol Version 6)";
+            }
+            // Check for IPv4 (contains dots)
+            if (ip.includes('.')) {
+                return "IPv4 (Internet Protocol Version 4)";
+            }
+            return "Unknown Format";
+        }
+
+        function updateIPTypeUI(ip) {
+            const type = identifyIPType(ip);
+            const textEl = document.getElementById('ip-type-text');
+            const badgeEl = document.getElementById('ip-type-badge');
+            
+            textEl.innerText = type;
+            badgeEl.innerText = ip.includes(':') ? 'IPv6' : 'IPv4';
+            badgeEl.classList.remove('hidden');
+            
+            if(ip.includes(':')) {
+                badgeEl.className = "bg-purple-500/20 text-purple-400 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-purple-500/30";
+            } else {
+                badgeEl.className = "bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-blue-500/30";
+            }
+        }
+
         // --- 10. WHOIS API Abuse Protection (Rate Limiting) ---
         let lastRequestTime = 0;
-        const REQUEST_COOLDOWN = 5000; // 5 seconds between performance/lookup requests
+        const REQUEST_COOLDOWN = 5000;
 
         function isAbusing() {
             const now = Date.now();
@@ -288,7 +321,6 @@
             return false;
         }
 
-        // Service Worker for Offline Mode
         if ('serviceWorker' in navigator) {
             const swCode = `
                 const CACHE_NAME = 'checkmyip-v6';
@@ -302,50 +334,38 @@
             navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
         }
 
-        // Performance Analysis Logic
         async function runPerformanceTest() {
             if (isAbusing()) return;
-
             const pingDisplay = document.getElementById('perf-ping');
             const jitterDisplay = document.getElementById('perf-jitter');
             const speedDisplay = document.getElementById('perf-speed');
             const btn = document.getElementById('btn-perf');
-            
             btn.disabled = true;
             pingDisplay.innerText = "Analyzing...";
-            
             const pings = [];
             const testUrl = 'https://api.ipify.org?nocache=' + Math.random();
-
             try {
                 for(let i=0; i<5; i++) {
                     const start = performance.now();
                     await fetch(testUrl, { mode: 'no-cors' });
                     pings.push(performance.now() - start);
                 }
-
                 const avgPing = pings.reduce((a, b) => a + b) / pings.length;
                 const jitter = Math.max(...pings) - Math.min(...pings);
-
                 pingDisplay.innerText = `${Math.round(avgPing)}ms`;
                 document.getElementById('ping-progress').style.width = `${Math.min(avgPing/2, 100)}%`;
-                
                 jitterDisplay.innerText = `${Math.round(jitter)}ms`;
                 document.getElementById('jitter-progress').style.width = `${Math.min(jitter*2, 100)}%`;
-
                 const downloadUrl = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css?v=' + Math.random();
                 const speedStart = performance.now();
                 const response = await fetch(downloadUrl);
                 const blob = await response.blob();
                 const speedEnd = performance.now();
-                
                 const durationSeconds = (speedEnd - speedStart) / 1000;
                 const bitsLoaded = blob.size * 8;
                 const speedMbps = ((bitsLoaded / durationSeconds) / (1024 * 1024)).toFixed(2);
-
                 speedDisplay.innerText = `${speedMbps} Mbps`;
                 document.getElementById('speed-progress').style.width = `${Math.min(speedMbps * 5, 100)}%`;
-
             } catch(e) {
                 pingDisplay.innerText = "Error";
             } finally {
@@ -361,7 +381,13 @@
 
                 const res6 = await fetch('https://api64.ipify.org?format=json');
                 const d6 = await res6.json();
-                document.getElementById('ipv6-display').innerText = d6.ip.includes(':') ? d6.ip : "Not Available";
+                const ipv6Value = d6.ip.includes(':') ? d6.ip : "Not Available";
+                document.getElementById('ipv6-display').innerText = ipv6Value;
+                
+                // Identify type based on the detected IP (prefers IPv6 if available, else IPv4)
+                const primaryIP = ipv6Value !== "Not Available" ? ipv6Value : d4.ip;
+                updateIPTypeUI(primaryIP);
+
                 return d4.ip;
             } catch(e) {
                 document.getElementById('ipv4-display').innerText = "Offline";
@@ -395,6 +421,9 @@
             document.getElementById('info-host').innerText = d.ip;
             document.getElementById('terminal-out').innerText = `NODE ACTIVE: ${d.ip}\nPROVIDER: ${d.isp}\nSTATUS: ENCRYPTED`;
             localStorage.setItem('checkmyip_cache', JSON.stringify(d));
+            
+            // If data contains an IP, update the Type UI
+            if (d.ip) updateIPTypeUI(d.ip);
         }
 
         function startWebRTC() {
