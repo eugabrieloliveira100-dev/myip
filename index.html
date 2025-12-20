@@ -279,11 +279,15 @@
 
         <!-- Section 3: Location Info & PROVIDER INFO -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="glass-card p-6 rounded-3xl">
+            <div class="glass-card p-6 rounded-3xl flex flex-col h-full">
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
                         <i class="fas fa-map-marker-alt mr-2 text-blue-500"></i> Location Info
                     </h3>
+                    <div id="geo-trust-badge" class="flex items-center gap-1.5 bg-white/5 px-2.5 py-1 rounded-full border border-white/10 hidden">
+                        <div id="geo-trust-dot" class="h-1.5 w-1.5 rounded-full bg-slate-500"></div>
+                        <span id="geo-trust-text" class="text-[9px] font-black uppercase tracking-tight text-slate-400">Syncing Sources...</span>
+                    </div>
                 </div>
                 <div class="space-y-4">
                     <div class="flex justify-between border-b border-white/5 pb-2">
@@ -298,6 +302,12 @@
                         <span class="text-slate-500 text-sm">Country</span>
                         <span id="info-country" class="text-white font-bold text-sm">---</span>
                     </div>
+                </div>
+                <!-- IP Registration Technical Note -->
+                <div class="mt-auto pt-6 border-t border-white/5">
+                    <p class="text-[13px] text-white leading-relaxed italic">
+                        <strong class="text-slate-300">Technical Reference:</strong> The city, region, and country listed above represent the geographical registration data officially assigned to this IP address by its owner (ISP or LIR). This information reflects the registered administrative location and network allocation point rather than the dynamic physical position of the user hardware.
+                    </p>
                 </div>
             </div>
 
@@ -415,20 +425,15 @@
 
             if (!riskEl) return;
 
-            let score = 100; // Começa com 100 (Seguro)
-            let isDangerous = false;
-            let isWarning = false;
-
+            let score = 100;
             const isp = (data.org || data.isp || "").toLowerCase();
             const isHosting = isp.includes("google") || isp.includes("amazon") || isp.includes("microsoft") || 
                               isp.includes("digitalocean") || isp.includes("ovh") || isp.includes("linode") ||
                               isp.includes("hetzner") || isp.includes("hosting") || isp.includes("data center") ||
                               isp.includes("cloudflare");
 
-            // Simulação de análise baseada em metadados reais (Data Center costuma ter score menor por risco de bots)
             if (isHosting) {
                 score -= 15;
-                isWarning = true;
                 spamEl.innerText = "CLEAN (Hosting)";
                 botEl.innerText = "NEUTRAL";
                 bruteEl.innerText = "POTENTIAL";
@@ -438,7 +443,6 @@
                 bruteEl.innerText = "CLEAN";
             }
 
-            // Aplicar Score Visual
             scoreLabel.innerText = `Score: ${score}/100`;
             scoreBar.style.width = `${score}%`;
 
@@ -497,7 +501,6 @@
                 usageEl.className = "text-xs font-bold text-blue-400";
             }
 
-            // Chamar a nova análise de risco
             runRiskAssessment(data);
         }
 
@@ -508,7 +511,6 @@
 
             try {
                 let dnsQueryName = "";
-                
                 if (ip.includes(':')) {
                     dnsQueryName = ip; 
                 } else {
@@ -528,17 +530,9 @@
                     const hostname = data.Answer[0].data;
                     ptrEl.innerText = hostname.endsWith('.') ? hostname.slice(0, -1) : hostname;
                 } else {
-                    const altResponse = await fetch(`https://dns.google/resolve?name=${ip}&type=PTR`);
-                    const altData = await altResponse.json();
-                    if (altData.Answer && altData.Answer.length > 0) {
-                        const hostname = altData.Answer[0].data;
-                        ptrEl.innerText = hostname.endsWith('.') ? hostname.slice(0, -1) : hostname;
-                    } else {
-                        ptrEl.innerText = "No PTR record found for this IP.";
-                    }
+                    ptrEl.innerText = "No PTR record found for this IP.";
                 }
             } catch (error) {
-                console.warn("DNS Lookup failed:", error);
                 ptrEl.innerText = "Lookup unavailable (Private or Unmapped)";
             }
         }
@@ -567,8 +561,7 @@
                 const extractEmails = (entity) => {
                     const vcard = entity.vcardArray ? entity.vcardArray[1] : [];
                     const emailField = vcard.find(field => field[0] === 'email');
-                    if (emailField) return emailField[3];
-                    return null;
+                    return emailField ? emailField[3] : null;
                 };
 
                 const findAbuseEmail = (entities) => {
@@ -600,7 +593,6 @@
                 abuseEl.innerText = abuseEmail;
 
             } catch (error) {
-                console.warn("Registry lookup failed:", error);
                 createdEl.innerText = "Data unavailable";
                 updatedEl.innerText = "Data unavailable";
                 emailEl.innerText = "Not found";
@@ -625,7 +617,7 @@
 
         if ('serviceWorker' in navigator) {
             const swCode = `
-                const CACHE_NAME = 'checkmyip-v10';
+                const CACHE_NAME = 'checkmyip-v11';
                 self.addEventListener('install', e => self.skipWaiting());
                 self.addEventListener('activate', e => e.waitUntil(clients.claim()));
                 self.addEventListener('fetch', e => {
@@ -677,41 +669,97 @@
         }
 
         async function detectIPs() {
+            const ipv4Display = document.getElementById('ipv4-display');
+            const ipv6Display = document.getElementById('ipv6-display');
+            
+            let detectedV4 = "Not Available";
+            let detectedV6 = "Not Available";
+
             try {
-                const res4 = await fetch('https://api.ipify.org?format=json');
-                const d4 = await res4.json();
-                document.getElementById('ipv4-display').innerText = d4.ip;
-                const res6 = await fetch('https://api64.ipify.org?format=json');
-                const d6 = await res6.json();
-                const ipv6Value = d6.ip.includes(':') ? d6.ip : "Not Available";
-                document.getElementById('ipv6-display').innerText = ipv6Value;
-                const primaryIP = ipv6Value !== "Not Available" ? ipv6Value : d4.ip;
-                
+                const res4 = await fetch('https://api.ipify.org?format=json').catch(() => null);
+                if (res4) {
+                    const d4 = await res4.json();
+                    detectedV4 = d4.ip;
+                }
+                ipv4Display.innerText = detectedV4;
+
+                const res6 = await fetch('https://api64.ipify.org?format=json').catch(() => null);
+                if (res6) {
+                    const d6 = await res6.json();
+                    if (d6.ip.includes(':')) {
+                        detectedV6 = d6.ip;
+                    } else {
+                        const res6Only = await fetch('https://v6.ident.me/.json').catch(() => null);
+                        if (res6Only) {
+                            const d6Only = await res6Only.json();
+                            detectedV6 = d6Only.address || d6Only.ip || "Not Available";
+                        }
+                    }
+                }
+                ipv6Display.innerText = detectedV6;
+
+                const primaryIP = detectedV6 !== "Not Available" ? detectedV6 : detectedV4;
                 updateIPTypeUI(primaryIP);
                 fetchRegistryDetails(primaryIP);
                 fetchReverseDNS(primaryIP);
                 
-                return d4.ip;
+                return primaryIP;
             } catch(e) {
-                document.getElementById('ipv4-display').innerText = "Offline";
+                ipv4Display.innerText = "Error";
+                ipv6Display.innerText = "Error";
                 return null;
             }
         }
 
-        async function getGeo(ip = '') {
-            try {
-                const r = await fetch(`https://ipapi.co/${ip ? ip + '/' : ''}json/`);
-                const d = await r.json();
-                return {
-                    city: d.city || "---",
-                    region: d.region || "---",
-                    country: d.country_name || "---",
-                    isp: d.org || "---",
-                    org: d.org || "---",
-                    asn: d.asn || "---",
-                    ip: d.ip || ip
-                };
-            } catch(e) { return null; }
+        async function getGeoMultiSource(ip = '') {
+            const badge = document.getElementById('geo-trust-badge');
+            const dot = document.getElementById('geo-trust-dot');
+            const text = document.getElementById('geo-trust-text');
+            badge.classList.remove('hidden');
+
+            const sources = [
+                { name: 'ipapi', url: `https://ipapi.co/${ip ? ip + '/' : ''}json/` },
+                { name: 'ip-api', url: `http://ip-api.com/json/${ip}` },
+                { name: 'ipwhois', url: `https://ipwhois.app/json/${ip}` }
+            ];
+
+            const results = await Promise.allSettled(sources.map(s => fetch(s.url).then(r => r.json())));
+            const validData = results.filter(r => r.status === 'fulfilled').map(r => r.value);
+            const cities = validData.map(d => (d.city || d.city_name || "").toLowerCase()).filter(c => c !== "");
+            
+            let confidence = "LOW";
+            if (cities.length >= 2) {
+                const frequency = {};
+                cities.forEach(c => frequency[c] = (frequency[c] || 0) + 1);
+                const maxFreq = Math.max(...Object.values(frequency));
+                if (maxFreq >= 3) confidence = "HIGH";
+                else if (maxFreq === 2) confidence = "MEDIUM";
+            }
+
+            if (confidence === "HIGH") {
+                dot.className = "h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse";
+                text.innerText = "Verified Location (High Confidence)";
+                text.className = "text-[9px] font-black uppercase tracking-tight text-emerald-400";
+            } else if (confidence === "MEDIUM") {
+                dot.className = "h-1.5 w-1.5 rounded-full bg-yellow-500";
+                text.innerText = "Likely Location (Medium Confidence)";
+                text.className = "text-[9px] font-black uppercase tracking-tight text-yellow-400";
+            } else {
+                dot.className = "h-1.5 w-1.5 rounded-full bg-red-500";
+                text.innerText = "Estimated Location (Low Confidence)";
+                text.className = "text-[9px] font-black uppercase tracking-tight text-red-400";
+            }
+
+            const primary = validData[0] || validData[1] || validData[2] || {};
+            return {
+                city: primary.city || primary.city_name || "---",
+                region: primary.region || primary.region_name || "---",
+                country: primary.country_name || primary.country || "---",
+                isp: primary.org || primary.isp || "---",
+                org: primary.org || primary.as || "---",
+                asn: primary.asn || primary.as || "---",
+                ip: primary.ip || primary.query || ip
+            };
         }
 
         function updateUI(d) {
@@ -766,10 +814,8 @@
             const ip = document.getElementById('ip-lookup-input').value.trim();
             if(!ip) return;
             btn.disabled = true;
-            
-            const data = await getGeo(ip);
+            const data = await getGeoMultiSource(ip);
             updateUI(data);
-            
             setTimeout(() => btn.disabled = false, REQUEST_COOLDOWN);
         }
 
@@ -795,7 +841,7 @@
                 return;
             }
             const myIp = await detectIPs();
-            const geo = await getGeo(myIp);
+            const geo = await getGeoMultiSource(myIp);
             updateUI(geo);
             startWebRTC();
             runPerformanceTest();
