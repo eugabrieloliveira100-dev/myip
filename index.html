@@ -690,14 +690,43 @@
             setTimeout(() => btn.disabled = false, REQUEST_COOLDOWN);
         }
 
+        // --- IMPROVED IPV6 DETECTION ---
         async function detectIPv6() {
             const ipv6El = document.getElementById('ipv6-display');
-            try {
-                const res = await fetch('https://api64.ipify.org?format=json');
-                const data = await res.json();
-                if (data.ip.includes(':')) { ipv6El.innerText = data.ip; return data.ip; }
-                else { ipv6El.innerText = "Not Detected / IPv4 Only"; return null; }
-            } catch (e) { ipv6El.innerText = "Not Detected / IPv4 Only"; return null; }
+            
+            // Try different providers to maximize chance of detection
+            const providers = [
+                'https://api64.ipify.org?format=json',
+                'https://v6.ident.me/.json',
+                'https://ipv6.icanhazip.com'
+            ];
+
+            for (const url of providers) {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 3000);
+                    
+                    const res = await fetch(url, { signal: controller.signal });
+                    let ip = "";
+                    
+                    if (url.includes('json')) {
+                        const data = await res.json();
+                        ip = data.ip || data.address;
+                    } else {
+                        ip = (await res.text()).trim();
+                    }
+
+                    if (ip && ip.includes(':')) {
+                        ipv6El.innerText = ip;
+                        return ip;
+                    }
+                } catch (e) {
+                    continue; // Try next provider
+                }
+            }
+            
+            ipv6El.innerText = "Not Detected / IPv4 Only";
+            return null;
         }
 
         async function detectIPs() {
