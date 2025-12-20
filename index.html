@@ -132,7 +132,10 @@
                         <i class="fas fa-biohazard text-red-500"></i>
                     </div>
                     <div>
-                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Risk & Reputation Score</h3>
+                        <div class="flex items-center gap-2 mb-0.5">
+                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Risk & Reputation Score</h3>
+                            <span id="risk-target-ip" class="bg-slate-800 text-slate-400 px-2 py-0.5 rounded font-mono text-[9px] border border-white/5">0.0.0.0</span>
+                        </div>
                         <p id="risk-assessment" class="text-sm font-bold text-white">Analyzing IP reputation...</p>
                     </div>
                 </div>
@@ -325,7 +328,6 @@
                 <span class="text-xs text-slate-600 animate-pulse">Initializing WebRTC scan...</span>
             </div>
             
-            <!-- WebRTC Explanation Text -->
             <div class="bg-black/40 p-6 rounded-2xl border border-white/10 shadow-xl">
                 <h4 class="text-[11px] font-extrabold text-white uppercase tracking-[0.2em] mb-4 border-b border-white/10 pb-2">Understanding WebRTC Leak Results</h4>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-[12px] leading-relaxed text-white">
@@ -471,7 +473,11 @@
             const spamEl = document.getElementById('risk-spam');
             const botEl = document.getElementById('risk-botnet');
             const bruteEl = document.getElementById('risk-brute');
+            const targetIpEl = document.getElementById('risk-target-ip');
+            
             if (!riskEl) return;
+            if (targetIpEl) targetIpEl.innerText = data.ip || "0.0.0.0";
+
             let score = 100;
             const isp = (data.org || data.isp || "").toLowerCase();
             const isHosting = isp.includes("google") || isp.includes("amazon") || isp.includes("microsoft") || 
@@ -541,18 +547,11 @@
             runRiskAssessment(data);
         }
 
-        // Função Recursiva para buscar e-mails no RDAP
         function findEmailsInRDAP(obj) {
             let emails = new Set();
             function scan(item) {
                 if (!item || typeof item !== 'object') return;
-                
-                // Procura no vcardArray padrão RDAP
-                if (Array.isArray(item) && item[0] === 'email') {
-                    emails.add(item[3]);
-                }
-                
-                // Recorre em objetos e arrays
+                if (Array.isArray(item) && item[0] === 'email') emails.add(item[3]);
                 Object.values(item).forEach(val => scan(val));
             }
             scan(obj);
@@ -571,7 +570,6 @@
             abuseEl.innerText = "Searching...";
 
             try {
-                // RDAP Proxy ou Direto para cobrir diferentes RIRs
                 const response = await fetch(`https://rdap.db.ripe.net/ip/${ip}`);
                 const data = await response.json();
                 
@@ -579,21 +577,16 @@
                 createdEl.innerText = events.find(e => e.eventAction === 'registration')?.eventDate ? new Date(events.find(e => e.eventAction === 'registration').eventDate).toLocaleDateString() : "Historical / Unknown";
                 updatedEl.innerText = events.find(e => e.eventAction === 'last changed')?.eventDate ? new Date(events.find(e => e.eventAction === 'last changed').eventDate).toLocaleDateString() : "Stable Allocation";
 
-                // Extração robusta usando recursão
                 let allEmails = findEmailsInRDAP(data);
-                
                 if (allEmails.length > 0) {
                     const abuse = allEmails.find(e => e.toLowerCase().includes('abuse')) || allEmails.find(e => e.toLowerCase().includes('noc')) || allEmails[0];
                     const support = allEmails.find(e => !e.toLowerCase().includes('abuse')) || allEmails[0];
-                    
                     emailEl.innerText = support;
                     abuseEl.innerText = abuse;
                 } else {
-                    // Fallback se não encontrar e-mails no RDAP
                     emailEl.innerText = "Check Provider Website";
                     abuseEl.innerText = "abuse@" + (document.getElementById('info-isp').innerText.split(' ')[0].toLowerCase() || "isp") + ".com";
                 }
-
             } catch (error) {
                 createdEl.innerText = "Not Found";
                 updatedEl.innerText = "Not Found";
@@ -616,6 +609,7 @@
             return false;
         }
 
+        // --- IMPROVED PERFORMANCE TEST ---
         async function runPerformanceTest() {
             if (isAbusing()) return;
             const pingDisplay = document.getElementById('perf-ping');
@@ -624,46 +618,60 @@
             const btn = document.getElementById('btn-perf');
             
             btn.disabled = true;
-            pingDisplay.innerText = "Testing...";
-            jitterDisplay.innerText = "Testing...";
-            speedDisplay.innerText = "Testing...";
+            pingDisplay.innerText = "Measuring Latency...";
+            jitterDisplay.innerText = "Calculating...";
+            speedDisplay.innerText = "Testing Speed...";
 
             const samples = [];
             try {
-                // 1. Latency & Jitter (5 samples)
-                for(let i=0; i<5; i++) {
+                // Real Latency Test (Multi-sample)
+                for(let i=0; i<8; i++) {
                     const s = performance.now();
-                    await fetch('https://api.ipify.org?v=' + Math.random(), { mode: 'no-cors' });
+                    // Using a fast CDN endpoint for low-overhead pinging
+                    await fetch('https://1.1.1.1/cdn-cgi/trace', { mode: 'no-cors', cache: 'no-store' });
                     samples.push(performance.now() - s);
                 }
+                
                 const avgPing = samples.reduce((a,b) => a+b) / samples.length;
-                const jitter = Math.max(...samples) - Math.min(...samples);
+                
+                // Calculating real Jitter (Average variation between successive pings)
+                let jitterSum = 0;
+                for(let i=1; i < samples.length; i++) {
+                    jitterSum += Math.abs(samples[i] - samples[i-1]);
+                }
+                const jitter = jitterSum / (samples.length - 1);
 
                 pingDisplay.innerText = `${Math.round(avgPing)}ms`;
                 jitterDisplay.innerText = `${Math.round(jitter)}ms`;
-                document.getElementById('ping-progress').style.width = "60%";
-                document.getElementById('jitter-progress').style.width = "40%";
+                
+                // Update UI Bars based on typical high-performance benchmarks
+                document.getElementById('ping-progress').style.width = Math.max(10, 100 - (avgPing / 2)) + "%";
+                document.getElementById('jitter-progress').style.width = Math.max(10, 100 - (jitter * 5)) + "%";
 
-                // 2. Speed Test (Download dummy blob)
+                // Improved Speed Test (1.5MB real data download)
                 const speedStart = performance.now();
-                // Baixa um pequeno pedaço de JS do CDN como teste (aprox 100KB)
-                const res = await fetch('https://cdnjs.cloudflare.com/ajax/libs/three.js/0.158.0/three.min.js', { cache: 'no-store' });
-                const blob = await res.blob();
+                // Download a substantial library file to measure throughput
+                const res = await fetch('https://cdnjs.cloudflare.com/ajax/libs/three.js/0.158.0/three.min.js?nocache=' + Math.random());
+                const reader = res.body.getReader();
+                let receivedLength = 0;
+                while(true) {
+                    const {done, value} = await reader.read();
+                    if (done) break;
+                    receivedLength += value.length;
+                }
                 const speedEnd = performance.now();
                 
                 const durationSec = (speedEnd - speedStart) / 1000;
-                const sizeMbit = (blob.size * 8) / (1024 * 1024);
+                const sizeMbit = (receivedLength * 8) / (1024 * 1024);
                 const mbps = sizeMbit / durationSec;
-
+                
                 speedDisplay.innerText = `${mbps.toFixed(1)} Mbps`;
                 document.getElementById('speed-progress').style.width = Math.min(mbps * 2, 100) + "%";
-
             } catch(e) { 
                 pingDisplay.innerText = "Timeout"; 
-                jitterDisplay.innerText = "Error";
+                jitterDisplay.innerText = "Error"; 
                 speedDisplay.innerText = "Blocked";
             }
-            
             setTimeout(() => btn.disabled = false, REQUEST_COOLDOWN);
         }
 
@@ -672,17 +680,9 @@
             try {
                 const res = await fetch('https://api64.ipify.org?format=json');
                 const data = await res.json();
-                if (data.ip.includes(':')) {
-                    ipv6El.innerText = data.ip;
-                    return data.ip;
-                } else {
-                    ipv6El.innerText = "Not Detected / IPv4 Only";
-                    return null;
-                }
-            } catch (e) {
-                ipv6El.innerText = "Not Detected / IPv4 Only";
-                return null;
-            }
+                if (data.ip.includes(':')) { ipv6El.innerText = data.ip; return data.ip; }
+                else { ipv6El.innerText = "Not Detected / IPv4 Only"; return null; }
+            } catch (e) { ipv6El.innerText = "Not Detected / IPv4 Only"; return null; }
         }
 
         async function detectIPs() {
@@ -702,24 +702,14 @@
             document.getElementById('info-city').innerText = d.city || "---";
             document.getElementById('info-region').innerText = d.region || "---";
             document.getElementById('info-country').innerText = d.country_name || "---";
-            
             const orgName = d.org || d.asn || "---";
             document.getElementById('info-isp').innerText = d.isp || orgName;
             document.getElementById('info-org').innerText = orgName;
-            
             document.getElementById('info-asn').innerText = d.asn || "---";
             document.getElementById('info-host').innerText = d.ip || "---";
-            
             updateSecurityUI(d);
             fetchRegistryDetails(d.ip);
-            
-            document.getElementById('terminal-out').innerText = JSON.stringify({
-                ip: d.ip,
-                asn: d.asn,
-                city: d.city,
-                country: d.country_code,
-                org: orgName
-            }, null, 2);
+            document.getElementById('terminal-out').innerText = JSON.stringify({ ip: d.ip, asn: d.asn, city: d.city, country: d.country_code, org: orgName }, null, 2);
         }
 
         function startWebRTC() {
@@ -747,10 +737,7 @@
             });
         }
 
-        function clearCache() {
-            localStorage.clear();
-            location.reload();
-        }
+        function clearCache() { localStorage.clear(); location.reload(); }
 
         async function init() {
             try {
@@ -766,7 +753,6 @@
                 document.getElementById('status-dot').className = "h-2 w-2 rounded-full bg-red-500";
             }
         }
-
         window.onload = init;
     </script>
 </body>
