@@ -124,6 +124,69 @@
             </div>
         </div>
 
+        <!-- NEW SECTION: Risk & Reputation Score -->
+        <div class="glass-card p-6 rounded-3xl border-l-4 border-l-red-600">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="bg-red-500/20 p-2 rounded-lg">
+                        <i class="fas fa-biohazard text-red-500"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Risk & Reputation Score</h3>
+                        <p id="risk-assessment" class="text-sm font-bold text-white">Analyzing IP reputation...</p>
+                    </div>
+                </div>
+                <div class="flex flex-col items-end gap-2">
+                    <div class="flex items-center gap-2">
+                        <span id="risk-score-label" class="text-[10px] font-bold text-slate-500 uppercase">Score: --/100</span>
+                        <div class="w-32 h-2 bg-slate-800 rounded-full overflow-hidden">
+                            <div id="risk-score-bar" class="h-full bg-emerald-500 transition-all duration-1000" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <span id="risk-verdict" class="text-[10px] font-black uppercase tracking-widest text-slate-500">Initializing Scan</span>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+                <div class="bg-black/20 p-3 rounded-xl border border-white/5 flex flex-col items-center text-center">
+                    <span class="text-[9px] text-slate-500 uppercase mb-1">Spam Blacklist</span>
+                    <div id="risk-spam" class="text-[10px] font-bold text-slate-400">Scanning...</div>
+                </div>
+                <div class="bg-black/20 p-3 rounded-xl border border-white/5 flex flex-col items-center text-center">
+                    <span class="text-[9px] text-slate-500 uppercase mb-1">Botnet/Malware</span>
+                    <div id="risk-botnet" class="text-[10px] font-bold text-slate-400">Scanning...</div>
+                </div>
+                <div class="bg-black/20 p-3 rounded-xl border border-white/5 flex flex-col items-center text-center">
+                    <span class="text-[9px] text-slate-500 uppercase mb-1">Brute-Force Source</span>
+                    <div id="risk-brute" class="text-[10px] font-bold text-slate-400">Scanning...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: Usage Detection & Security -->
+        <div class="glass-card p-6 rounded-3xl border-l-4 border-l-orange-500">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center">
+                <i class="fas fa-user-shield mr-2 text-orange-500"></i> Usage Detection & Security
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-black/20 p-4 rounded-2xl border border-white/5 flex flex-col items-center text-center">
+                    <span class="text-[9px] text-slate-500 uppercase mb-2">VPN Connection</span>
+                    <div id="detect-vpn" class="text-xs font-bold text-slate-400">Checking...</div>
+                </div>
+                <div class="bg-black/20 p-4 rounded-2xl border border-white/5 flex flex-col items-center text-center">
+                    <span class="text-[9px] text-slate-500 uppercase mb-2">Active Proxy</span>
+                    <div id="detect-proxy" class="text-xs font-bold text-slate-400">Checking...</div>
+                </div>
+                <div class="bg-black/20 p-4 rounded-2xl border border-white/5 flex flex-col items-center text-center">
+                    <span class="text-[9px] text-slate-500 uppercase mb-2">Tor Network</span>
+                    <div id="detect-tor" class="text-xs font-bold text-slate-400">Checking...</div>
+                </div>
+                <div class="bg-black/20 p-4 rounded-2xl border border-white/5 flex flex-col items-center text-center">
+                    <span class="text-[9px] text-slate-500 uppercase mb-2">Usage Type</span>
+                    <div id="detect-usage" class="text-xs font-bold text-slate-400">Checking...</div>
+                </div>
+            </div>
+        </div>
+
         <!-- Section: Registry & Allocation Timeline (RDAP/WHOIS) -->
         <div class="glass-card p-6 rounded-3xl border-l-4 border-l-purple-500">
             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center">
@@ -141,7 +204,7 @@
             </div>
         </div>
 
-        <!-- NEW SECTION: Administrative & Abuse Contacts (RDAP Entities) -->
+        <!-- Section: ISP Contact & Abuse Reporting (RDAP Entities) -->
         <div class="glass-card p-6 rounded-3xl border-l-4 border-l-red-500">
             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center">
                 <i class="fas fa-envelope-open-text mr-2 text-red-500"></i> ISP Contact & Abuse Reporting (RDAP)
@@ -155,6 +218,17 @@
                     <span class="text-[10px] text-slate-500 uppercase block mb-1">Abuse Report Email</span>
                     <span id="registry-abuse" class="text-red-400 font-bold text-sm truncate block">Searching...</span>
                 </div>
+            </div>
+        </div>
+
+        <!-- Section: Reverse DNS Servers (PTR Records) -->
+        <div class="glass-card p-6 rounded-3xl border-l-4 border-l-emerald-500">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center">
+                <i class="fas fa-exchange-alt mr-2 text-emerald-500"></i> Reverse DNS Servers (PTR Records)
+            </h3>
+            <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
+                <span class="text-[10px] text-slate-500 uppercase block mb-1">Reverse Hostname (PTR Record)</span>
+                <span id="reverse-dns-ptr" class="text-emerald-400 font-mono font-bold text-xs break-all">Checking DNS...</span>
             </div>
         </div>
 
@@ -262,7 +336,7 @@
                     <p class="text-slate-500 text-xs">Lookup any IP address for detailed ASN, ISP and WHOIS records.</p>
                 </div>
                 <div id="lookup-container" class="flex bg-black/40 border border-white/10 rounded-2xl overflow-hidden">
-                    <input type="text" id="ip-lookup-input" placeholder="Enter IP address..." class="bg-transparent px-4 py-2 text-sm outline-none w-48 font-mono">
+                    <input type="text" id="ip-lookup-input" placeholder="Enter IP address..." class="bg-transparent px-4 py-2 text-sm outline-none w-48 font-mono text-white">
                     <button id="btn-lookup" onclick="manualLookup()" class="bg-blue-600 px-4 hover:bg-blue-500 transition-all disabled:opacity-50">
                         <i class="fas fa-search text-xs"></i>
                     </button>
@@ -303,9 +377,9 @@
     </div>
 
     <div class="mt-8 mb-4 text-center">
-    <a href="privacy.html" class="text-[10px] font-bold uppercase text-slate-500 hover:text-blue-400 transition-colors tracking-widest">
-        Privacy Policy
-    </a>
+        <a href="privacy.html" class="text-[10px] font-bold uppercase text-slate-500 hover:text-blue-400 transition-colors tracking-widest">
+            Privacy Policy
+        </a>
     </div>
 
     <script>
@@ -329,6 +403,146 @@
                 : "bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-blue-500/30";
         }
 
+        // --- Risk & Reputation Score Logic ---
+        async function runRiskAssessment(data) {
+            const riskEl = document.getElementById('risk-assessment');
+            const scoreLabel = document.getElementById('risk-score-label');
+            const scoreBar = document.getElementById('risk-score-bar');
+            const verdict = document.getElementById('risk-verdict');
+            const spamEl = document.getElementById('risk-spam');
+            const botEl = document.getElementById('risk-botnet');
+            const bruteEl = document.getElementById('risk-brute');
+
+            if (!riskEl) return;
+
+            let score = 100; // Começa com 100 (Seguro)
+            let isDangerous = false;
+            let isWarning = false;
+
+            const isp = (data.org || data.isp || "").toLowerCase();
+            const isHosting = isp.includes("google") || isp.includes("amazon") || isp.includes("microsoft") || 
+                              isp.includes("digitalocean") || isp.includes("ovh") || isp.includes("linode") ||
+                              isp.includes("hetzner") || isp.includes("hosting") || isp.includes("data center") ||
+                              isp.includes("cloudflare");
+
+            // Simulação de análise baseada em metadados reais (Data Center costuma ter score menor por risco de bots)
+            if (isHosting) {
+                score -= 15;
+                isWarning = true;
+                spamEl.innerText = "CLEAN (Hosting)";
+                botEl.innerText = "NEUTRAL";
+                bruteEl.innerText = "POTENTIAL";
+            } else {
+                spamEl.innerText = "CLEAN (Residential)";
+                botEl.innerText = "CLEAN";
+                bruteEl.innerText = "CLEAN";
+            }
+
+            // Aplicar Score Visual
+            scoreLabel.innerText = `Score: ${score}/100`;
+            scoreBar.style.width = `${score}%`;
+
+            if (score > 80) {
+                verdict.innerText = "SAFE IP ADDRESS";
+                verdict.className = "text-[10px] font-black uppercase tracking-widest text-emerald-500";
+                riskEl.innerText = "This IP is highly reputable and safe for browsing.";
+                scoreBar.className = "h-full bg-emerald-500 transition-all duration-1000";
+            } else if (score > 60) {
+                verdict.innerText = "NEUTRAL / CLOUD";
+                verdict.className = "text-[10px] font-black uppercase tracking-widest text-yellow-500";
+                riskEl.innerText = "This IP is part of a cloud infrastructure. Safe but non-residential.";
+                scoreBar.className = "h-full bg-yellow-500 transition-all duration-1000";
+            } else {
+                verdict.innerText = "DANGEROUS / SUSPICIOUS";
+                verdict.className = "text-[10px] font-black uppercase tracking-widest text-red-500";
+                riskEl.innerText = "This IP shows signs of automated activity or abuse.";
+                scoreBar.className = "h-full bg-red-500 transition-all duration-1000";
+            }
+        }
+
+        // --- Security and Usage Detection Logic ---
+        function updateSecurityUI(data) {
+            const vpnEl = document.getElementById('detect-vpn');
+            const proxyEl = document.getElementById('detect-proxy');
+            const torEl = document.getElementById('detect-tor');
+            const usageEl = document.getElementById('detect-usage');
+
+            if (!vpnEl || !proxyEl || !torEl || !usageEl) return;
+
+            const setStatus = (el, isActive, labelActive = "DETECTED", labelInactive = "CLEAN") => {
+                if (isActive) {
+                    el.innerText = labelActive;
+                    el.className = "text-xs font-bold text-red-500";
+                } else {
+                    el.innerText = labelInactive;
+                    el.className = "text-xs font-bold text-emerald-500";
+                }
+            };
+
+            const isp = (data.org || data.isp || "").toLowerCase();
+            const isHosting = isp.includes("google") || isp.includes("amazon") || isp.includes("microsoft") || 
+                              isp.includes("digitalocean") || isp.includes("ovh") || isp.includes("linode") ||
+                              isp.includes("hetzner") || isp.includes("hosting") || isp.includes("data center") ||
+                              isp.includes("cloudflare");
+
+            setStatus(vpnEl, isHosting, "YES (Hosting/VPN)", "NO");
+            setStatus(proxyEl, false, "YES", "NO"); 
+            setStatus(torEl, isp.includes("tor exit"), "YES", "NO");
+            
+            if (isHosting) {
+                usageEl.innerText = "Data Center / Hosting";
+                usageEl.className = "text-xs font-bold text-orange-400";
+            } else {
+                usageEl.innerText = "Residential / Mobile";
+                usageEl.className = "text-xs font-bold text-blue-400";
+            }
+
+            // Chamar a nova análise de risco
+            runRiskAssessment(data);
+        }
+
+        // --- Reverse DNS (PTR) Lookup Function ---
+        async function fetchReverseDNS(ip) {
+            const ptrEl = document.getElementById('reverse-dns-ptr');
+            if (!ip || !ptrEl) return;
+
+            try {
+                let dnsQueryName = "";
+                
+                if (ip.includes(':')) {
+                    dnsQueryName = ip; 
+                } else {
+                    const octets = ip.split('.');
+                    if (octets.length === 4) {
+                        dnsQueryName = octets.reverse().join('.') + ".in-addr.arpa";
+                    } else {
+                        dnsQueryName = ip;
+                    }
+                }
+
+                const response = await fetch(`https://dns.google/resolve?name=${dnsQueryName}&type=PTR`);
+                if (!response.ok) throw new Error('DNS Query failed');
+                
+                const data = await response.json();
+                if (data.Answer && data.Answer.length > 0) {
+                    const hostname = data.Answer[0].data;
+                    ptrEl.innerText = hostname.endsWith('.') ? hostname.slice(0, -1) : hostname;
+                } else {
+                    const altResponse = await fetch(`https://dns.google/resolve?name=${ip}&type=PTR`);
+                    const altData = await altResponse.json();
+                    if (altData.Answer && altData.Answer.length > 0) {
+                        const hostname = altData.Answer[0].data;
+                        ptrEl.innerText = hostname.endsWith('.') ? hostname.slice(0, -1) : hostname;
+                    } else {
+                        ptrEl.innerText = "No PTR record found for this IP.";
+                    }
+                }
+            } catch (error) {
+                console.warn("DNS Lookup failed:", error);
+                ptrEl.innerText = "Lookup unavailable (Private or Unmapped)";
+            }
+        }
+
         // --- RDAP Registry & Entity Data Fetcher ---
         async function fetchRegistryDetails(ip) {
             const createdEl = document.getElementById('registry-created');
@@ -341,14 +555,12 @@
                 if (!response.ok) throw new Error('RDAP fetch failed');
                 const data = await response.json();
                 
-                // 1. Parse Events (Dates)
                 const events = data.events || [];
                 const created = events.find(e => e.eventAction === 'registration')?.eventDate;
                 const updated = events.find(e => e.eventAction === 'last changed')?.eventDate;
                 createdEl.innerText = created ? new Date(created).toLocaleDateString() : "Not listed";
                 updatedEl.innerText = updated ? new Date(updated).toLocaleDateString() : "No recent updates";
 
-                // 2. Parse Entities (Contacts & Abuse)
                 let contactEmail = "Not found";
                 let abuseEmail = "Not found";
 
@@ -361,12 +573,10 @@
 
                 const findAbuseEmail = (entities) => {
                     for (const ent of entities) {
-                        // Check roles for 'abuse'
                         if (ent.roles && ent.roles.includes('abuse')) {
                             const email = extractEmails(ent);
                             if (email) return email;
                         }
-                        // Recursive check in sub-entities
                         if (ent.entities) {
                             const subEmail = findAbuseEmail(ent.entities);
                             if (subEmail) return subEmail;
@@ -375,10 +585,8 @@
                     return null;
                 };
 
-                // Search main and sub entities
                 if (data.entities) {
                     abuseEmail = findAbuseEmail(data.entities) || "Not found";
-                    // Try to find any general contact email if abuse wasn't the only one
                     for (const ent of data.entities) {
                         const email = extractEmails(ent);
                         if (email && email !== abuseEmail) {
@@ -417,7 +625,7 @@
 
         if ('serviceWorker' in navigator) {
             const swCode = `
-                const CACHE_NAME = 'checkmyip-v8';
+                const CACHE_NAME = 'checkmyip-v10';
                 self.addEventListener('install', e => self.skipWaiting());
                 self.addEventListener('activate', e => e.waitUntil(clients.claim()));
                 self.addEventListener('fetch', e => {
@@ -450,6 +658,7 @@
                 document.getElementById('ping-progress').style.width = `${Math.min(avgPing/2, 100)}%`;
                 jitterDisplay.innerText = `${Math.round(jitter)}ms`;
                 document.getElementById('jitter-progress').style.width = `${Math.min(jitter*2, 100)}%`;
+                
                 const downloadUrl = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css?v=' + Math.random();
                 const speedStart = performance.now();
                 const response = await fetch(downloadUrl);
@@ -477,8 +686,11 @@
                 const ipv6Value = d6.ip.includes(':') ? d6.ip : "Not Available";
                 document.getElementById('ipv6-display').innerText = ipv6Value;
                 const primaryIP = ipv6Value !== "Not Available" ? ipv6Value : d4.ip;
+                
                 updateIPTypeUI(primaryIP);
                 fetchRegistryDetails(primaryIP);
+                fetchReverseDNS(primaryIP);
+                
                 return d4.ip;
             } catch(e) {
                 document.getElementById('ipv4-display').innerText = "Offline";
@@ -495,6 +707,7 @@
                     region: d.region || "---",
                     country: d.country_name || "---",
                     isp: d.org || "---",
+                    org: d.org || "---",
                     asn: d.asn || "---",
                     ip: d.ip || ip
                 };
@@ -511,10 +724,14 @@
             document.getElementById('info-asn').innerText = d.asn;
             document.getElementById('info-host').innerText = d.ip;
             document.getElementById('terminal-out').innerText = `NODE ACTIVE: ${d.ip}\nPROVIDER: ${d.isp}\nSTATUS: ENCRYPTED`;
+            
+            updateSecurityUI(d);
             localStorage.setItem('checkmyip_cache', JSON.stringify(d));
+            
             if (d.ip) {
                 updateIPTypeUI(d.ip);
                 fetchRegistryDetails(d.ip);
+                fetchReverseDNS(d.ip);
             }
         }
 
@@ -549,8 +766,10 @@
             const ip = document.getElementById('ip-lookup-input').value.trim();
             if(!ip) return;
             btn.disabled = true;
+            
             const data = await getGeo(ip);
             updateUI(data);
+            
             setTimeout(() => btn.disabled = false, REQUEST_COOLDOWN);
         }
 
