@@ -108,7 +108,7 @@
             </div>
         </div>
 
-        <!-- NEW SECTION: IP Type Analysis -->
+        <!-- Section: IP Type Analysis -->
         <div class="glass-card p-6 rounded-3xl border-l-4 border-l-blue-500">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
@@ -121,6 +121,23 @@
                     </div>
                 </div>
                 <span id="ip-type-badge" class="hidden bg-white/10 text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">Unknown</span>
+            </div>
+        </div>
+
+        <!-- NEW SECTION: Registry & Allocation Timeline (RDAP/WHOIS) -->
+        <div class="glass-card p-6 rounded-3xl border-l-4 border-l-purple-500">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center">
+                <i class="fas fa-calendar-alt mr-2 text-purple-500"></i> Registry & Allocation Timeline (RDAP)
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
+                    <span class="text-[10px] text-slate-500 uppercase block mb-1">Registration Date</span>
+                    <span id="registry-created" class="text-white font-bold text-sm">Loading...</span>
+                </div>
+                <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
+                    <span class="text-[10px] text-slate-500 uppercase block mb-1">Last Allocation Update</span>
+                    <span id="registry-updated" class="text-white font-bold text-sm">Loading...</span>
+                </div>
             </div>
         </div>
 
@@ -278,14 +295,8 @@
         // --- IP Type Detection Logic ---
         function identifyIPType(ip) {
             if (!ip) return "Unknown";
-            // Check for IPv6 (contains colons)
-            if (ip.includes(':')) {
-                return "IPv6 (Internet Protocol Version 6)";
-            }
-            // Check for IPv4 (contains dots)
-            if (ip.includes('.')) {
-                return "IPv4 (Internet Protocol Version 4)";
-            }
+            if (ip.includes(':')) return "IPv6 (Internet Protocol Version 6)";
+            if (ip.includes('.')) return "IPv4 (Internet Protocol Version 4)";
             return "Unknown Format";
         }
 
@@ -293,7 +304,8 @@
             const type = identifyIPType(ip);
             const textEl = document.getElementById('ip-type-text');
             const badgeEl = document.getElementById('ip-type-badge');
-            
+            if(!textEl || !badgeEl) return;
+
             textEl.innerText = type;
             badgeEl.innerText = ip.includes(':') ? 'IPv6' : 'IPv4';
             badgeEl.classList.remove('hidden');
@@ -302,6 +314,31 @@
                 badgeEl.className = "bg-purple-500/20 text-purple-400 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-purple-500/30";
             } else {
                 badgeEl.className = "bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-blue-500/30";
+            }
+        }
+
+        // --- RDAP Registry Data Fetcher ---
+        async function fetchRegistryDetails(ip) {
+            const createdEl = document.getElementById('registry-created');
+            const updatedEl = document.getElementById('registry-updated');
+            
+            try {
+                // RDAP is a standardized HTTP alternative to WHOIS
+                const response = await fetch(`https://rdap.db.ripe.net/ip/${ip}`);
+                if (!response.ok) throw new Error('RDAP fetch failed');
+                const data = await response.json();
+                
+                // Common event actions in RDAP are 'registration' and 'last changed'
+                const events = data.events || [];
+                const created = events.find(e => e.eventAction === 'registration')?.eventDate;
+                const updated = events.find(e => e.eventAction === 'last changed')?.eventDate;
+                
+                createdEl.innerText = created ? new Date(created).toLocaleDateString() : "Not listed";
+                updatedEl.innerText = updated ? new Date(updated).toLocaleDateString() : "No recent updates";
+            } catch (error) {
+                console.warn("Registry lookup failed, trying fallback...", error);
+                createdEl.innerText = "Data unavailable";
+                updatedEl.innerText = "Data unavailable";
             }
         }
 
@@ -323,7 +360,7 @@
 
         if ('serviceWorker' in navigator) {
             const swCode = `
-                const CACHE_NAME = 'checkmyip-v6';
+                const CACHE_NAME = 'checkmyip-v7';
                 self.addEventListener('install', e => self.skipWaiting());
                 self.addEventListener('activate', e => e.waitUntil(clients.claim()));
                 self.addEventListener('fetch', e => {
@@ -384,9 +421,9 @@
                 const ipv6Value = d6.ip.includes(':') ? d6.ip : "Not Available";
                 document.getElementById('ipv6-display').innerText = ipv6Value;
                 
-                // Identify type based on the detected IP (prefers IPv6 if available, else IPv4)
                 const primaryIP = ipv6Value !== "Not Available" ? ipv6Value : d4.ip;
                 updateIPTypeUI(primaryIP);
+                fetchRegistryDetails(primaryIP);
 
                 return d4.ip;
             } catch(e) {
@@ -422,8 +459,10 @@
             document.getElementById('terminal-out').innerText = `NODE ACTIVE: ${d.ip}\nPROVIDER: ${d.isp}\nSTATUS: ENCRYPTED`;
             localStorage.setItem('checkmyip_cache', JSON.stringify(d));
             
-            // If data contains an IP, update the Type UI
-            if (d.ip) updateIPTypeUI(d.ip);
+            if (d.ip) {
+                updateIPTypeUI(d.ip);
+                fetchRegistryDetails(d.ip);
+            }
         }
 
         function startWebRTC() {
@@ -446,6 +485,7 @@
 
         function renderWebRTC(set) {
             const container = document.getElementById('webrtc-ips');
+            if(!container) return;
             container.innerHTML = '';
             set.forEach(ip => {
                 const el = document.createElement('span');
