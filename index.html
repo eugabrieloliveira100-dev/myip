@@ -124,7 +124,7 @@
             </div>
         </div>
 
-        <!-- NEW SECTION: Registry & Allocation Timeline (RDAP/WHOIS) -->
+        <!-- Section: Registry & Allocation Timeline (RDAP/WHOIS) -->
         <div class="glass-card p-6 rounded-3xl border-l-4 border-l-purple-500">
             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center">
                 <i class="fas fa-calendar-alt mr-2 text-purple-500"></i> Registry & Allocation Timeline (RDAP)
@@ -137,6 +137,23 @@
                 <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
                     <span class="text-[10px] text-slate-500 uppercase block mb-1">Last Allocation Update</span>
                     <span id="registry-updated" class="text-white font-bold text-sm">Loading...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW SECTION: Administrative & Abuse Contacts (RDAP Entities) -->
+        <div class="glass-card p-6 rounded-3xl border-l-4 border-l-red-500">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center">
+                <i class="fas fa-envelope-open-text mr-2 text-red-500"></i> ISP Contact & Abuse Reporting (RDAP)
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
+                    <span class="text-[10px] text-slate-500 uppercase block mb-1">Contact/Support Email</span>
+                    <span id="registry-email" class="text-blue-400 font-bold text-sm truncate block">Searching...</span>
+                </div>
+                <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
+                    <span class="text-[10px] text-slate-500 uppercase block mb-1">Abuse Report Email</span>
+                    <span id="registry-abuse" class="text-red-400 font-bold text-sm truncate block">Searching...</span>
                 </div>
             </div>
         </div>
@@ -301,48 +318,88 @@
         }
 
         function updateIPTypeUI(ip) {
-            const type = identifyIPType(ip);
             const textEl = document.getElementById('ip-type-text');
             const badgeEl = document.getElementById('ip-type-badge');
             if(!textEl || !badgeEl) return;
-
-            textEl.innerText = type;
+            textEl.innerText = identifyIPType(ip);
             badgeEl.innerText = ip.includes(':') ? 'IPv6' : 'IPv4';
             badgeEl.classList.remove('hidden');
-            
-            if(ip.includes(':')) {
-                badgeEl.className = "bg-purple-500/20 text-purple-400 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-purple-500/30";
-            } else {
-                badgeEl.className = "bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-blue-500/30";
-            }
+            badgeEl.className = ip.includes(':') 
+                ? "bg-purple-500/20 text-purple-400 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-purple-500/30"
+                : "bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-blue-500/30";
         }
 
-        // --- RDAP Registry Data Fetcher ---
+        // --- RDAP Registry & Entity Data Fetcher ---
         async function fetchRegistryDetails(ip) {
             const createdEl = document.getElementById('registry-created');
             const updatedEl = document.getElementById('registry-updated');
+            const emailEl = document.getElementById('registry-email');
+            const abuseEl = document.getElementById('registry-abuse');
             
             try {
-                // RDAP is a standardized HTTP alternative to WHOIS
                 const response = await fetch(`https://rdap.db.ripe.net/ip/${ip}`);
                 if (!response.ok) throw new Error('RDAP fetch failed');
                 const data = await response.json();
                 
-                // Common event actions in RDAP are 'registration' and 'last changed'
+                // 1. Parse Events (Dates)
                 const events = data.events || [];
                 const created = events.find(e => e.eventAction === 'registration')?.eventDate;
                 const updated = events.find(e => e.eventAction === 'last changed')?.eventDate;
-                
                 createdEl.innerText = created ? new Date(created).toLocaleDateString() : "Not listed";
                 updatedEl.innerText = updated ? new Date(updated).toLocaleDateString() : "No recent updates";
+
+                // 2. Parse Entities (Contacts & Abuse)
+                let contactEmail = "Not found";
+                let abuseEmail = "Not found";
+
+                const extractEmails = (entity) => {
+                    const vcard = entity.vcardArray ? entity.vcardArray[1] : [];
+                    const emailField = vcard.find(field => field[0] === 'email');
+                    if (emailField) return emailField[3];
+                    return null;
+                };
+
+                const findAbuseEmail = (entities) => {
+                    for (const ent of entities) {
+                        // Check roles for 'abuse'
+                        if (ent.roles && ent.roles.includes('abuse')) {
+                            const email = extractEmails(ent);
+                            if (email) return email;
+                        }
+                        // Recursive check in sub-entities
+                        if (ent.entities) {
+                            const subEmail = findAbuseEmail(ent.entities);
+                            if (subEmail) return subEmail;
+                        }
+                    }
+                    return null;
+                };
+
+                // Search main and sub entities
+                if (data.entities) {
+                    abuseEmail = findAbuseEmail(data.entities) || "Not found";
+                    // Try to find any general contact email if abuse wasn't the only one
+                    for (const ent of data.entities) {
+                        const email = extractEmails(ent);
+                        if (email && email !== abuseEmail) {
+                            contactEmail = email;
+                            break;
+                        }
+                    }
+                }
+                
+                emailEl.innerText = contactEmail;
+                abuseEl.innerText = abuseEmail;
+
             } catch (error) {
-                console.warn("Registry lookup failed, trying fallback...", error);
+                console.warn("Registry lookup failed:", error);
                 createdEl.innerText = "Data unavailable";
                 updatedEl.innerText = "Data unavailable";
+                emailEl.innerText = "Not found";
+                abuseEl.innerText = "Not found";
             }
         }
 
-        // --- 10. WHOIS API Abuse Protection (Rate Limiting) ---
         let lastRequestTime = 0;
         const REQUEST_COOLDOWN = 5000;
 
@@ -360,7 +417,7 @@
 
         if ('serviceWorker' in navigator) {
             const swCode = `
-                const CACHE_NAME = 'checkmyip-v7';
+                const CACHE_NAME = 'checkmyip-v8';
                 self.addEventListener('install', e => self.skipWaiting());
                 self.addEventListener('activate', e => e.waitUntil(clients.claim()));
                 self.addEventListener('fetch', e => {
@@ -415,16 +472,13 @@
                 const res4 = await fetch('https://api.ipify.org?format=json');
                 const d4 = await res4.json();
                 document.getElementById('ipv4-display').innerText = d4.ip;
-
                 const res6 = await fetch('https://api64.ipify.org?format=json');
                 const d6 = await res6.json();
                 const ipv6Value = d6.ip.includes(':') ? d6.ip : "Not Available";
                 document.getElementById('ipv6-display').innerText = ipv6Value;
-                
                 const primaryIP = ipv6Value !== "Not Available" ? ipv6Value : d4.ip;
                 updateIPTypeUI(primaryIP);
                 fetchRegistryDetails(primaryIP);
-
                 return d4.ip;
             } catch(e) {
                 document.getElementById('ipv4-display').innerText = "Offline";
@@ -458,7 +512,6 @@
             document.getElementById('info-host').innerText = d.ip;
             document.getElementById('terminal-out').innerText = `NODE ACTIVE: ${d.ip}\nPROVIDER: ${d.isp}\nSTATUS: ENCRYPTED`;
             localStorage.setItem('checkmyip_cache', JSON.stringify(d));
-            
             if (d.ip) {
                 updateIPTypeUI(d.ip);
                 fetchRegistryDetails(d.ip);
@@ -472,12 +525,7 @@
             pc.onicecandidate = e => {
                 if(e.candidate) {
                     const match = e.candidate.candidate.match(/([0-9]{1,3}(\.[0-9]{1,3}){3}|[a-f0-9:]+)/gi);
-                    match?.forEach(ip => {
-                        if(ip.length > 6) {
-                            ips.add(ip);
-                            renderWebRTC(ips);
-                        }
-                    });
+                    match?.forEach(ip => { if(ip.length > 6) { ips.add(ip); renderWebRTC(ips); } });
                 }
             };
             pc.createOffer().then(o => pc.setLocalDescription(o));
