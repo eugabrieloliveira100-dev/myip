@@ -65,23 +65,56 @@
             z-index: 1000;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
         }
+
+        /* Copy Button Success feedback */
+        #copy-toast {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #10b981;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 2000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
     </style>
 </head>
 <body>
     <div id="offline-banner">OFFLINE MODE ACTIVE - DISPLAYING CACHED DATA</div>
     <div id="abuse-alert">🛡️ ANTI-ABUSE PROTECTION: Please wait before making another request.</div>
+    <div id="copy-toast">✅ INFORMATION COPIED TO CLIPBOARD</div>
 
     <div class="max-w-5xl mx-auto flex flex-col gap-6">
         
         <!-- Header -->
         <header class="flex flex-col md:flex-row justify-between items-center gap-4 bg-slate-900/50 p-6 rounded-3xl border border-white/5">
-            <div>
-                <h1 class="text-2xl font-extrabold tracking-tight text-white">CHECKMYIP.<span class="text-blue-500">TODAY</span></h1>
-                <p class="text-slate-500 text-[10px] font-mono uppercase tracking-widest">Real-Time Network & Performance Analysis</p>
+            <div class="flex flex-col md:flex-row items-center gap-4">
+                <div>
+                    <h1 class="text-2xl font-extrabold tracking-tight text-white">CHECKMYIP.<span class="text-blue-500">TODAY</span></h1>
+                    <p class="text-slate-500 text-[10px] font-mono uppercase tracking-widest">Real-Time Network & Performance Analysis</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="copyPageSummary()" class="bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-extrabold px-4 py-2 rounded-full flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-blue-500/20">
+                        <i class="fas fa-copy"></i> COPY SUMMARY
+                    </button>
+                    <!-- Download JSON -->
+                    <button onclick="downloadInfo('json')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-extrabold px-4 py-2 rounded-full flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-emerald-500/20">
+                        <i class="fas fa-file-code"></i> DOWNLOAD JSON
+                    </button>
+                    <!-- Download TXT -->
+                    <button onclick="downloadInfo('txt')" class="bg-purple-600 hover:bg-purple-500 text-white text-[10px] font-extrabold px-4 py-2 rounded-full flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-purple-500/20">
+                        <i class="fas fa-file-alt"></i> DOWNLOAD TEXT
+                    </button>
+                </div>
             </div>
             <div class="flex items-center gap-3 bg-black/30 px-4 py-2 rounded-full border border-white/10">
                 <span id="status-dot" class="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
-                <span id="status-text" class="text-[10px] font-bold uppercase tracking-widest text-slate-300"> Network & Organization Details Lookup any IP address for detailed ASN, ISP and WHOIS records</span>
+                <span id="status-text" class="text-[10px] font-bold uppercase tracking-widest text-slate-300">Network & Organization Details Lookup any IP address for detailed ASN, ISP and WHOIS records</span>
             </div>
         </header>
 
@@ -200,13 +233,13 @@
                         </p>
                     </div>
                     <div>
-                        <h4 class="text-white font-bold text-sm mb-1 uppercase tracking-wider">Tor Node Verification</h4>
+                        <h4 class="text-white font-bold text-sm mb-1 uppercase tracking-wider">TOR NODE VERIFICATION</h4>
                         <p class="text-white text-[13px] leading-relaxed">
                             Checks the address against the real-time public directory of Tor (The Onion Router) "Exit Nodes". A match indicates that your connection is being routed through a multi-layered anonymity network, which is often prioritized for high-privacy use cases.
                         </p>
                     </div>
                     <div>
-                        <h4 class="text-white font-bold text-sm mb-1 uppercase tracking-wider">Proxy Integrity Check</h4>
+                        <h4 class="text-white font-bold text-sm mb-1 uppercase tracking-wider">PROXY INTEGRITY CHECK</h4>
                         <p class="text-white text-[13px] leading-relaxed">
                             Proxy integrity analyzes HTTP headers (such as X-Forwarded-For) and network signatures to detect intermediaries. Unlike a VPN, a proxy might operate only within the browser, and this test checks for signs that your request was forwarded by a third-party server.
                         </p>
@@ -235,7 +268,7 @@
                 </div>
                 <div class="bg-black/20 p-4 rounded-2xl border border-white/5 flex flex-col items-center text-center">
                     <span class="text-[9px] text-slate-500 uppercase mb-2">Usage Type</span>
-                    <div id="detect-usage" class="text-xs font-bold text-slate-400">Checking...</div>
+                    <div id="detect-usage" class="text-xs font-bold text-slate-400 uppercase">Checking...</div>
                 </div>
             </div>
         </div>
@@ -283,7 +316,7 @@
                 <button id="btn-perf" onclick="runPerformanceTest()" class="text-[10px] bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-full font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed">RE-RUN TEST</button>
             </div>
 
-            <!-- New Logic Description -->
+            <!-- Performance Explanation -->
             <div class="mb-6 px-2">
                 <p class="text-white text-[13px] leading-relaxed">
                     This section does not measure your raw ISP subscription speed (Bandwidth). Instead, it analyzes <strong>Network Quality</strong> and <strong>Routing Efficiency</strong>. It evaluates how quickly your current IP can establish handshakes with global edge nodes, measuring the stability (Jitter) and responsiveness (Latency) of your connection's path through the internet.
@@ -406,7 +439,7 @@
                     </div>
                 </div>
                 <div class="mt-6 pt-5 border-t border-white/10">
-                    <p class="text-[12px] font-bold text-white mb-2 uppercase tracking-wide">The VPN Conflict:</p>
+                    <p class="text-[12px] font-bold text-white mb-2 uppercase tracking-wide">THE VPN CONFLICT:</p>
                     <p class="text-[11px] leading-relaxed text-white opacity-90">
                         When you use a VPN, you expect all traffic to be hidden. However, WebRTC is a powerful browser API that operates outside standard HTTP requests. If not configured correctly, it can "bypass" the VPN software to discover your original provider's address. To stay fully protected, ensure your VPN has <strong>WebRTC Leak Protection</strong> enabled or use browser extensions to disable WebRTC entirely.
                     </p>
@@ -448,7 +481,7 @@
             <div class="bg-black p-4 rounded-xl font-mono text-xs text-green-400 border border-white/5">
                 <div class="flex items-center gap-2">
                     <span class="text-white">$ curl -s checkmyip.today/api</span>
-                    <button onclick="copyToClipboard('curl -s checkmyip.today/api')" class="text-slate-500 hover:text-white"><i class="fas fa-copy"></i></button>
+                    <button onclick="legacyCopy('curl -s checkmyip.today/api')" class="text-slate-500 hover:text-white"><i class="fas fa-copy"></i></button>
                 </div>
                 <div id="terminal-out" class="mt-4 text-blue-400 opacity-70">Handshaking...</div>
             </div>
@@ -463,12 +496,40 @@
     </div>
 
     <div class="mt-8 mb-4 text-center">
-        <a href="privacy.html" class="text-[10px] font-bold uppercase text-slate-500 hover:text-blue-400 transition-colors tracking-widest">
-            Privacy Policy
+        <a href="#" class="text-[10px] font-bold uppercase text-slate-500 hover:text-blue-400 transition-colors tracking-widest">
+            PRIVACY POLICY
         </a>
     </div>
 
     <script>
+        const NORMALIZATION_MAP = {
+            "TELEFONICA BRASIL S.A.": "Vivo / Telefônica",
+            "TELEFONICA": "Vivo / Telefônica",
+            "CLARO S.A.": "Claro / NET",
+            "AMAZON-02": "Amazon Web Services (AWS)",
+            "AMAZON-AES": "Amazon Web Services (AWS)",
+            "GOOGLE-CLOUD": "Google Cloud Platform",
+            "MICROSOFT-CORP-MS-P-AS-BLOCK": "Microsoft Azure",
+            "DIGITALOCEAN-ASN": "DigitalOcean",
+            "TIM CELULAR S.A.": "TIM Brasil",
+            "OI MOVEL S.A.": "Oi Móvel",
+            "COMPANHIA DE TELECOMUNICACOES DO BRASIL CENTRAL": "Algar Telecom",
+            "PROVEDOR": "Regional ISP",
+            "GOOGLE": "Google LLC",
+            "LTDA": "Ltda"
+        };
+
+        const CLOUD_KEYWORDS = ["amazon", "aws", "google", "microsoft", "azure", "digitalocean", "linode", "vultr", "hetzner", "ovh", "hosting", "datacenter", "data center", "cloud", "server"];
+
+        function normalizeName(name) {
+            if (!name) return "---";
+            const upper = name.toUpperCase();
+            for (let key in NORMALIZATION_MAP) {
+                if (upper.includes(key)) return NORMALIZATION_MAP[key];
+            }
+            return name.replace(/ S\.A\./gi, " S.A.").trim();
+        }
+
         function identifyIPType(ip) {
             if (!ip) return "Unknown";
             if (ip.includes(':')) return "IPv6 (Internet Protocol Version 6)";
@@ -488,6 +549,113 @@
                 : "bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-blue-500/30";
         }
 
+        function legacyCopy(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-9999px";
+            textArea.style.top = "0";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showToast();
+            } catch (err) {
+                console.error('Fallback copy failed', err);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function showToast() {
+            const toast = document.getElementById('copy-toast');
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 3000);
+        }
+
+        // --- EXPORT FUNCTIONALITY ---
+        function getSummaryData() {
+            return {
+                ipv4: document.getElementById('ipv4-display').innerText,
+                ipv6: document.getElementById('ipv6-display').innerText,
+                ipType: document.getElementById('ip-type-text').innerText,
+                regDate: document.getElementById('registry-created').innerText,
+                abuseEmail: document.getElementById('registry-abuse').innerText,
+                city: document.getElementById('info-city').innerText,
+                region: document.getElementById('info-region').innerText,
+                country: document.getElementById('info-country').innerText,
+                org: document.getElementById('info-org').innerText,
+                asn: document.getElementById('info-asn').innerText
+            };
+        }
+
+        function downloadInfo(format) {
+            const d = getSummaryData();
+            let content = "";
+            let fileName = `ip_info_${Date.now()}`;
+            let mimeType = "text/plain";
+
+            if (format === 'json') {
+                const jsonObj = {
+                    "IPV4 PROTOCOL": d.ipv4,
+                    "IPV6 PROTOCOL": d.ipv6,
+                    "IP Type Analysis": d.ipType,
+                    "Registration Date": d.regDate,
+                    "ISP Contact & Abuse Reporting (RDAP)": d.abuseEmail,
+                    "LOCATION INFO": {
+                        "CITY": d.city,
+                        "REGION": d.region,
+                        "COUNTRY": d.country
+                    },
+                    "PROVIDER INFO": {
+                        "ORGANIZATION": d.org
+                    },
+                    "ASN": d.asn
+                };
+                content = JSON.stringify(jsonObj, null, 4);
+                fileName += ".json";
+                mimeType = "application/json";
+            } else {
+                content = [
+                    `IPV4 PROTOCOL: "${d.ipv4}"`,
+                    `IPV6 PROTOCOL: "${d.ipv6}"`,
+                    `IP Type Analysis: "${d.ipType}"`,
+                    `Registration Date: "${d.regDate}"`,
+                    `ISP Contact & Abuse Reporting (RDAP): "${d.abuseEmail}"`,
+                    `LOCATION INFO: CITY: "${d.city}", REGION: "${d.region}", COUNTRY: "${d.country}"`,
+                    `PROVIDER INFO: ORGANIZATION: "${d.org}"`,
+                    `ASN: "${d.asn}"`
+                ].join('\n');
+                fileName += ".txt";
+            }
+
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        function copyPageSummary() {
+            const d = getSummaryData();
+            const summary = [
+                `IPV4 PROTOCOL: "${d.ipv4}"`,
+                `IPV6 PROTOCOL: "${d.ipv6}"`,
+                `IP Type Analysis: "${d.ipType}"`,
+                `Registration Date: "${d.regDate}"`,
+                `ISP Contact & Abuse Reporting (RDAP): "${d.abuseEmail}"`,
+                `LOCATION INFO: CITY: "${d.city}", REGION: "${d.region}", COUNTRY: "${d.country}"`,
+                `PROVIDER INFO: ORGANIZATION: "${d.org}"`,
+                `ASN: "${d.asn}"`
+            ].join('\n');
+
+            legacyCopy(summary);
+        }
+
         async function manualLookup() {
             const input = document.getElementById('ip-lookup-input');
             const ip = input.value.trim();
@@ -500,20 +668,7 @@
             } catch (error) { console.error(error); }
         }
 
-        function copyToClipboard(text) {
-            const el = document.createElement('textarea');
-            el.value = text;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-            const terminalOut = document.getElementById('terminal-out');
-            const original = terminalOut.innerText;
-            terminalOut.innerText = "Command copied to clipboard!";
-            setTimeout(() => terminalOut.innerText = original, 2000);
-        }
-
-        async function runRiskAssessment(data) {
+        function runRiskAssessment(data) {
             const riskEl = document.getElementById('risk-assessment');
             const scoreLabel = document.getElementById('risk-score-label');
             const scoreBar = document.getElementById('risk-score-bar');
@@ -527,20 +682,18 @@
             if (targetIpEl) targetIpEl.innerText = data.ip || "0.0.0.0";
 
             let score = 100;
-            const isp = (data.org || data.isp || "").toLowerCase();
-            const asn = (data.asn || "").toLowerCase();
-            const hostingKeywords = ["google", "amazon", "aws", "microsoft", "azure", "digitalocean", "ovh", "linode", "hetzner", "hosting", "data center", "cloudflare"];
-            const isHosting = hostingKeywords.some(kw => isp.includes(kw) || asn.includes(kw));
+            const orgLower = (data.org || "").toLowerCase();
+            const isCloud = CLOUD_KEYWORDS.some(kw => orgLower.includes(kw));
             
             let spamStatus = "CLEAN";
             let botStatus = "CLEAN";
             let bruteStatus = "CLEAN";
 
-            if (isHosting) {
+            if (isCloud) {
                 score -= 40;
-                spamStatus = "POTENTIAL";
+                spamStatus = "DATACENTER";
                 botStatus = "MONITORED";
-                bruteStatus = "DATACENTER";
+                bruteStatus = "SERVER-IP";
             }
 
             spamEl.innerText = spamStatus;
@@ -556,7 +709,7 @@
             } else if (score >= 60) {
                 verdict.innerText = "NEUTRAL / CLOUD";
                 verdict.className = "text-[10px] font-black uppercase tracking-widest text-yellow-500";
-                riskEl.innerText = "Cloud infrastructure detected.";
+                riskEl.innerText = "Hosting or cloud infrastructure detected.";
             } else {
                 verdict.innerText = "SUSPICIOUS";
                 verdict.className = "text-[10px] font-black uppercase tracking-widest text-red-500";
@@ -570,21 +723,27 @@
             const torEl = document.getElementById('detect-tor');
             const usageEl = document.getElementById('detect-usage');
             
-            const isp = (data.org || data.isp || "").toLowerCase();
-            const asn = (data.asn || "").toLowerCase();
-            const hostingKeywords = ["google", "amazon", "aws", "microsoft", "azure", "digitalocean", "ovh", "linode", "hetzner", "hosting", "data center", "cloudflare"];
-            const isHosting = hostingKeywords.some(kw => isp.includes(kw) || asn.includes(kw));
+            const orgText = (data.org || data.asn || "").toLowerCase();
+            const isCloud = CLOUD_KEYWORDS.some(kw => orgText.includes(kw));
 
             const setStatus = (el, isActive) => {
                 el.innerText = isActive ? "DETECTED" : "CLEAN";
                 el.className = isActive ? "text-xs font-bold text-red-500" : "text-xs font-bold text-emerald-500";
             };
 
-            setStatus(vpnEl, isHosting);
+            setStatus(vpnEl, isCloud); 
             setStatus(proxyEl, false); 
-            setStatus(torEl, isp.includes("tor") || asn.includes("tor"));
-            usageEl.innerText = isHosting ? "Data Center" : "Residential";
-            usageEl.className = isHosting ? "text-xs font-bold text-orange-400" : "text-xs font-bold text-blue-400";
+            setStatus(torEl, orgText.includes("tor"));
+            
+            if (isCloud) {
+                const cloudName = normalizeName(data.org || data.asn);
+                usageEl.innerHTML = `<span class="text-orange-500">This is a Server (${cloudName}), not a residential user</span>`;
+                usageEl.className = "text-[10px] font-black uppercase tracking-tighter leading-tight text-center";
+            } else {
+                usageEl.innerText = "RESIDENTIAL / MOBILE";
+                usageEl.className = "text-xs font-bold text-emerald-500";
+            }
+
             runRiskAssessment(data);
         }
 
@@ -604,8 +763,8 @@
                 const response = await fetch(`https://rdap.db.ripe.net/ip/${ip}`);
                 const data = await response.json();
                 const events = data.events || [];
-                document.getElementById('registry-created').innerText = events.find(e => e.eventAction === 'registration')?.eventDate ? new Date(events.find(e => e.eventAction === 'registration').eventDate).toLocaleDateString() : "Historical";
-                document.getElementById('registry-updated').innerText = events.find(e => e.eventAction === 'last changed')?.eventDate ? new Date(events.find(e => e.eventAction === 'last changed').eventDate).toLocaleDateString() : "Stable";
+                document.getElementById('registry-created').innerText = events.find(e => e.eventAction === 'registration')?.eventDate ? new Date(events.find(e => e.eventAction === 'registration').eventDate).toLocaleDateString() : "Historical Registration";
+                document.getElementById('registry-updated').innerText = events.find(e => e.eventAction === 'last changed')?.eventDate ? new Date(events.find(e => e.eventAction === 'last changed').eventDate).toLocaleDateString() : "Stable Allocation";
 
                 let allEmails = findEmailsInRDAP(data);
                 if (allEmails.length > 0) {
@@ -631,22 +790,18 @@
             if (isAbusing()) return;
             const btn = document.getElementById('btn-perf');
             btn.disabled = true;
-            
             const pingEl = document.getElementById('perf-ping');
             const jitterEl = document.getElementById('perf-jitter');
             const speedEl = document.getElementById('perf-speed');
             const pingProg = document.getElementById('ping-progress');
             const jitterProg = document.getElementById('jitter-progress');
             const speedProg = document.getElementById('speed-progress');
-
             pingEl.innerText = "Measuring...";
             jitterEl.innerText = "Analyzing...";
             speedEl.innerText = "Transferring...";
-
             const samples = [];
             const speedTestUrl = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js?cb=' + Date.now();
             const latencyUrl = 'https://www.google.com/favicon.ico?v=' + Date.now();
-
             try {
                 for(let i=0; i<8; i++) {
                     const s = performance.now();
@@ -655,31 +810,25 @@
                     if (i > 0) samples.push(duration);
                     await new Promise(r => setTimeout(r, 50));
                 }
-
                 const avgPing = samples.reduce((a,b) => a+b) / samples.length;
                 const jitter = Math.sqrt(samples.map(x => Math.pow(x - avgPing, 2)).reduce((a, b) => a + b) / samples.length);
-
                 const startTime = performance.now();
                 const response = await fetch(speedTestUrl, { cache: 'no-store' });
                 const blob = await response.blob();
                 const endTime = performance.now();
-                
                 const durationSeconds = (endTime - startTime) / 1000;
                 const sizeBits = blob.size * 8;
                 const speedMbps = (sizeBits / durationSeconds) / (1024 * 1024);
-
                 pingEl.innerText = `${Math.round(avgPing)}ms`;
                 jitterEl.innerText = `${Math.round(jitter)}ms`;
                 speedEl.innerText = `${speedMbps.toFixed(2)} Mbps`;
-
                 pingProg.style.width = Math.min(100, Math.max(5, 100 - (avgPing / 2.5))) + "%";
                 jitterProg.style.width = Math.min(100, Math.max(5, 100 - (jitter * 5))) + "%";
                 speedProg.style.width = Math.min(100, (speedMbps / 100) * 100) + "%";
-
             } catch (e) {
-                pingEl.innerText = "Blocked";
-                jitterEl.innerText = "Blocked";
-                speedEl.innerText = "Check CORS/Net";
+                pingEl.innerText = "Timed Out";
+                jitterEl.innerText = "N/A";
+                speedEl.innerText = "Check Net";
             } finally {
                 btn.disabled = false;
             }
@@ -692,9 +841,9 @@
                 if (data.ip.includes(':')) {
                     document.getElementById('ipv6-display').innerText = data.ip;
                 } else {
-                    document.getElementById('ipv6-display').innerText = "Not Detected / IPv4 Only";
+                    document.getElementById('ipv6-display').innerText = "Not Detected (IPv4 Preferred)";
                 }
-            } catch (e) { document.getElementById('ipv6-display').innerText = "Offline/Hidden"; }
+            } catch (e) { document.getElementById('ipv6-display').innerText = "Offline/Restricted"; }
         }
 
         async function detectIPs() {
@@ -714,9 +863,10 @@
             document.getElementById('info-city').innerText = d.city || "---";
             document.getElementById('info-region').innerText = d.region || "---";
             document.getElementById('info-country').innerText = d.country_name || "---";
-            const orgName = d.org || d.asn || "---";
-            document.getElementById('info-isp').innerText = d.isp || orgName;
-            document.getElementById('info-org').innerText = orgName;
+            const normalizedISP = normalizeName(d.isp || d.org);
+            const normalizedOrg = normalizeName(d.org || d.asn);
+            document.getElementById('info-isp').innerText = normalizedISP;
+            document.getElementById('info-org').innerText = normalizedOrg;
             document.getElementById('info-asn').innerText = d.asn || "---";
             document.getElementById('info-host').innerText = d.ip || "---";
             updateSecurityUI(d);
