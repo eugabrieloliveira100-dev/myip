@@ -40,7 +40,6 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
-        /* Estilo específico para garantir visibilidade do footer */
         footer a {
             text-decoration: none;
             position: relative;
@@ -73,7 +72,7 @@
             </div>
             <div class="flex items-center gap-3 bg-black/30 px-4 py-2 rounded-full border border-white/10">
                 <span id="status-dot" class="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
-                <span id="status-text" class="text-[10px] font-bold uppercase tracking-widest text-slate-300">Network & Organization</span>
+                <span id="status-text" class="text-[10px] font-bold uppercase tracking-widest text-slate-300">Network & Organization Details</span>
             </div>
         </header>
 
@@ -213,7 +212,7 @@
             </div>
         </section>
 
-        <!-- FOOTER: ADICIONADO DENTRO DA PÁGINA PRINCIPAL -->
+        <!-- FOOTER ATUALIZADO -->
         <footer class="mt-8 mb-12 py-8 border-t border-white/5 text-center">
             <div class="flex flex-col items-center gap-6">
                 <div class="flex items-center gap-8">
@@ -221,7 +220,8 @@
                         Home
                     </a>
                     <span class="h-1 w-1 rounded-full bg-slate-700"></span>
-                    <a href="privacy.html" class="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 hover:text-blue-500 transition-all underline decoration-blue-500/30 underline-offset-4">
+                    <!-- O link abaixo agora usa um caminho absoluto ou relativo verificado -->
+                    <a href="./privacy.html" class="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 hover:text-blue-500 transition-all underline decoration-blue-500/30 underline-offset-4">
                         Privacy & Terms
                     </a>
                 </div>
@@ -258,8 +258,8 @@
                 const regDate = events.find(e => e.eventAction === 'registration')?.eventDate;
                 const lastUpdate = events.find(e => e.eventAction === 'last changed')?.eventDate;
 
-                document.getElementById('registry-created').innerText = regDate ? new Date(regDate).toLocaleDateString() : "Unknown";
-                document.getElementById('registry-updated').innerText = lastUpdate ? new Date(lastUpdate).toLocaleDateString() : "Unknown";
+                document.getElementById('registry-created').innerText = regDate ? new Date(regDate).toLocaleDateString() : "N/A";
+                document.getElementById('registry-updated').innerText = lastUpdate ? new Date(lastUpdate).toLocaleDateString() : "N/A";
 
                 let emails = { support: "Not found", abuse: "Not found" };
                 if (data.entities) {
