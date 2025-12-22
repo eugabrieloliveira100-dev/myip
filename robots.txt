@@ -1,6 +1,1 @@
-User-agent: *
-Allow: /
-
-Link direto para o seu sitemap
-
-Sitemap: https://www.google.com/url?sa=E&source=gmail&q=https://checkmyip.today/sitemap.xml
+Sitemap: https://checkmyip.today/sitemap.xml
