@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Check My IP - Global Analysis & Anti-Abuse</title>
+    <title>Check My IP - Global Analysis</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -24,19 +24,6 @@
         }
         .glass-card:hover { transform: translateY(-2px); border-color: rgba(59, 130, 246, 0.2); }
         
-        #offline-banner {
-            display: none;
-            background: #f59e0b;
-            color: #000;
-            text-align: center;
-            padding: 0.5rem;
-            font-size: 0.75rem;
-            font-weight: 800;
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            z-index: 100;
-        }
-
         #copy-toast {
             display: none;
             position: fixed;
@@ -55,8 +42,7 @@
     </style>
 </head>
 <body>
-    <div id="offline-banner">MODO OFFLINE ATIVO - EXIBINDO DADOS EM CACHE</div>
-    <div id="copy-toast">✅ INFORMAÇÃO COPIADA</div>
+    <div id="copy-toast">✅ INFORMATION COPIED</div>
 
     <div class="max-w-5xl mx-auto flex flex-col gap-6">
         
@@ -65,7 +51,7 @@
             <div class="flex flex-col md:flex-row items-center gap-4">
                 <div>
                     <h1 class="text-2xl font-extrabold tracking-tight text-white">CHECKMYIP.<span class="text-blue-500">TODAY</span></h1>
-                    <p class="text-slate-500 text-[10px] font-mono uppercase tracking-widest">Inteligência de Rede e Segurança em Tempo Real</p>
+                    <p class="text-slate-500 text-[10px] font-mono uppercase tracking-widest">Real-Time Network Intelligence</p>
                 </div>
                 <div class="flex flex-wrap gap-2">
                     <button onclick="copyPageSummary()" class="bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-extrabold px-4 py-2 rounded-full flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-blue-500/20">
@@ -74,36 +60,33 @@
                     <button onclick="downloadInfo('json')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-extrabold px-4 py-2 rounded-full flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-emerald-500/20">
                         <i class="fas fa-file-code"></i> DOWNLOAD JSON
                     </button>
-                    <button onclick="downloadInfo('txt')" class="bg-purple-600 hover:bg-purple-500 text-white text-[10px] font-extrabold px-4 py-2 rounded-full flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-purple-500/20">
-                        <i class="fas fa-file-alt"></i> DOWNLOAD TEXT
-                    </button>
                 </div>
             </div>
             <div class="flex items-center gap-3 bg-black/30 px-4 py-2 rounded-full border border-white/10">
                 <span id="status-dot" class="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
-                <span id="status-text" class="text-[10px] font-bold uppercase tracking-widest text-slate-300">Network & Organization Details</span>
+                <span id="status-text" class="text-[10px] font-bold uppercase tracking-widest text-slate-300">Network & Organization</span>
             </div>
         </header>
 
-        <!-- Section 1: Public IP Protocol -->
+        <!-- Section 1: Public IPs -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="glass-card p-8 rounded-3xl relative overflow-hidden">
                 <div class="flex justify-between items-start mb-4">
-                    <span class="bg-blue-500/10 text-blue-400 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">Your Public IP Address</span>
+                    <span class="bg-blue-500/10 text-blue-400 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">IPv4 Address</span>
                     <i class="fas fa-shield-alt text-blue-500/30"></i>
                 </div>
-                <h2 class="text-slate-500 text-xs font-bold mb-1 uppercase">IPv4 Address (Standard numeric dots):</h2>
+                <h2 class="text-slate-500 text-xs font-bold mb-1 uppercase">Public IPv4 Address:</h2>
                 <div id="ipv4-display" class="text-3xl md:text-4xl font-black tracking-tighter text-white font-mono break-all">Detecting...</div>
             </div>
 
             <div class="glass-card p-8 rounded-3xl relative overflow-hidden">
                 <div class="flex justify-between items-start mb-4">
-                    <span class="bg-purple-500/10 text-purple-400 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">Your Public IP Address</span>
+                    <span class="bg-purple-500/10 text-purple-400 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">IPv6 Address</span>
                     <i class="fas fa-globe-americas text-purple-500/30"></i>
                 </div>
-                <h2 class="text-slate-500 text-xs font-bold mb-1 uppercase">IPv6 Address (Longer formats with colons)</h2>
-                <div id="ipv6-display" class="text-lg md:text-xl lg:text-2xl font-black font-mono text-purple-200 break-all leading-snug min-h-[3.5rem] transition-all duration-200">
-                    Checking...
+                <h2 class="text-slate-500 text-xs font-bold mb-1 uppercase">Public IPv6 Address:</h2>
+                <div id="ipv6-display" class="text-lg md:text-xl lg:text-2xl font-black font-mono text-purple-200 break-all leading-snug min-h-[3.5rem]">
+                    Verifying...
                 </div>
             </div>
         </div>
@@ -111,88 +94,88 @@
         <!-- RDAP Timeline -->
         <div class="glass-card p-6 rounded-3xl border-l-4 border-l-purple-500">
             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center">
-                <i class="fas fa-calendar-alt mr-2 text-purple-500"></i> Registry & Allocation Timeline (RDAP)
+                <i class="fas fa-calendar-alt mr-2 text-purple-500"></i> Registry & Allocation (RDAP)
             </h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
                     <span class="text-[10px] text-slate-500 uppercase block mb-1">Registration Date</span>
-                    <span id="registry-created" class="text-white font-bold text-sm">Carregando...</span>
+                    <span id="registry-created" class="text-white font-bold text-sm">Loading...</span>
                 </div>
                 <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
-                    <span class="text-[10px] text-slate-500 uppercase block mb-1">Last Allocation Update</span>
-                    <span id="registry-updated" class="text-white font-bold text-sm">Carregando...</span>
+                    <span class="text-[10px] text-slate-500 uppercase block mb-1">Last Update</span>
+                    <span id="registry-updated" class="text-white font-bold text-sm">Loading...</span>
                 </div>
             </div>
         </div>
 
-        <!-- ISP Abuse RDAP -->
+        <!-- ISP RDAP Contacts -->
         <div class="glass-card p-6 rounded-3xl border-l-4 border-l-red-500">
             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center">
-                <i class="fas fa-envelope-open-text mr-2 text-red-500"></i> ISP Contact & Abuse Reporting (RDAP)
+                <i class="fas fa-envelope-open-text mr-2 text-red-500"></i> Contacts & Abuse Reporting (RDAP)
             </h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
-                    <span class="text-[10px] text-slate-500 uppercase block mb-1">Contact/Support Email</span>
-                    <span id="registry-email" class="text-blue-400 font-bold text-sm truncate block">Buscando...</span>
+                    <span class="text-[10px] text-slate-500 uppercase block mb-1">Support Email</span>
+                    <span id="registry-email" class="text-blue-400 font-bold text-sm truncate block">Searching...</span>
                 </div>
                 <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
-                    <span class="text-[10px] text-slate-500 uppercase block mb-1">Abuse Report Email</span>
-                    <span id="registry-abuse" class="text-red-400 font-bold text-sm truncate block">Buscando...</span>
+                    <span class="text-[10px] text-slate-500 uppercase block mb-1">Abuse Email</span>
+                    <span id="registry-abuse" class="text-red-400 font-bold text-sm truncate block">Searching...</span>
                 </div>
             </div>
         </div>
 
-        <!-- Location Info -->
+        <!-- Location & ISP -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="glass-card p-6 rounded-3xl flex flex-col h-full">
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
-                        <i class="fas fa-map-marker-alt mr-2 text-blue-500"></i> Location Info
+                        <i class="fas fa-map-marker-alt mr-2 text-blue-500"></i> Location
                     </h3>
                 </div>
                 <div class="space-y-4">
                     <div class="flex justify-between border-b border-white/5 pb-2">
-                        <span class="text-slate-500 text-sm">Cidade</span>
-                        <span id="info-city" class="text-white font-bold text-sm">---</span>
+                        <span class="text-slate-500 text-sm">City</span>
+                        <span id="info-city" class="text-white font-bold text-sm">...</span>
                     </div>
                     <div class="flex justify-between border-b border-white/5 pb-2">
-                        <span class="text-slate-500 text-sm">Região</span>
-                        <span id="info-region" class="text-white font-bold text-sm">---</span>
+                        <span class="text-slate-500 text-sm">Region</span>
+                        <span id="info-region" class="text-white font-bold text-sm">...</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-slate-500 text-sm">País</span>
-                        <span id="info-country" class="text-white font-bold text-sm">---</span>
+                        <span class="text-slate-500 text-sm">Country</span>
+                        <span id="info-country" class="text-white font-bold text-sm">...</span>
                     </div>
                 </div>
             </div>
 
             <div class="glass-card p-6 rounded-3xl">
                 <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center">
-                    <i class="fas fa-server mr-2 text-blue-500"></i> PROVIDER INFO
+                    <i class="fas fa-server mr-2 text-blue-500"></i> Provider Information
                 </h3>
                 <div class="space-y-4">
                     <div class="flex flex-col gap-1 border-b border-white/5 pb-2">
-                        <span class="text-slate-500 text-[10px] uppercase">ISP (Internet Provider)</span>
-                        <span id="info-isp" class="text-white font-bold text-sm truncate">---</span>
+                        <span class="text-slate-500 text-[10px] uppercase">ISP (Internet Service Provider)</span>
+                        <span id="info-isp" class="text-white font-bold text-sm truncate">Loading ISP...</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-slate-500 text-sm">Organization</span>
-                        <span id="info-org" class="text-white font-bold text-sm truncate max-w-[180px]">---</span>
+                        <span id="info-org" class="text-white font-bold text-sm truncate max-w-[180px]">...</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Search / WHOIS -->
+        <!-- WHOIS Lookup -->
         <section class="glass-card p-8 rounded-3xl bg-slate-900/40">
             <div class="flex flex-col md:flex-row justify-between gap-6 mb-8">
                 <div>
-                    <h2 class="text-lg font-bold flex items-center gap-2">🔍 Network & Organization Details</h2>
-                    <p class="text-slate-500 text-xs">Consulte qualquer IP para registros detalhados de ASN, ISP e WHOIS.</p>
+                    <h2 class="text-lg font-bold flex items-center gap-2">🔍 Network Details</h2>
+                    <p class="text-slate-500 text-xs">Lookup ASN and WHOIS records for any IP address.</p>
                 </div>
-                <div id="lookup-container" class="flex bg-black/40 border border-white/10 rounded-2xl overflow-hidden">
-                    <input type="text" id="ip-lookup-input" placeholder="Enter IP address..." class="bg-transparent px-4 py-2 text-sm outline-none w-48 font-mono text-white">
-                    <button id="btn-lookup" onclick="manualLookup()" class="bg-blue-600 px-4 hover:bg-blue-500 transition-all disabled:opacity-50">
+                <div class="flex bg-black/40 border border-white/10 rounded-2xl overflow-hidden">
+                    <input type="text" id="ip-lookup-input" placeholder="Enter IP..." class="bg-transparent px-4 py-2 text-sm outline-none w-48 font-mono text-white">
+                    <button id="btn-lookup" onclick="manualLookup()" class="bg-blue-600 px-4 hover:bg-blue-500 transition-all">
                         <i class="fas fa-search text-xs"></i>
                     </button>
                 </div>
@@ -200,33 +183,28 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="bg-white/5 p-4 rounded-xl">
                     <span class="text-[10px] text-slate-500 block uppercase">ASN</span>
-                    <span id="info-asn" class="text-blue-400 font-mono font-bold">---</span>
+                    <span id="info-asn" class="text-blue-400 font-mono font-bold">...</span>
                 </div>
                 <div class="bg-white/5 p-4 rounded-xl">
-                    <span class="text-[10px] text-slate-500 block uppercase">HOSTNAME / IP</span>
-                    <span id="info-host" class="text-white font-mono text-xs truncate block">---</span>
+                    <span class="text-[10px] text-slate-500 block uppercase">HOSTNAME</span>
+                    <span id="info-host" class="text-white font-mono text-xs truncate block">...</span>
                 </div>
             </div>
         </section>
 
-        <!-- Terminal Section -->
+        <!-- Terminal -->
         <section class="glass-card p-6 rounded-3xl">
             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center">
-                💻 Check IP via Terminal
+                💻 Terminal Query
             </h3>
             <div class="bg-black p-4 rounded-xl font-mono text-xs text-green-400 border border-white/5">
                 <div class="flex items-center gap-2">
                     <span class="text-white">$ curl -s checkmyip.today/api</span>
                     <button onclick="legacyCopy('curl -s checkmyip.today/api')" class="text-slate-500 hover:text-white"><i class="fas fa-copy"></i></button>
                 </div>
-                <div id="terminal-out" class="mt-4 text-blue-400 opacity-70">Handshaking...</div>
+                <div id="terminal-out" class="mt-4 text-blue-400 opacity-70">> System ready.</div>
             </div>
         </section>
-
-        <footer class="glass-card p-6 rounded-3xl border-dashed border-white/10 flex flex-wrap gap-4 items-center">
-            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mr-4">🛠️ Developer Tools</h3>
-            <button onclick="location.reload()" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg text-[10px] font-bold uppercase">Reload</button>
-        </footer>
     </div>
 
     <script>
@@ -235,16 +213,17 @@
         async function fetchRegistryDetails(ip) {
             try {
                 const response = await fetch(`https://rdap.db.ripe.net/ip/${ip}`);
+                if(!response.ok) throw new Error();
                 const data = await response.json();
                 const events = data.events || [];
                 
                 const regDate = events.find(e => e.eventAction === 'registration')?.eventDate;
                 const lastUpdate = events.find(e => e.eventAction === 'last changed')?.eventDate;
 
-                document.getElementById('registry-created').innerText = regDate ? new Date(regDate).toLocaleDateString() : "N/A";
-                document.getElementById('registry-updated').innerText = lastUpdate ? new Date(lastUpdate).toLocaleDateString() : "N/A";
+                document.getElementById('registry-created').innerText = regDate ? new Date(regDate).toLocaleDateString() : "Not available";
+                document.getElementById('registry-updated').innerText = lastUpdate ? new Date(lastUpdate).toLocaleDateString() : "Not available";
 
-                let emails = { support: "N/A", abuse: "N/A" };
+                let emails = { support: "Not available", abuse: "Not available" };
                 if (data.entities) {
                     const findEmails = (ents) => {
                         ents.forEach(e => {
@@ -262,79 +241,77 @@
                 }
                 document.getElementById('registry-email').innerText = emails.support;
                 document.getElementById('registry-abuse').innerText = emails.abuse;
-                currentData.registry = { ...emails, created: regDate, updated: lastUpdate };
             } catch (e) {
-                ["registry-created", "registry-updated", "registry-email", "registry-abuse"].forEach(id => document.getElementById(id).innerText = "N/A");
+                ["registry-created", "registry-updated", "registry-email", "registry-abuse"].forEach(id => document.getElementById(id).innerText = "RDAP Error");
             }
         }
 
         function updateUI(d) {
-            currentData.geo = d;
-            document.getElementById('info-city').innerText = d.city || "---";
-            document.getElementById('info-region').innerText = d.region || "---";
-            document.getElementById('info-country').innerText = d.country_name || "---";
-            document.getElementById('info-isp').innerText = d.isp || "---";
-            document.getElementById('info-org').innerText = d.org || "---";
-            document.getElementById('info-asn').innerText = d.asn || "---";
-            document.getElementById('info-host').innerText = d.ip || "---";
-            fetchRegistryDetails(d.ip);
+            currentData = d;
+            const ispName = d.isp || d.org || d.asn_org || "Not identified";
+            const orgName = d.org || d.asn_org || d.isp || "Not identified";
+
+            document.getElementById('info-city').innerText = d.city || "Unknown";
+            document.getElementById('info-region').innerText = d.region || d.region_code || "...";
+            document.getElementById('info-country').innerText = d.country_name || d.country || "...";
+            document.getElementById('info-isp').innerText = ispName;
+            document.getElementById('info-org').innerText = orgName;
+            document.getElementById('info-asn').innerText = d.asn || d.asn_number || "---";
+            document.getElementById('info-host').innerText = d.ip || d.query || "...";
+            
+            fetchRegistryDetails(d.ip || d.query);
         }
 
         async function init() {
             try {
-                const res = await fetch('https://api.ipify.org?format=json');
-                const d = await res.json();
-                document.getElementById('ipv4-display').innerText = d.ip;
-                const geo = await (await fetch(`https://ipapi.co/${d.ip}/json/`)).json();
-                updateUI(geo);
+                const geoRes = await fetch('https://ipapi.co/json/');
+                const geoData = await geoRes.json();
                 
-                const v6Res = await fetch('https://api64.ipify.org?format=json');
-                const v6Data = await v6Res.json();
-                document.getElementById('ipv6-display').innerText = v6Data.ip.includes(':') ? v6Data.ip : "NOT DETECTED";
-            } catch(e) { console.error(e); }
-            document.getElementById('terminal-out').innerText = "Pronto para análise.";
+                if (geoData && geoData.ip) {
+                    document.getElementById('ipv4-display').innerText = geoData.ip;
+                    updateUI(geoData);
+                } else {
+                    const fbRes = await fetch('https://ip-api.com/json/');
+                    const fbData = await fbRes.json();
+                    document.getElementById('ipv4-display').innerText = fbData.query;
+                    updateUI(fbData);
+                }
+                
+                try {
+                    const v6Res = await fetch('https://api64.ipify.org?format=json');
+                    const v6Data = await v6Res.json();
+                    document.getElementById('ipv6-display').innerText = v6Data.ip.includes(':') ? v6Data.ip : "Not detected on this connection";
+                } catch(e) {
+                    document.getElementById('ipv6-display').innerText = "Not available";
+                }
+
+            } catch(e) { 
+                console.error("Initial load error:", e);
+                document.getElementById('terminal-out').innerText = "> Error loading data. Check connection.";
+            }
         }
 
         async function manualLookup() {
             const input = document.getElementById('ip-lookup-input').value.trim();
             if (!input) return;
-            document.getElementById('btn-lookup').disabled = true;
+            const btn = document.getElementById('btn-lookup');
+            btn.disabled = true;
             try {
-                const geo = await (await fetch(`https://ipapi.co/${input}/json/`)).json();
-                if (geo.error) throw new Error("IP Inválido");
+                const res = await fetch(`https://ipapi.co/${input}/json/`);
+                const geo = await res.json();
+                if (geo.error) throw new Error("Invalid IP");
                 updateUI(geo);
-                document.getElementById('terminal-out').innerText = `Dados de ${input} carregados.`;
+                document.getElementById('terminal-out').innerText = `> Data for ${input} loaded successfully.`;
             } catch (e) {
-                document.getElementById('terminal-out').innerText = `Erro: ${e.message}`;
+                document.getElementById('terminal-out').innerText = `> Lookup error: ${e.message}`;
             } finally {
-                document.getElementById('btn-lookup').disabled = false;
+                btn.disabled = false;
             }
         }
 
         function copyPageSummary() {
-            const summary = `
-IP Análise Summary:
-- IPv4: ${document.getElementById('ipv4-display').innerText}
-- ISP: ${document.getElementById('info-isp').innerText}
-- Org: ${document.getElementById('info-org').innerText}
-- Location: ${document.getElementById('info-city').innerText}, ${document.getElementById('info-country').innerText}
-            `.trim();
+            const summary = `IP Report: ${currentData.ip}\nISP: ${currentData.isp || 'N/A'}\nLocation: ${currentData.city}, ${currentData.country_name}`;
             legacyCopy(summary);
-        }
-
-        function downloadInfo(format) {
-            const content = format === 'json' 
-                ? JSON.stringify(currentData, null, 2)
-                : `CHECKMYIP REPORT\n${"-".repeat(20)}\n${JSON.stringify(currentData, null, 2)}`;
-            const blob = new Blob([content], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `ip-report-${currentData.geo?.ip || 'data'}.${format}`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
         }
 
         function legacyCopy(text) {
