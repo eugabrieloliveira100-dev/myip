@@ -264,23 +264,36 @@
 
         async function init() {
             try {
-                const geoRes = await fetch('https://ipapi.co/json/');
-                const geoData = await geoRes.json();
+                // Force IPv4 detection using an IPv4-only endpoint first
+                const ipv4Res = await fetch('https://api.ipify.org?format=json');
+                const ipv4Data = await ipv4Res.json();
                 
-                if (geoData && geoData.ip) {
-                    document.getElementById('ipv4-display').innerText = geoData.ip;
+                // Ensure it's not an IPv6 (doesn't contain ':')
+                if (ipv4Data.ip && !ipv4Data.ip.includes(':')) {
+                    document.getElementById('ipv4-display').innerText = ipv4Data.ip;
+                    // Now get Geo info using this specific IPv4
+                    const geoRes = await fetch(`https://ipapi.co/${ipv4Data.ip}/json/`);
+                    const geoData = await geoRes.json();
                     updateUI(geoData);
                 } else {
-                    const fbRes = await fetch('https://ip-api.com/json/');
-                    const fbData = await fbRes.json();
-                    document.getElementById('ipv4-display').innerText = fbData.query;
-                    updateUI(fbData);
+                    // Fallback to general detect if first fails
+                    const genRes = await fetch('https://ipapi.co/json/');
+                    const genData = await genRes.json();
+                    if (genData.ip && !genData.ip.includes(':')) {
+                        document.getElementById('ipv4-display').innerText = genData.ip;
+                        updateUI(genData);
+                    }
                 }
                 
+                // Separately detect IPv6
                 try {
                     const v6Res = await fetch('https://api64.ipify.org?format=json');
                     const v6Data = await v6Res.json();
-                    document.getElementById('ipv6-display').innerText = v6Data.ip.includes(':') ? v6Data.ip : "Not detected on this connection";
+                    if (v6Data.ip.includes(':')) {
+                        document.getElementById('ipv6-display').innerText = v6Data.ip;
+                    } else {
+                        document.getElementById('ipv6-display').innerText = "Not detected (IPv4 only)";
+                    }
                 } catch(e) {
                     document.getElementById('ipv6-display').innerText = "Not available";
                 }
