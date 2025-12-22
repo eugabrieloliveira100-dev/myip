@@ -39,6 +39,15 @@
             z-index: 2000;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
+
+        /* Estilo específico para garantir visibilidade do footer */
+        footer a {
+            text-decoration: none;
+            position: relative;
+        }
+        footer a:hover {
+            color: #3b82f6 !important;
+        }
     </style>
 </head>
 <body>
@@ -68,14 +77,14 @@
             </div>
         </header>
 
-        <!-- Section 1: Public IPs -->
+        <!-- IPv4 & IPv6 -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="glass-card p-8 rounded-3xl relative overflow-hidden">
                 <div class="flex justify-between items-start mb-4">
                     <span class="bg-blue-500/10 text-blue-400 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">IPv4 Address</span>
                     <i class="fas fa-shield-alt text-blue-500/30"></i>
                 </div>
-                <h2 class="text-slate-500 text-xs font-bold mb-1 uppercase">Public IPv4:</h2>
+                <h2 class="text-slate-500 text-xs font-bold mb-1 uppercase text-blue-500/80">Public IPv4:</h2>
                 <div id="ipv4-display" class="text-3xl md:text-4xl font-black tracking-tighter text-white font-mono break-all">Detecting...</div>
             </div>
 
@@ -84,14 +93,14 @@
                     <span class="bg-purple-500/10 text-purple-400 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">IPv6 Address</span>
                     <i class="fas fa-globe-americas text-purple-500/30"></i>
                 </div>
-                <h2 class="text-slate-500 text-xs font-bold mb-1 uppercase">Public IPv6:</h2>
+                <h2 class="text-slate-500 text-xs font-bold mb-1 uppercase text-purple-500/80">Public IPv6:</h2>
                 <div id="ipv6-display" class="text-lg md:text-xl lg:text-2xl font-black font-mono text-purple-200 break-all leading-snug min-h-[3.5rem]">
                     Checking...
                 </div>
             </div>
         </div>
 
-        <!-- RDAP Timeline -->
+        <!-- RDAP Registry -->
         <div class="glass-card p-6 rounded-3xl border-l-4 border-l-purple-500">
             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center">
                 <i class="fas fa-calendar-alt mr-2 text-purple-500"></i> Registry & Allocation (RDAP)
@@ -108,7 +117,7 @@
             </div>
         </div>
 
-        <!-- ISP RDAP Contacts -->
+        <!-- Abuse Contacts -->
         <div class="glass-card p-6 rounded-3xl border-l-4 border-l-red-500">
             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center">
                 <i class="fas fa-envelope-open-text mr-2 text-red-500"></i> Abuse Contacts (RDAP)
@@ -125,14 +134,12 @@
             </div>
         </div>
 
-        <!-- Location & ISP -->
+        <!-- Location & ISP Info -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="glass-card p-6 rounded-3xl flex flex-col h-full">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
-                        <i class="fas fa-map-marker-alt mr-2 text-blue-500"></i> Location
-                    </h3>
-                </div>
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center">
+                    <i class="fas fa-map-marker-alt mr-2 text-blue-500"></i> Location
+                </h3>
                 <div class="space-y-4">
                     <div class="flex justify-between border-b border-white/5 pb-2">
                         <span class="text-slate-500 text-sm">City</span>
@@ -147,11 +154,6 @@
                         <span id="info-country" class="text-white font-bold text-sm">...</span>
                     </div>
                 </div>
-                <div class="mt-auto pt-6 border-t border-white/5">
-                    <p class="text-[13px] text-white/90 leading-relaxed italic">
-                        <strong class="text-blue-400">Note:</strong> This reflects the geographical location where the IP address was officially registered by its owner (ISP/Provider).
-                    </p>
-                </div>
             </div>
 
             <div class="glass-card p-6 rounded-3xl">
@@ -161,17 +163,17 @@
                 <div class="space-y-4">
                     <div class="flex flex-col gap-1 border-b border-white/5 pb-2">
                         <span class="text-slate-500 text-[10px] uppercase">ISP (Internet Service Provider)</span>
-                        <span id="info-isp" class="text-white font-bold text-sm truncate">Loading ISP...</span>
+                        <span id="info-isp" class="text-white font-bold text-sm truncate">Loading...</span>
                     </div>
-                    <div class="flex justify-between">
-                        <span class="text-slate-500 text-sm">Organization</span>
-                        <span id="info-org" class="text-white font-bold text-sm truncate max-w-[180px]">...</span>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-slate-500 text-[10px] uppercase">Organization</span>
+                        <span id="info-org" class="text-white font-bold text-sm truncate">...</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- WHOIS Lookup -->
+        <!-- Network Details WHOIS -->
         <section class="glass-card p-8 rounded-3xl bg-slate-900/40">
             <div class="flex flex-col md:flex-row justify-between gap-6 mb-8">
                 <div>
@@ -187,11 +189,11 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="bg-white/5 p-4 rounded-xl">
-                    <span class="text-[10px] text-slate-500 block uppercase">ASN</span>
+                    <span class="text-[10px] text-slate-500 block uppercase font-bold mb-1">ASN</span>
                     <span id="info-asn" class="text-blue-400 font-mono font-bold">...</span>
                 </div>
                 <div class="bg-white/5 p-4 rounded-xl">
-                    <span class="text-[10px] text-slate-500 block uppercase">HOSTNAME</span>
+                    <span class="text-[10px] text-slate-500 block uppercase font-bold mb-1">HOSTNAME</span>
                     <span id="info-host" class="text-white font-mono text-xs truncate block">...</span>
                 </div>
             </div>
@@ -211,17 +213,21 @@
             </div>
         </section>
 
-        <!-- FOOTER ADDED HERE -->
-        <footer class="mt-8 pb-12 text-center">
-            <div class="flex flex-col items-center gap-4">
-                <div class="h-px w-24 bg-gradient-to-r from-transparent via-slate-700 to-transparent mb-4"></div>
-                <nav class="flex gap-6 text-xs font-bold uppercase tracking-widest text-slate-500">
-                    <a href="index.html" class="hover:text-blue-400 transition-colors">Home</a>
-                    <a href="privacy.html" class="hover:text-blue-400 transition-colors">Privacy & Terms</a>
-                </nav>
-                <p class="text-[10px] text-slate-600 font-mono mt-2">
-                    &copy; 2024 CheckMyIP.Today - Reliable Network Intelligence
-                </p>
+        <!-- FOOTER: ADICIONADO DENTRO DA PÁGINA PRINCIPAL -->
+        <footer class="mt-8 mb-12 py-8 border-t border-white/5 text-center">
+            <div class="flex flex-col items-center gap-6">
+                <div class="flex items-center gap-8">
+                    <a href="index.html" class="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 hover:text-blue-500 transition-all">
+                        Home
+                    </a>
+                    <span class="h-1 w-1 rounded-full bg-slate-700"></span>
+                    <a href="privacy.html" class="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 hover:text-blue-500 transition-all underline decoration-blue-500/30 underline-offset-4">
+                        Privacy & Terms
+                    </a>
+                </div>
+                <div class="text-[10px] font-mono text-slate-600 uppercase tracking-widest">
+                    &copy; 2024 CheckMyIP.Today • Global Network Intelligence
+                </div>
             </div>
         </footer>
     </div>
@@ -229,7 +235,6 @@
     <script>
         let currentData = {};
 
-        // Função para download dos dados
         function downloadInfo(format) {
             if (!currentData || Object.keys(currentData).length === 0) return;
             const dataStr = JSON.stringify(currentData, null, 2);
@@ -237,7 +242,7 @@
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `network_report_${currentData.ip || 'ip'}.json`;
+            link.download = `ip_report_${currentData.ip || 'detect'}.json`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -253,10 +258,10 @@
                 const regDate = events.find(e => e.eventAction === 'registration')?.eventDate;
                 const lastUpdate = events.find(e => e.eventAction === 'last changed')?.eventDate;
 
-                document.getElementById('registry-created').innerText = regDate ? new Date(regDate).toLocaleDateString() : "Not available";
-                document.getElementById('registry-updated').innerText = lastUpdate ? new Date(lastUpdate).toLocaleDateString() : "Not available";
+                document.getElementById('registry-created').innerText = regDate ? new Date(regDate).toLocaleDateString() : "Unknown";
+                document.getElementById('registry-updated').innerText = lastUpdate ? new Date(lastUpdate).toLocaleDateString() : "Unknown";
 
-                let emails = { support: "Not available", abuse: "Not available" };
+                let emails = { support: "Not found", abuse: "Not found" };
                 if (data.entities) {
                     const findEmails = (ents) => {
                         ents.forEach(e => {
@@ -275,23 +280,19 @@
                 document.getElementById('registry-email').innerText = emails.support;
                 document.getElementById('registry-abuse').innerText = emails.abuse;
             } catch (e) {
-                ["registry-created", "registry-updated", "registry-email", "registry-abuse"].forEach(id => document.getElementById(id).innerText = "RDAP Error");
+                ["registry-created", "registry-updated", "registry-email", "registry-abuse"].forEach(id => document.getElementById(id).innerText = "N/A");
             }
         }
 
         function updateUI(d) {
             currentData = d;
-            const ispName = d.isp || d.org || d.asn_org || "Unknown Provider";
-            const orgName = d.org || d.asn_org || d.isp || "Unknown Org";
-
-            document.getElementById('info-city').innerText = d.city || "Unknown";
-            document.getElementById('info-region').innerText = d.region || d.region_code || "...";
-            document.getElementById('info-country').innerText = d.country_name || d.country || "...";
-            document.getElementById('info-isp').innerText = ispName;
-            document.getElementById('info-org').innerText = orgName;
-            document.getElementById('info-asn').innerText = d.asn || d.asn_number || "---";
-            document.getElementById('info-host').innerText = d.ip || d.query || "...";
-            
+            document.getElementById('info-city').innerText = d.city || "N/A";
+            document.getElementById('info-region').innerText = d.region || d.region_code || "N/A";
+            document.getElementById('info-country').innerText = d.country_name || d.country || "N/A";
+            document.getElementById('info-isp').innerText = d.isp || d.org || "N/A";
+            document.getElementById('info-org').innerText = d.org || d.asn_org || "N/A";
+            document.getElementById('info-asn').innerText = d.asn || "N/A";
+            document.getElementById('info-host').innerText = d.hostname || d.ip || "...";
             fetchRegistryDetails(d.ip || d.query);
         }
 
@@ -299,72 +300,42 @@
             try {
                 const ipv4Res = await fetch('https://api.ipify.org?format=json');
                 const ipv4Data = await ipv4Res.json();
+                document.getElementById('ipv4-display').innerText = ipv4Data.ip;
                 
-                if (ipv4Data.ip && !ipv4Data.ip.includes(':')) {
-                    document.getElementById('ipv4-display').innerText = ipv4Data.ip;
-                    const geoRes = await fetch(`https://ipapi.co/${ipv4Data.ip}/json/`);
-                    const geoData = await geoRes.json();
-                    updateUI(geoData);
-                } else {
-                    const genRes = await fetch('https://ipapi.co/json/');
-                    const genData = await genRes.json();
-                    if (genData.ip && !genData.ip.includes(':')) {
-                        document.getElementById('ipv4-display').innerText = genData.ip;
-                        updateUI(genData);
-                    }
-                }
-                
+                const geoRes = await fetch(`https://ipapi.co/${ipv4Data.ip}/json/`);
+                const geoData = await geoRes.json();
+                updateUI(geoData);
+
                 try {
                     const v6Res = await fetch('https://api64.ipify.org?format=json');
                     const v6Data = await v6Res.json();
-                    if (v6Data.ip.includes(':')) {
-                        document.getElementById('ipv6-display').innerText = v6Data.ip;
-                    } else {
-                        document.getElementById('ipv6-display').innerText = "Not detected (IPv4 Only)";
-                    }
+                    document.getElementById('ipv6-display').innerText = v6Data.ip.includes(':') ? v6Data.ip : "Not Detected";
                 } catch(e) {
-                    document.getElementById('ipv6-display').innerText = "Not available";
+                    document.getElementById('ipv6-display').innerText = "IPv4 Only";
                 }
-            } catch(e) { 
-                document.getElementById('terminal-out').innerText = "> Error loading data. Check connection.";
+            } catch(e) {
+                document.getElementById('terminal-out').innerText = "> Error: Check network connectivity.";
             }
         }
 
         async function manualLookup() {
             const input = document.getElementById('ip-lookup-input').value.trim();
             if (!input) return;
-            const btn = document.getElementById('btn-lookup');
-            btn.disabled = true;
             try {
                 const res = await fetch(`https://ipapi.co/${input}/json/`);
                 const geo = await res.json();
-                if (geo.error) throw new Error("Invalid IP");
                 updateUI(geo);
-                document.getElementById('terminal-out').innerText = `> Data for ${input} loaded successfully.`;
-            } catch (e) {
-                document.getElementById('terminal-out').innerText = `> Lookup error: ${e.message}`;
-            } finally {
-                btn.disabled = false;
-            }
+            } catch (e) {}
         }
 
         function copyPageSummary() {
-            const ipV4 = document.getElementById('ipv4-display').innerText;
-            const ipV6 = document.getElementById('ipv6-display').innerText;
-            const city = document.getElementById('info-city').innerText;
-            const country = document.getElementById('info-country').innerText;
-            const isp = document.getElementById('info-isp').innerText;
-            const asn = document.getElementById('info-asn').innerText;
-            const summary = `--- NETWORK REPORT ---\nIPv4: ${ipV4}\nIPv6: ${ipV6}\nISP: ${isp}\nASN: ${asn}\nLocation: ${city}, ${country}\n----------------------`;
-            legacyCopy(summary);
+            const sum = `IP: ${document.getElementById('ipv4-display').innerText}\nISP: ${document.getElementById('info-isp').innerText}\nLoc: ${document.getElementById('info-city').innerText}, ${document.getElementById('info-country').innerText}`;
+            legacyCopy(sum);
         }
 
         function legacyCopy(text) {
             const el = document.createElement('textarea'); 
             el.value = text;
-            el.setAttribute('readonly', '');
-            el.style.position = 'absolute';
-            el.style.left = '-9999px';
             document.body.appendChild(el); 
             el.select(); 
             document.execCommand('copy');
