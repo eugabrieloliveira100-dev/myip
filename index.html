@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Check My IP - Global Analysis</title>
-    <!-- Carregamento do Tailwind CSS -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -43,7 +43,7 @@
     </style>
 </head>
 <body>
-    <div id="copy-toast">✅ INFORMATION COPIED</div>
+    <div id="copy-toast">✅ RELATÓRIO COPIADO COM SUCESSO</div>
 
     <div class="max-w-5xl mx-auto flex flex-col gap-6">
         
@@ -129,15 +129,15 @@
                 <div class="space-y-4">
                     <div class="flex justify-between border-b border-white/5 pb-2">
                         <span class="text-slate-500 text-sm">City</span>
-                        <span id="info-city" class="text-white font-bold text-sm">...</span>
+                        <span id="info-city" class="text-white font-bold text-sm">Detecting...</span>
                     </div>
                     <div class="flex justify-between border-b border-white/5 pb-2">
                         <span class="text-slate-500 text-sm">Region</span>
-                        <span id="info-region" class="text-white font-bold text-sm">...</span>
+                        <span id="info-region" class="text-white font-bold text-sm">Detecting...</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-slate-500 text-sm">Country</span>
-                        <span id="info-country" class="text-white font-bold text-sm">...</span>
+                        <span id="info-country" class="text-white font-bold text-sm">Detecting...</span>
                     </div>
                 </div>
             </div>
@@ -220,152 +220,7 @@
     </div>
 
     <script>
-        // Sistema de Fallback para GeoData
-        async function fetchGeoData(ip) {
-            const providers = [
-                // Método 1: ipwho.is (JSON)
-                async () => {
-                    const r = await fetch(`https://ipwho.is/${ip}`);
-                    const d = await r.json();
-                    if (!d.success) throw new Error();
-                    return {
-                        ip: d.ip, city: d.city, region: d.region, country_name: d.country,
-                        isp: d.connection?.isp, org: d.connection?.org, asn: d.connection?.asn,
-                        hostname: d.ip
-                    };
-                },
-                // Método 2: seeip.org
-                async () => {
-                    const r = await fetch(`https://ipapi.seeip.org/geoip/${ip}`);
-                    const d = await r.json();
-                    return {
-                        ip: d.ip, city: d.city, region: d.region, country_name: d.country,
-                        isp: d.organization, org: d.organization, asn: d.asn, hostname: d.ip
-                    };
-                },
-                // Método 3: ipapi.co (Original com tratamento de erro)
-                async () => {
-                    const r = await fetch(`https://ipapi.co/${ip}/json/`);
-                    const d = await r.json();
-                    if (d.error) throw new Error();
-                    return d;
-                }
-            ];
-
-            for (let provider of providers) {
-                try {
-                    const data = await provider();
-                    if (data && data.ip) return data;
-                } catch (e) { console.warn("Geo provider failed, trying next..."); }
-            }
-            throw new Error("All geo providers failed");
-        }
-
-        async function fetchRegistryDetails(ip) {
-            if (!ip || ip === "Detecting...") return;
-            try {
-                // RDAP via RIPE (Proxy centralizado para outros RIRs)
-                const response = await fetch(`https://rdap.db.ripe.net/ip/${ip}`);
-                if(!response.ok) throw new Error();
-                const data = await response.json();
-                
-                const events = data.events || [];
-                const regDate = events.find(e => e.eventAction === 'registration')?.eventDate;
-                const lastUpdate = events.find(e => e.eventAction === 'last changed')?.eventDate;
-
-                document.getElementById('registry-created').innerText = regDate ? new Date(regDate).toLocaleDateString() : "N/A";
-                document.getElementById('registry-updated').innerText = lastUpdate ? new Date(lastUpdate).toLocaleDateString() : "N/A";
-
-                let emails = { support: "Not found", abuse: "Not found" };
-                if (data.entities) {
-                    const findEmails = (ents) => {
-                        ents.forEach(e => {
-                            const vcard = e.vcardArray?.[1] || [];
-                            vcard.forEach(attr => {
-                                if (attr[0] === 'email') {
-                                    if (e.roles?.includes('abuse')) emails.abuse = attr[3];
-                                    else emails.support = attr[3];
-                                }
-                            });
-                            if (e.entities) findEmails(e.entities);
-                        });
-                    };
-                    findEmails(data.entities);
-                }
-                document.getElementById('registry-email').innerText = emails.support;
-                document.getElementById('registry-abuse').innerText = emails.abuse;
-            } catch (e) {
-                document.getElementById('registry-created').innerText = "N/A";
-                document.getElementById('registry-updated').innerText = "N/A";
-                document.getElementById('registry-email').innerText = "N/A";
-                document.getElementById('registry-abuse').innerText = "N/A";
-            }
-        }
-
-        function updateUI(d) {
-            if (!d) return;
-            document.getElementById('info-city').innerText = d.city || "N/A";
-            document.getElementById('info-region').innerText = d.region || d.region_code || "N/A";
-            document.getElementById('info-country').innerText = d.country_name || d.country || "N/A";
-            document.getElementById('info-isp').innerText = d.isp || d.org || d.organization || "N/A";
-            document.getElementById('info-org').innerText = d.org || d.asn_org || "N/A";
-            document.getElementById('info-asn').innerText = d.asn || "N/A";
-            document.getElementById('info-host').innerText = d.hostname || d.ip || "...";
-            fetchRegistryDetails(d.ip || d.query);
-        }
-
-        async function init() {
-            try {
-                // Passo 1: Detectar apenas o IP (Mais estável)
-                let ipv4 = "Detecting...";
-                try {
-                    const ipv4Res = await fetch('https://api.ipify.org?format=json');
-                    const ipv4Data = await ipv4Res.json();
-                    ipv4 = ipv4Data.ip;
-                    document.getElementById('ipv4-display').innerText = ipv4;
-                    fetchRegistryDetails(ipv4);
-                } catch(e) {
-                    document.getElementById('ipv4-display').innerText = "Error Fetching IP";
-                }
-
-                // Passo 2: Buscar Geo Data com sistema de Fallback
-                if (ipv4 !== "Detecting...") {
-                    try {
-                        const geoData = await fetchGeoData(ipv4);
-                        updateUI(geoData);
-                    } catch(e) {
-                        console.error("Geo Data Fetching failed", e);
-                        document.getElementById('terminal-out').innerText = "> Geo-location service unavailable.";
-                    }
-                }
-
-                // Passo 3: IPv6 (Assíncrono separado)
-                try {
-                    const v6Res = await fetch('https://api64.ipify.org?format=json');
-                    const v6Data = await v6Res.json();
-                    document.getElementById('ipv6-display').innerText = v6Data.ip.includes(':') ? v6Data.ip : "Not Detected";
-                } catch(e) {
-                    document.getElementById('ipv6-display').innerText = "IPv4 Only";
-                }
-            } catch(e) {
-                console.error("Initialization failed", e);
-            }
-        }
-
-        async function manualLookup() {
-            const input = document.getElementById('ip-lookup-input').value.trim();
-            if (!input) return;
-            document.getElementById('terminal-out').innerText = "> Querying: " + input + "...";
-            try {
-                const geo = await fetchGeoData(input);
-                updateUI(geo);
-                document.getElementById('terminal-out').innerText = "> Query complete.";
-            } catch (e) {
-                document.getElementById('terminal-out').innerText = "> Lookup failed. Trying RDAP...";
-                fetchRegistryDetails(input);
-            }
-        }
-
+        // Função utilitária para copiar texto
         function legacyCopy(text) {
             const el = document.createElement('textarea'); 
             el.value = text;
@@ -373,15 +228,212 @@
             el.select(); 
             document.execCommand('copy');
             document.body.removeChild(el);
+            
             const t = document.getElementById('copy-toast');
             t.style.display = 'block'; 
-            setTimeout(() => t.style.display = 'none', 2000);
+            setTimeout(() => t.style.display = 'none', 2500);
+        }
+
+        /**
+         * Busca informações detalhadas via RDAP (ISP, Datas, Emails)
+         * Rodado imediatamente após o IP ser descoberto.
+         */
+        async function fetchRegistryDetails(ip) {
+            if (!ip || ip.includes("Detecting")) return;
+            try {
+                // RDAP via RIPE (Proxy CORS amigável para IPs globais)
+                const response = await fetch(`https://rdap.db.ripe.net/ip/${ip}`);
+                if(!response.ok) throw new Error("RDAP fetch failed");
+                const data = await response.json();
+                
+                // Extração de Datas
+                const events = data.events || [];
+                const regDate = events.find(e => e.eventAction === 'registration')?.eventDate;
+                const lastUpdate = events.find(e => e.eventAction === 'last changed')?.eventDate;
+
+                document.getElementById('registry-created').innerText = regDate ? new Date(regDate).toLocaleDateString() : "N/A";
+                document.getElementById('registry-updated').innerText = lastUpdate ? new Date(lastUpdate).toLocaleDateString() : "N/A";
+
+                // Extração de Emails
+                let emails = { support: "N/A", abuse: "N/A" };
+                const processEntities = (entities) => {
+                    entities.forEach(e => {
+                        const vcard = e.vcardArray?.[1] || [];
+                        vcard.forEach(attr => {
+                            if (attr[0] === 'email') {
+                                if (e.roles?.includes('abuse')) emails.abuse = attr[3];
+                                else emails.support = attr[3];
+                            }
+                        });
+                        if (e.entities) processEntities(e.entities);
+                    });
+                };
+                if (data.entities) processEntities(data.entities);
+                
+                document.getElementById('registry-email').innerText = emails.support;
+                document.getElementById('registry-abuse').innerText = emails.abuse;
+
+                // Extração de ISP e Org caso falte
+                const ispName = data.entities?.[0]?.vcardArray?.[1]?.find(a => a[0] === 'fn')?.[3] || data.name || "N/A";
+                const orgName = data.entities?.[1]?.vcardArray?.[1]?.find(a => a[0] === 'fn')?.[3] || data.name || "N/A";
+                
+                if (document.getElementById('info-isp').innerText.includes("Loading")) {
+                    document.getElementById('info-isp').innerText = ispName;
+                    document.getElementById('info-org').innerText = orgName;
+                }
+                
+                if (document.getElementById('info-asn').innerText === "...") {
+                    document.getElementById('info-asn').innerText = data.handle || "N/A";
+                }
+
+            } catch (e) {
+                console.error("RDAP error", e);
+            }
+        }
+
+        /**
+         * Busca Geolocalização com Múltiplos Fallbacks
+         */
+        async function fetchGeoData(ip) {
+            const providers = [
+                `https://ipwho.is/${ip}`,
+                `https://api.cloudapi.net/ip/geo?ip=${ip}`, // Placeholder para outro provider
+                `https://ipapi.co/${ip}/json/`
+            ];
+
+            for (let url of providers) {
+                try {
+                    const res = await fetch(url);
+                    const d = await res.json();
+                    if (d.success || d.city || d.country) {
+                        return {
+                            city: d.city || d.city_name,
+                            region: d.region || d.region_name,
+                            country: d.country || d.country_name,
+                            isp: d.connection?.isp || d.isp || d.org,
+                            org: d.connection?.org || d.org,
+                            asn: d.connection?.asn || d.asn || d.as
+                        };
+                    }
+                } catch (e) { continue; }
+            }
+            return null;
+        }
+
+        async function init() {
+            try {
+                // 1. Descobrir IPv4 rápido
+                let ipv4 = null;
+                const trace = await fetch('https://1.1.1.1/cdn-cgi/trace').then(r => r.text());
+                ipv4 = trace.match(/ip=([0-9.]+)/)?.[1];
+                
+                if (ipv4) {
+                    document.getElementById('ipv4-display').innerText = ipv4;
+                    document.getElementById('info-host').innerText = ipv4;
+                    
+                    // 2. Disparar RDAP imediatamente (Confiável para ISP)
+                    fetchRegistryDetails(ipv4);
+                    
+                    // 3. Disparar Geo
+                    const geo = await fetchGeoData(ipv4);
+                    if (geo) {
+                        document.getElementById('info-city').innerText = geo.city || "N/A";
+                        document.getElementById('info-region').innerText = geo.region || "N/A";
+                        document.getElementById('info-country').innerText = geo.country || "N/A";
+                        if (geo.isp) document.getElementById('info-isp').innerText = geo.isp;
+                        if (geo.org) document.getElementById('info-org').innerText = geo.org;
+                        if (geo.asn) document.getElementById('info-asn').innerText = geo.asn;
+                    }
+                }
+
+                // IPv6 Check
+                try {
+                    const v6 = await fetch('https://api64.ipify.org?format=json').then(r => r.json());
+                    document.getElementById('ipv6-display').innerText = v6.ip.includes(':') ? v6.ip : "Not Detected";
+                } catch(e) {
+                    document.getElementById('ipv6-display').innerText = "IPv4 Only";
+                }
+                
+                document.getElementById('terminal-out').innerText = "> All systems active.";
+            } catch(e) {
+                document.getElementById('terminal-out').innerText = "> Initialization error.";
+            }
         }
 
         function copyPageSummary() {
-            const ip = document.getElementById('ipv4-display').innerText;
-            const isp = document.getElementById('info-isp').innerText;
-            legacyCopy(`IP: ${ip} | ISP: ${isp}`);
+            // Captura forçada de todos os elementos conforme solicitado
+            const getT = (id) => document.getElementById(id)?.innerText || "N/A";
+
+            const report = {
+                ip: getT('ipv4-display'),
+                ipv6: getT('ipv6-display'),
+                isp: getT('info-isp'),
+                org: getT('info-org'),
+                regDate: getT('registry-created'),
+                lastUpdate: getT('registry-updated'),
+                supportEmail: getT('registry-email'),
+                abuseEmail: getT('registry-abuse'),
+                city: getT('info-city'),
+                region: getT('info-region'),
+                country: getT('info-country'),
+                asn: getT('info-asn'),
+                host: getT('info-host')
+            };
+
+            const summary = `
+[CHECKMYIP.TODAY - FULL ANALYSIS REPORT]
+-------------------------------------------
+IP: ${report.ip} | ISP: ${report.isp}
+
+NETWORK ADDRESSES:
+- Public IPv4: ${report.ip}
+- Public IPv6: ${report.ipv6}
+
+REGISTRY & ALLOCATION (RDAP):
+- Registration Date: ${report.regDate}
+- Last Update: ${report.lastUpdate}
+
+ABUSE CONTACTS (RDAP):
+- Support Email: ${report.supportEmail}
+- Abuse Email: ${report.abuseEmail}
+
+LOCATION:
+- City: ${report.city}
+- Region: ${report.region}
+- Country: ${report.country}
+
+PROVIDER INFORMATION:
+- ISP (Internet Service Provider): ${report.isp}
+- Organization: ${report.org}
+
+🔍 NETWORK DETAILS:
+- Query ASN and WHOIS for any IP.
+- ASN: ${report.asn}
+- HOSTNAME: ${report.host}
+
+-------------------------------------------
+Terminal Query: curl -s checkmyip.today/api
+Generated: ${new Date().toLocaleString()}
+`.trim();
+
+            legacyCopy(summary);
+        }
+
+        async function manualLookup() {
+            const input = document.getElementById('ip-lookup-input').value.trim();
+            if (!input) return;
+            document.getElementById('terminal-out').innerText = "> Querying: " + input + "...";
+            const geo = await fetchGeoData(input);
+            if (geo) {
+                document.getElementById('info-city').innerText = geo.city || "N/A";
+                document.getElementById('info-region').innerText = geo.region || "N/A";
+                document.getElementById('info-country').innerText = geo.country || "N/A";
+                document.getElementById('info-isp').innerText = geo.isp || "N/A";
+                document.getElementById('info-org').innerText = geo.org || "N/A";
+                document.getElementById('info-asn').innerText = geo.asn || "N/A";
+                document.getElementById('info-host').innerText = input;
+                fetchRegistryDetails(input);
+            }
         }
 
         window.onload = init;
