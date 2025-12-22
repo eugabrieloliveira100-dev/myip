@@ -37,43 +37,6 @@
             z-index: 100;
         }
 
-        .perf-bar {
-            height: 4px;
-            background: #1e293b;
-            border-radius: 2px;
-            overflow: hidden;
-        }
-        .perf-progress {
-            height: 100%;
-            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-            width: 0%;
-            transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .scanning-pulse {
-            animation: pulse-bg 1.5s infinite;
-        }
-        @keyframes pulse-bg {
-            0% { opacity: 1; }
-            50% { opacity: 0.4; }
-            100% { opacity: 1; }
-        }
-
-        #abuse-alert {
-            display: none;
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #ef4444;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: bold;
-            z-index: 1000;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-        }
-
         #copy-toast {
             display: none;
             position: fixed;
@@ -92,9 +55,8 @@
     </style>
 </head>
 <body>
-    <div id="offline-banner">OFFLINE MODE ACTIVE - DISPLAYING CACHED DATA</div>
-    <div id="abuse-alert">🛡️ ANTI-ABUSE PROTECTION: Please wait before making another request.</div>
-    <div id="copy-toast">✅ INFORMATION COPIED TO CLIPBOARD</div>
+    <div id="offline-banner">MODO OFFLINE ATIVO - EXIBINDO DADOS EM CACHE</div>
+    <div id="copy-toast">✅ INFORMAÇÃO COPIADA</div>
 
     <div class="max-w-5xl mx-auto flex flex-col gap-6">
         
@@ -103,7 +65,7 @@
             <div class="flex flex-col md:flex-row items-center gap-4">
                 <div>
                     <h1 class="text-2xl font-extrabold tracking-tight text-white">CHECKMYIP.<span class="text-blue-500">TODAY</span></h1>
-                    <p class="text-slate-500 text-[10px] font-mono uppercase tracking-widest">Real-Time Network & Performance Analysis</p>
+                    <p class="text-slate-500 text-[10px] font-mono uppercase tracking-widest">Inteligência de Rede e Segurança em Tempo Real</p>
                 </div>
                 <div class="flex flex-wrap gap-2">
                     <button onclick="copyPageSummary()" class="bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-extrabold px-4 py-2 rounded-full flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-blue-500/20">
@@ -119,7 +81,7 @@
             </div>
             <div class="flex items-center gap-3 bg-black/30 px-4 py-2 rounded-full border border-white/10">
                 <span id="status-dot" class="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
-                <span id="status-text" class="text-[10px] font-bold uppercase tracking-widest text-slate-300">Network & Organization Details Lookup any IP address for detailed ASN, ISP and WHOIS records</span>
+                <span id="status-text" class="text-[10px] font-bold uppercase tracking-widest text-slate-300">Network & Organization Details</span>
             </div>
         </header>
 
@@ -130,7 +92,7 @@
                     <span class="bg-blue-500/10 text-blue-400 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">Your Public IP Address</span>
                     <i class="fas fa-shield-alt text-blue-500/30"></i>
                 </div>
-                <h2 class="text-slate-500 text-xs font-bold mb-1 uppercase">IPv4 PROTOCOL</h2>
+                <h2 class="text-slate-500 text-xs font-bold mb-1 uppercase">IPv4 Address (Standard numeric dots):</h2>
                 <div id="ipv4-display" class="text-3xl md:text-4xl font-black tracking-tighter text-white font-mono break-all">Detecting...</div>
             </div>
 
@@ -139,191 +101,14 @@
                     <span class="bg-purple-500/10 text-purple-400 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">Your Public IP Address</span>
                     <i class="fas fa-globe-americas text-purple-500/30"></i>
                 </div>
-                <h2 class="text-slate-500 text-xs font-bold mb-1 uppercase">IPv6 PROTOCOL</h2>
-                <div id="ipv6-display" class="text-lg md:text-xl lg:text-2xl font-black font-mono text-purple-200 break-all break-words overflow-wrap-anywhere hyphens-auto leading-snug min-h-[3.5rem] transition-all duration-200">
+                <h2 class="text-slate-500 text-xs font-bold mb-1 uppercase">IPv6 Address (Longer formats with colons)</h2>
+                <div id="ipv6-display" class="text-lg md:text-xl lg:text-2xl font-black font-mono text-purple-200 break-all leading-snug min-h-[3.5rem] transition-all duration-200">
                     Checking...
                 </div>
             </div>
         </div>
 
-        <div class="glass-card p-6 rounded-3xl border-l-4 border-l-blue-500">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="bg-blue-500/20 p-2 rounded-lg">
-                        <i class="fas fa-network-wired text-blue-400"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">IP Type Analysis</h3>
-                        <p id="ip-type-text" class="text-sm font-bold text-white">Analyzing protocol family...</p>
-                    </div>
-                </div>
-                <span id="ip-type-badge" class="hidden bg-white/10 text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">Unknown</span>
-            </div>
-        </div>
-
-        <!-- Risk & Reputation Score (ULTRA PROFISSIONAL) -->
-        <div class="glass-card p-6 rounded-3xl border-l-4 border-l-red-600 bg-gradient-to-br from-slate-900 via-slate-900 to-red-950/20">
-            <!-- Header do Bloco -->
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                <div class="flex items-center gap-3">
-                    <div class="bg-red-500/20 p-3 rounded-2xl ring-1 ring-red-500/30">
-                        <i class="fas fa-user-secret text-red-500 text-xl"></i>
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-2 mb-1">
-                            <h3 class="text-xs font-black text-white uppercase tracking-widest">Risk & Reputation Score(Spam Blacklist, Botnet/Malware, Brute-Force Source)</h3>
-                            <span id="risk-target-ip" class="bg-red-500/10 text-red-400 px-2 py-0.5 rounded font-mono text-[9px] border border-red-500/20">0.0.0.0</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span id="scanning-indicator" class="flex items-center gap-1.5 text-[9px] font-bold text-red-500/80 uppercase">
-                                <span class="h-1.5 w-1.5 bg-red-500 rounded-full scanning-pulse"></span> 
-                                Fetching Global Reputation Data...
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex flex-col items-end">
-                    <div class="text-[32px] font-black text-white leading-none mb-1" id="risk-score-display">0<span class="text-slate-600 text-lg">/100</span></div>
-                    <span id="risk-verdict" class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 px-3 py-1 bg-white/5 rounded-full">Calculating Confidence</span>
-                </div>
-            </div>
-
-            <!-- NOVOS METRICAS DE GRANULARIDADE (FORENSIC DATA) -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-                <div class="bg-slate-950/60 p-3 rounded-xl border border-white/5 flex flex-col justify-center">
-                    <span class="text-[9px] text-slate-500 font-bold uppercase tracking-widest mb-1">Confidence Score</span>
-                    <div class="flex items-center gap-2">
-                        <span id="meta-confidence" class="text-sm font-black text-blue-400">--%</span>
-                        <div class="flex-1 h-1 bg-slate-800 rounded-full overflow-hidden">
-                            <div id="bar-confidence" class="h-full bg-blue-500 w-0 transition-all duration-1000"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-slate-950/60 p-3 rounded-xl border border-white/5 flex flex-col justify-center">
-                    <span class="text-[9px] text-slate-500 font-bold uppercase tracking-widest mb-1">Last Sight</span>
-                    <div class="flex items-center gap-2">
-                        <i class="far fa-clock text-blue-500/50 text-xs"></i>
-                        <span id="meta-last-sight" class="text-[11px] font-bold text-slate-300">SCANNING...</span>
-                    </div>
-                </div>
-                <div class="bg-slate-950/60 p-3 rounded-xl border border-white/5 flex flex-col justify-center">
-                    <span class="text-[9px] text-slate-500 font-bold uppercase tracking-widest mb-1">Evidence Count</span>
-                    <div class="flex items-center gap-2">
-                        <i class="fas fa-database text-blue-500/50 text-xs"></i>
-                        <span id="meta-evidence" class="text-[11px] font-bold text-slate-300">0 DATABASES</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Barras Originais Mantidas -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                <div class="bg-black/40 p-4 rounded-2xl border border-white/5">
-                    <div class="flex justify-between items-start mb-3">
-                        <span class="text-[9px] text-slate-500 font-black uppercase tracking-widest">Spam Blacklist</span>
-                        <i id="icon-spam" class="fas fa-envelope-open-text text-slate-600 text-xs"></i>
-                    </div>
-                    <div id="risk-spam" class="text-[11px] font-bold text-slate-400 mb-2">CLEAN</div>
-                    <div class="w-full h-1 bg-slate-800 rounded-full">
-                        <div id="bar-spam" class="h-full bg-emerald-500 transition-all duration-500" style="width: 100%"></div>
-                    </div>
-                </div>
-                <div class="bg-black/40 p-4 rounded-2xl border border-white/5">
-                    <div class="flex justify-between items-start mb-3">
-                        <span class="text-[9px] text-slate-500 font-black uppercase tracking-widest">Botnet/Malware</span>
-                        <i id="icon-botnet" class="fas fa-robot text-slate-600 text-xs"></i>
-                    </div>
-                    <div id="risk-botnet" class="text-[11px] font-bold text-slate-400 mb-2">CLEAN</div>
-                    <div class="w-full h-1 bg-slate-800 rounded-full">
-                        <div id="bar-botnet" class="h-full bg-emerald-500 transition-all duration-700" style="width: 100%"></div>
-                    </div>
-                </div>
-                <div class="bg-black/40 p-4 rounded-2xl border border-white/5">
-                    <div class="flex justify-between items-start mb-3">
-                        <span class="text-[9px] text-slate-500 font-black uppercase tracking-widest">Brute-Force Sourc</span>
-                        <i id="icon-brute" class="fas fa-unlock-alt text-slate-600 text-xs"></i>
-                    </div>
-                    <div id="risk-brute" class="text-[11px] font-bold text-slate-400 mb-2">CLEAN</div>
-                    <div class="w-full h-1 bg-slate-800 rounded-full">
-                        <div id="bar-brute" class="h-full bg-emerald-500 transition-all duration-1000" style="width: 100%"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Textos Explicativos Mantidos -->
-            <div class="mt-6 border-t border-white/10 pt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <h4 class="text-sm font-extrabold text-emerald-400 uppercase tracking-wider mb-2">Why is it marked as "Safe"?</h4>
-                    <p class="text-[13px] text-white leading-relaxed">
-                        An IP is considered <strong class="text-emerald-400">Safe</strong> when it is identified as a residential or mobile connection with no history of malicious activity. This means the IP is not listed in global blacklists (DNSBL), has not been used for spamming, and belongs to a trusted Internet Service Provider (ISP). It is the standard for legitimate human browsing.
-                    </p>
-                </div>
-                <div>
-                    <h4 class="text-sm font-extrabold text-yellow-400 uppercase tracking-wider mb-2">Why is it marked as "Neutral"?</h4>
-                    <p class="text-[13px] text-white leading-relaxed">
-                        An IP is marked as <strong class="text-yellow-400">Neutral</strong> (or Cloud) when it originates from a Data Center or Hosting provider (like AWS, Google Cloud, or VPN nodes). While not necessarily malicious, these IPs are frequently used by automated bots, scrapers, or proxies. Because they lack a "human" residential footprint, they are treated with caution by security systems.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Usage Detection & Security -->
-        <div class="glass-card p-6 rounded-3xl border-l-4 border-l-orange-500">
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center">
-                <i class="fas fa-user-shield mr-2 text-orange-500"></i> Usage Detection & Security
-            </h3>
-
-            <div class="mb-8 space-y-6 px-2">
-                <p class="text-white text-[14px] leading-relaxed">
-                    This advanced forensic module performs deep packet inspection and network layer auditing to determine the legitimacy and routing of your connection. Below are the key pillars of our security analysis:
-                </p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <h4 class="text-white font-bold text-sm mb-1 uppercase tracking-wider">VPN Detection Logic</h4>
-                        <p class="text-white text-[13px] leading-relaxed">
-                            This module utilizes cross-analysis of ASN (Autonomous System Number) and network intelligence databases to identify if your IP belongs to a commercial VPN provider. It verifies if traffic is being encapsulated in known tunnels that mask the real residential address.
-                        </p>
-                    </div>
-                    <div>
-                        <h4 class="text-white font-bold text-sm mb-1 uppercase tracking-wider">TOR NODE VERIFICATION</h4>
-                        <p class="text-white text-[13px] leading-relaxed">
-                            Checks the address against the real-time public directory of Tor (The Onion Router) "Exit Nodes". A match indicates that your connection is being routed through a multi-layered anonymity network, which is often prioritized for high-privacy use cases.
-                        </p>
-                    </div>
-                    <div>
-                        <h4 class="text-white font-bold text-sm mb-1 uppercase tracking-wider">PROXY INTEGRITY CHECK</h4>
-                        <p class="text-white text-[13px] leading-relaxed">
-                            Proxy integrity analyzes HTTP headers (such as X-Forwarded-For) and network signatures to detect intermediaries. Unlike a VPN, a proxy might operate only within the browser, and this test checks for signs that your request was forwarded by a third-party server.
-                        </p>
-                    </div>
-                    <div>
-                        <h4 class="text-white font-bold text-sm mb-1 uppercase tracking-wider">Traffic Profile Profiling</h4>
-                        <p class="text-white text-[13px] leading-relaxed">
-                            The Traffic Profile classifies the nature of your connection (Residential, Mobile, or Data Center). It analyzes whether the IP is static within a hosting server (common for bots and cloud services) or if it exhibits the latency and routing characteristics of a standard home or mobile user connection.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-black/20 p-4 rounded-2xl border border-white/5 flex flex-col items-center text-center">
-                    <span class="text-[9px] text-slate-500 uppercase mb-2">VPN Connection</span>
-                    <div id="detect-vpn" class="text-xs font-bold text-slate-400">Checking...</div>
-                </div>
-                <div class="bg-black/20 p-4 rounded-2xl border border-white/5 flex flex-col items-center text-center">
-                    <span class="text-[9px] text-slate-500 uppercase mb-2">Active Proxy</span>
-                    <div id="detect-proxy" class="text-xs font-bold text-slate-400">Checking...</div>
-                </div>
-                <div class="bg-black/20 p-4 rounded-2xl border border-white/5 flex flex-col items-center text-center">
-                    <span class="text-[9px] text-slate-500 uppercase mb-2">Tor Network</span>
-                    <div id="detect-tor" class="text-xs font-bold text-slate-400">Checking...</div>
-                </div>
-                <div class="bg-black/20 p-4 rounded-2xl border border-white/5 flex flex-col items-center text-center">
-                    <span class="text-[9px] text-slate-500 uppercase mb-2">Usage Type</span>
-                    <div id="detect-usage" class="text-xs font-bold text-slate-400 uppercase">Checking...</div>
-                </div>
-            </div>
-        </div>
-
+        <!-- RDAP Timeline -->
         <div class="glass-card p-6 rounded-3xl border-l-4 border-l-purple-500">
             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center">
                 <i class="fas fa-calendar-alt mr-2 text-purple-500"></i> Registry & Allocation Timeline (RDAP)
@@ -331,15 +116,16 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
                     <span class="text-[10px] text-slate-500 uppercase block mb-1">Registration Date</span>
-                    <span id="registry-created" class="text-white font-bold text-sm">Loading...</span>
+                    <span id="registry-created" class="text-white font-bold text-sm">Carregando...</span>
                 </div>
                 <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
                     <span class="text-[10px] text-slate-500 uppercase block mb-1">Last Allocation Update</span>
-                    <span id="registry-updated" class="text-white font-bold text-sm">Loading...</span>
+                    <span id="registry-updated" class="text-white font-bold text-sm">Carregando...</span>
                 </div>
             </div>
         </div>
 
+        <!-- ISP Abuse RDAP -->
         <div class="glass-card p-6 rounded-3xl border-l-4 border-l-red-500">
             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center">
                 <i class="fas fa-envelope-open-text mr-2 text-red-500"></i> ISP Contact & Abuse Reporting (RDAP)
@@ -347,67 +133,16 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
                     <span class="text-[10px] text-slate-500 uppercase block mb-1">Contact/Support Email</span>
-                    <span id="registry-email" class="text-blue-400 font-bold text-sm truncate block">Searching...</span>
+                    <span id="registry-email" class="text-blue-400 font-bold text-sm truncate block">Buscando...</span>
                 </div>
                 <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
                     <span class="text-[10px] text-slate-500 uppercase block mb-1">Abuse Report Email</span>
-                    <span id="registry-abuse" class="text-red-400 font-bold text-sm truncate block">Searching...</span>
+                    <span id="registry-abuse" class="text-red-400 font-bold text-sm truncate block">Buscando...</span>
                 </div>
             </div>
         </div>
 
-        <!-- Performance Analysis -->
-        <section class="glass-card p-6 rounded-3xl border-t-2 border-t-blue-500">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center">
-                    <i class="fas fa-tachometer-alt mr-2 text-blue-500"></i> Performance Analysis
-                </h3>
-                <button id="btn-perf" onclick="runPerformanceTest()" class="text-[10px] bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-full font-bold transition-all disabled:opacity-50">RE-RUN TEST</button>
-            </div>
-
-            <div class="mb-6 px-2">
-                <p class="text-white text-[13px] leading-relaxed">
-                    This section does not measure your raw ISP subscription speed (Bandwidth). Instead, it analyzes <strong>Network Quality</strong> and <strong>Routing Efficiency</strong>. It evaluates how quickly your current IP can establish handshakes with global edge nodes, measuring the stability (Jitter) and responsiveness (Latency) of your connection's path through the internet.
-                </p>
-            </div>
-            
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-                <div>
-                    <div class="flex justify-between mb-2">
-                        <span class="text-[10px] text-slate-500 uppercase">Latency (Ping)</span>
-                        <span id="perf-ping" class="text-xs font-bold text-blue-400">---</span>
-                    </div>
-                    <div class="perf-bar"><div id="ping-progress" class="perf-progress"></div></div>
-                </div>
-                <div>
-                    <div class="flex justify-between mb-2">
-                        <span class="text-[10px] text-slate-500 uppercase">Jitter</span>
-                        <span id="perf-jitter" class="text-xs font-bold text-purple-400">---</span>
-                    </div>
-                    <div class="perf-bar"><div id="jitter-progress" class="perf-progress"></div></div>
-                </div>
-                <div>
-                    <div class="flex justify-between mb-2">
-                        <span class="text-[10px] text-slate-500 uppercase">Route Speed</span>
-                        <span id="perf-speed" class="text-xs font-bold text-green-400">---</span>
-                    </div>
-                    <div class="perf-bar"><div id="speed-progress" class="perf-progress"></div></div>
-                </div>
-            </div>
-
-            <div class="bg-blue-950/20 border border-blue-500/20 p-4 rounded-xl">
-                <div class="flex items-start gap-3">
-                    <i class="fas fa-info-circle text-blue-400 mt-1"></i>
-                    <div class="text-[11px] text-slate-400 leading-relaxed">
-                        <p><strong class="text-blue-400">Latency:</strong> Real measurement based on HTTP response time.</p>
-                        <p><strong class="text-purple-400">Jitter:</strong> Latency variance captured during 5 consecutive samples.</p>
-                        <p><strong class="text-green-400">Route Speed:</strong> Responsiveness of the specific routing path used by your IP.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Location & Provider Info -->
+        <!-- Location Info -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="glass-card p-6 rounded-3xl flex flex-col h-full">
                 <div class="flex justify-between items-center mb-6">
@@ -417,22 +152,17 @@
                 </div>
                 <div class="space-y-4">
                     <div class="flex justify-between border-b border-white/5 pb-2">
-                        <span class="text-slate-500 text-sm">City</span>
+                        <span class="text-slate-500 text-sm">Cidade</span>
                         <span id="info-city" class="text-white font-bold text-sm">---</span>
                     </div>
                     <div class="flex justify-between border-b border-white/5 pb-2">
-                        <span class="text-slate-500 text-sm">Region</span>
+                        <span class="text-slate-500 text-sm">Região</span>
                         <span id="info-region" class="text-white font-bold text-sm">---</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-slate-500 text-sm">Country</span>
+                        <span class="text-slate-500 text-sm">País</span>
                         <span id="info-country" class="text-white font-bold text-sm">---</span>
                     </div>
-                </div>
-                <div class="mt-auto pt-6 border-t border-white/5">
-                    <p class="text-[13px] text-white leading-relaxed italic">
-                        <strong class="text-slate-300">Technical Reference:</strong> The city, region, and country listed above represent the geographical registration data officially assigned to this IP address by its owner (ISP or LIR). This information reflects the registered administrative location and network allocation point rather than the dynamic physical position of the user hardware.
-                    </p>
                 </div>
             </div>
 
@@ -453,54 +183,12 @@
             </div>
         </div>
 
-        <!-- WebRTC Section -->
-        <section class="glass-card p-6 rounded-3xl border-l-4 border-l-yellow-500">
-            <h3 class="text-xs font-bold text-yellow-500 uppercase tracking-widest mb-4 flex items-center">
-                🛡️ WebRTC Leak Test
-            </h3>
-            <div class="flex flex-wrap gap-2 mb-6" id="webrtc-ips">
-                <span class="text-xs text-slate-600 animate-pulse">Initializing WebRTC scan...</span>
-            </div>
-            
-            <div class="bg-black/40 p-6 rounded-2xl border border-white/10 shadow-xl">
-                <h4 class="text-[11px] font-extrabold text-white uppercase tracking-[0.2em] mb-4 border-b border-white/10 pb-2">Understanding WebRTC Leak Results</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-[12px] leading-relaxed text-white">
-                    <div class="space-y-4">
-                        <p>
-                            <strong class="text-blue-400 block mb-1">1. IPv6 Addresses (Longer formats with colons):</strong> 
-                            IPv6 is the modern standard for IP addresses, designed to replace the exhausted pool of IPv4. These addresses look like <code class="bg-white/5 px-1 rounded text-purple-300">2001:0db8:85a3:0000:0000:8a2e:0370:7334</code>. Because WebRTC is designed for direct point-to-point communication, it often requests your browser to reveal all available network interfaces. If your VPN does not support IPv6 or fails to tunnel it correctly, your "real" residential IPv6 might be exposed here.
-                        </p>
-                        <p>
-                            <strong class="text-blue-400 block mb-1">2. IPv4 Addresses (Standard numeric dots):</strong> 
-                            The classic 32-bit addresses formatted as <code class="bg-white/5 px-1 rounded text-blue-300">123.45.67.89</code>. In the context of a VPN, this field is critical. If you are connected to a VPN and see your real internet provider's IP address listed in the WebRTC candidates instead of the VPN server's IP, your browser is leaking your true identity despite an active encryption tunnel.
-                        </p>
-                    </div>
-                    <div class="space-y-4">
-                        <p>
-                            <strong class="text-blue-400 block mb-1">3. mDNS Hostnames (Random alphanumeric IDs):</strong> 
-                            Modern browsers (Chrome, Firefox, Safari) have implemented a privacy feature where your internal/private network IP (like <code class="bg-white/5 px-1 rounded">192.168.x.x</code>) is hidden behind a random "mDNS" string like <code class="bg-white/5 px-1 rounded text-emerald-300">763f6b8c-5264-4a57-b4f7.local</code>. This prevents sites from fingerprinting your local network topology while still allowing WebRTC to function.
-                        </p>
-                        <p>
-                            <strong class="text-blue-400 block mb-1">4. ICE Candidates (The Connection Framework):</strong> 
-                            ICE (Interactive Connectivity Establishment) is the protocol WebRTC uses to discover how to connect two people. It gathers "candidates" — different ways your computer can be reached. This includes your local IP (Host), your public IP (Srflx), and sometimes a relay server (Relay). If a candidate reveals an IP that does not belong to your VPN, it is considered a leak.
-                        </p>
-                    </div>
-                </div>
-                <div class="mt-6 pt-5 border-t border-white/10">
-                    <p class="text-[12px] font-bold text-white mb-2 uppercase tracking-wide">THE VPN CONFLICT:</p>
-                    <p class="text-[11px] leading-relaxed text-white opacity-90">
-                        When you use a VPN, you expect all traffic to be hidden. However, WebRTC is a powerful browser API that operates outside standard HTTP requests. If not configured correctly, it can "bypass" the VPN software to discover your original provider's address. To stay fully protected, ensure your VPN has <strong>WebRTC Leak Protection</strong> enabled or use browser extensions to disable WebRTC entirely.
-                    </p>
-                </div>
-            </div>
-        </section>
-
         <!-- Search / WHOIS -->
         <section class="glass-card p-8 rounded-3xl bg-slate-900/40">
             <div class="flex flex-col md:flex-row justify-between gap-6 mb-8">
                 <div>
                     <h2 class="text-lg font-bold flex items-center gap-2">🔍 Network & Organization Details</h2>
-                    <p class="text-slate-500 text-xs">Lookup any IP address for detailed ASN, ISP and WHOIS records.</p>
+                    <p class="text-slate-500 text-xs">Consulte qualquer IP para registros detalhados de ASN, ISP e WHOIS.</p>
                 </div>
                 <div id="lookup-container" class="flex bg-black/40 border border-white/10 rounded-2xl overflow-hidden">
                     <input type="text" id="ip-lookup-input" placeholder="Enter IP address..." class="bg-transparent px-4 py-2 text-sm outline-none w-48 font-mono text-white">
@@ -521,7 +209,7 @@
             </div>
         </section>
 
-        <!-- Terminal & Footer -->
+        <!-- Terminal Section -->
         <section class="glass-card p-6 rounded-3xl">
             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center">
                 💻 Check IP via Terminal
@@ -538,264 +226,58 @@
         <footer class="glass-card p-6 rounded-3xl border-dashed border-white/10 flex flex-wrap gap-4 items-center">
             <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mr-4">🛠️ Developer Tools</h3>
             <button onclick="location.reload()" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg text-[10px] font-bold uppercase">Reload</button>
-            <button onclick="clearCache()" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg text-[10px] font-bold uppercase">Clear Cache</button>
         </footer>
     </div>
 
-    <div class="mt-8 mb-4 text-center">
-        <a href="#" class="text-[10px] font-bold uppercase text-slate-500 hover:text-blue-400 transition-colors tracking-widest">
-            PRIVACY POLICY
-        </a>
-    </div>
-
     <script>
-        const ABUSE_IP_DB_KEY = ""; 
-
-        const NORMALIZATION_MAP = {
-            "TELEFONICA BRASIL S.A.": "Vivo / Telefônica",
-            "CLARO S.A.": "Claro / NET",
-            "AMAZON": "Amazon Web Services (AWS)",
-            "GOOGLE": "Google Cloud / Services",
-            "MICROSOFT": "Microsoft Azure",
-            "TIM CELULAR": "TIM Brasil"
-        };
-
-        const CLOUD_KEYWORDS = ["amazon", "aws", "google", "microsoft", "azure", "digitalocean", "linode", "vultr", "hetzner", "ovh", "hosting", "datacenter", "data center", "cloud", "server"];
-
-        function normalizeName(name) {
-            if (!name) return "---";
-            const upper = name.toUpperCase();
-            for (let key in NORMALIZATION_MAP) {
-                if (upper.includes(key)) return NORMALIZATION_MAP[key];
-            }
-            return name.trim();
-        }
-
-        function identifyIPType(ip) {
-            if (!ip) return "Unknown";
-            return ip.includes(':') ? "IPv6 (Internet Protocol Version 6)" : "IPv4 (Internet Protocol Version 4)";
-        }
-
-        function updateIPTypeUI(ip) {
-            const textEl = document.getElementById('ip-type-text');
-            const badgeEl = document.getElementById('ip-type-badge');
-            if(!textEl || !badgeEl) return;
-            textEl.innerText = identifyIPType(ip);
-            badgeEl.innerText = ip.includes(':') ? 'IPv6' : 'IPv4';
-            badgeEl.classList.remove('hidden');
-        }
-
-        async function fetchAbuseReputation(ip) {
-            if (!ABUSE_IP_DB_KEY) return null;
-            try {
-                const response = await fetch(`https://api.abuseipdb.com/api/v2/check?ipAddress=${ip}`, {
-                    headers: { 'Key': ABUSE_IP_DB_KEY, 'Accept': 'application/json' }
-                });
-                return await response.json();
-            } catch (e) { return null; }
-        }
-
-        // IMPLEMENTAÇÃO DO NÍVEL MÁXIMO DE GRANULARIDADE
-        async function updateRiskUI(ip, orgData) {
-            const scoreDisplay = document.getElementById('risk-score-display');
-            const verdict = document.getElementById('risk-verdict');
-            const targetIpEl = document.getElementById('risk-target-ip');
-            const indicator = document.getElementById('scanning-indicator');
-            
-            // Novos Elementos Forenses
-            const metaConfidence = document.getElementById('meta-confidence');
-            const metaLastSight = document.getElementById('meta-last-sight');
-            const metaEvidence = document.getElementById('meta-evidence');
-            const barConfidence = document.getElementById('bar-confidence');
-
-            const [spamEl, botEl, bruteEl] = [document.getElementById('risk-spam'), document.getElementById('risk-botnet'), document.getElementById('risk-brute')];
-            const [barSpam, barBot, barBrute] = [document.getElementById('bar-spam'), document.getElementById('bar-botnet'), document.getElementById('bar-brute')];
-
-            if (targetIpEl) targetIpEl.innerText = ip;
-            const orgLower = (orgData || "").toLowerCase();
-            const isCloud = CLOUD_KEYWORDS.some(kw => orgLower.includes(kw));
-            
-            // Simulação de Dados de Granularidade Profissional
-            const abuseData = await fetchAbuseReputation(ip);
-            let abuseScore = abuseData ? abuseData.data.abuseConfidenceScore : (isCloud ? 15 : 0);
-            
-            // 1. Confidence Score (Inverso do risco para o display principal, mas direto para o meta)
-            let forensicConfidence = 100 - (abuseScore * 0.8); // Probabilidade do dado estar correto
-            if (isCloud) forensicConfidence = 98; // Alta confiança para IPs de DataCenter conhecidos
-
-            // 2. Last Sight (Simulação baseada em TTL de DNS/Cache)
-            const timeOptions = ["2 minutes ago", "14 minutes ago", "1 hour ago", "Never (Static)", "Clean History"];
-            const lastSightText = abuseScore > 0 ? timeOptions[Math.floor(Math.random()*2)] : timeOptions[4];
-
-            // 3. Evidence Count (Correlacionado ao score de abuso)
-            const databases = ["Spamhaus", "Barracuda", "AlienVault", "Talos Intelligence", "CrowdStrike Falcon"];
-            const evidenceCount = abuseScore > 50 ? 4 : (abuseScore > 10 ? 2 : 0);
-            
-            // Atualização Visual
-            metaConfidence.innerText = forensicConfidence.toFixed(0) + "%";
-            barConfidence.style.width = forensicConfidence + "%";
-            metaLastSight.innerText = lastSightText;
-            metaEvidence.innerText = `${evidenceCount} DATABASE${evidenceCount !== 1 ? 'S' : ''} MATCHED`;
-
-            const displayScore = 100 - abuseScore;
-            scoreDisplay.innerHTML = `${displayScore}<span class="text-slate-600 text-lg">/100</span>`;
-            
-            if (isCloud) {
-                spamEl.innerText = "DATACENTER"; botEl.innerText = "MONITORED"; bruteEl.innerText = "SERVER-IP";
-                barSpam.className = "h-full bg-blue-500/50"; barBot.className = "h-full bg-yellow-500"; barBrute.className = "h-full bg-yellow-500";
-            } else {
-                spamEl.innerText = abuseScore > 10 ? "REPORTED" : "CLEAN";
-                botEl.innerText = abuseScore > 30 ? "SUSPICIOUS" : "CLEAN";
-                bruteEl.innerText = abuseScore > 50 ? "ATTACKER" : "CLEAN";
-                const barColor = abuseScore > 20 ? "bg-red-500" : "bg-emerald-500";
-                [barSpam, barBot, barBrute].forEach(b => b.className = `h-full ${barColor}`);
-            }
-
-            indicator.innerHTML = `<i class="fas fa-check-circle"></i> Forensic Scan Complete (Level 4 Intelligence)`;
-            indicator.className = "flex items-center gap-1.5 text-[9px] font-bold text-slate-500 uppercase";
-            
-            if (displayScore >= 90) {
-                verdict.innerText = "SAFE IP ADDRESS"; verdict.className = "text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500 px-3 py-1 bg-emerald-500/10 rounded-full";
-            } else if (displayScore >= 60) {
-                verdict.innerText = "NEUTRAL / CLOUD"; verdict.className = "text-[10px] font-black uppercase tracking-[0.2em] text-yellow-500 px-3 py-1 bg-yellow-500/10 rounded-full";
-            } else {
-                verdict.innerText = "HIGH RISK DETECTED"; verdict.className = "text-[10px] font-black uppercase tracking-[0.2em] text-red-500 px-3 py-1 bg-red-500/10 rounded-full";
-            }
-        }
-
-        function updateSecurityUI(data) {
-            const vpnEl = document.getElementById('detect-vpn');
-            const proxyEl = document.getElementById('detect-proxy');
-            const torEl = document.getElementById('detect-tor');
-            const usageEl = document.getElementById('detect-usage');
-            const orgText = (data.org || data.asn || "").toLowerCase();
-            const isCloud = CLOUD_KEYWORDS.some(kw => orgText.includes(kw));
-
-            vpnEl.innerText = isCloud ? "DETECTED" : "CLEAN";
-            vpnEl.className = isCloud ? "text-xs font-bold text-red-500" : "text-xs font-bold text-emerald-500";
-            proxyEl.innerText = "CLEAN";
-            proxyEl.className = "text-xs font-bold text-emerald-500";
-            const isTor = orgText.includes("tor");
-            torEl.innerText = isTor ? "DETECTED" : "CLEAN";
-            torEl.className = isTor ? "text-xs font-bold text-red-500" : "text-xs font-bold text-emerald-500";
-            
-            if (isCloud) {
-                usageEl.innerText = "DATA CENTER / HOSTING";
-                usageEl.className = "text-[10px] font-bold text-yellow-500";
-            } else {
-                usageEl.innerText = "RESIDENTIAL / MOBILE";
-                usageEl.className = "text-xs font-bold text-emerald-500";
-            }
-            updateRiskUI(data.ip, data.org || data.asn);
-        }
-
-        async function manualLookup() {
-            const input = document.getElementById('ip-lookup-input');
-            const ip = input.value.trim();
-            if (!ip || isAbusing()) return;
-            const geo = await getGeoMultiSource(ip);
-            updateUI(geo);
-            updateIPTypeUI(ip);
-        }
+        let currentData = {};
 
         async function fetchRegistryDetails(ip) {
             try {
                 const response = await fetch(`https://rdap.db.ripe.net/ip/${ip}`);
-                if (!response.ok) throw new Error();
                 const data = await response.json();
                 const events = data.events || [];
-                document.getElementById('registry-created').innerText = events.find(e => e.eventAction === 'registration')?.eventDate ? new Date(events.find(e => e.eventAction === 'registration').eventDate).toLocaleDateString() : "Historical Registration";
-                document.getElementById('registry-updated').innerText = events.find(e => e.eventAction === 'last changed')?.eventDate ? new Date(events.find(e => e.eventAction === 'last changed').eventDate).toLocaleDateString() : "Stable Allocation";
+                
+                const regDate = events.find(e => e.eventAction === 'registration')?.eventDate;
+                const lastUpdate = events.find(e => e.eventAction === 'last changed')?.eventDate;
 
-                let supportEmail = "N/A (Private)";
-                let abuseEmail = "abuse@" + (data.name?.toLowerCase() || "isp.com");
+                document.getElementById('registry-created').innerText = regDate ? new Date(regDate).toLocaleDateString() : "N/A";
+                document.getElementById('registry-updated').innerText = lastUpdate ? new Date(lastUpdate).toLocaleDateString() : "N/A";
 
-                const findEmails = (entities) => {
-                    if (!entities) return;
-                    entities.forEach(entity => {
-                        const vcard = entity.vcardArray?.[1] || [];
-                        vcard.forEach(attr => {
-                            if (attr[0] === 'email') {
-                                const email = attr[3];
-                                const type = (attr[1]?.type || "").toLowerCase();
-                                if (type.includes('abuse')) abuseEmail = email;
-                                else supportEmail = email;
-                            }
+                let emails = { support: "N/A", abuse: "N/A" };
+                if (data.entities) {
+                    const findEmails = (ents) => {
+                        ents.forEach(e => {
+                            const vcard = e.vcardArray?.[1] || [];
+                            vcard.forEach(attr => {
+                                if (attr[0] === 'email') {
+                                    if (e.roles?.includes('abuse')) emails.abuse = attr[3];
+                                    else emails.support = attr[3];
+                                }
+                            });
+                            if (e.entities) findEmails(e.entities);
                         });
-                        if (entity.entities) findEmails(entity.entities);
-                    });
-                };
-                findEmails(data.entities);
-                document.getElementById('registry-email').innerText = supportEmail;
-                document.getElementById('registry-abuse').innerText = abuseEmail;
+                    };
+                    findEmails(data.entities);
+                }
+                document.getElementById('registry-email').innerText = emails.support;
+                document.getElementById('registry-abuse').innerText = emails.abuse;
+                currentData.registry = { ...emails, created: regDate, updated: lastUpdate };
             } catch (e) {
-                document.getElementById('registry-email').innerText = "Contact ISP Support";
-                document.getElementById('registry-abuse').innerText = "abuse@isp-provider.net";
+                ["registry-created", "registry-updated", "registry-email", "registry-abuse"].forEach(id => document.getElementById(id).innerText = "N/A");
             }
-        }
-
-        let lastReq = 0;
-        function isAbusing() {
-            if (Date.now() - lastReq < 2000) return true;
-            lastReq = Date.now();
-            return false;
-        }
-
-        async function runPerformanceTest() {
-            const btn = document.getElementById('btn-perf'); btn.disabled = true;
-            const [p, j, s] = [document.getElementById('perf-ping'), document.getElementById('perf-jitter'), document.getElementById('perf-speed')];
-            try {
-                const start = performance.now();
-                await fetch('https://www.google.com/favicon.ico', { mode: 'no-cors' });
-                const lat = Math.round(performance.now() - start);
-                p.innerText = lat + "ms"; document.getElementById('ping-progress').style.width = "70%";
-                j.innerText = "4ms"; document.getElementById('jitter-progress').style.width = "90%";
-                s.innerText = "Fast Path"; document.getElementById('speed-progress').style.width = "85%";
-            } finally { btn.disabled = false; }
-        }
-
-        async function getGeoMultiSource(ip = '') {
-            try {
-                const res = await fetch(`https://ipapi.co/${ip}/json/`);
-                return await res.json();
-            } catch (e) { return { ip: ip, org: "Unknown Network" }; }
         }
 
         function updateUI(d) {
+            currentData.geo = d;
             document.getElementById('info-city').innerText = d.city || "---";
             document.getElementById('info-region').innerText = d.region || "---";
             document.getElementById('info-country').innerText = d.country_name || "---";
-            document.getElementById('info-isp').innerText = normalizeName(d.isp || d.org);
-            document.getElementById('info-org').innerText = normalizeName(d.org || d.asn);
+            document.getElementById('info-isp').innerText = d.isp || "---";
+            document.getElementById('info-org').innerText = d.org || "---";
             document.getElementById('info-asn').innerText = d.asn || "---";
             document.getElementById('info-host').innerText = d.ip || "---";
-            updateSecurityUI(d);
             fetchRegistryDetails(d.ip);
-        }
-
-        function legacyCopy(text) {
-            const el = document.createElement('textarea'); el.value = text;
-            document.body.appendChild(el); el.select(); document.execCommand('copy');
-            document.body.removeChild(el);
-            const t = document.getElementById('copy-toast');
-            t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2000);
-        }
-
-        async function fetchIPv6() {
-            const ipv6El = document.getElementById('ipv6-display');
-            try {
-                const controller = new AbortController();
-                setTimeout(() => controller.abort(), 3000);
-                const res = await fetch('https://api64.ipify.org?format=json', { signal: controller.signal });
-                const data = await res.json();
-                if (data.ip.includes(':')) {
-                    ipv6El.innerText = data.ip; ipv6El.classList.remove('text-purple-200'); ipv6El.classList.add('text-purple-400');
-                } else {
-                    ipv6El.innerText = "NOT DETECTED"; ipv6El.classList.add('opacity-50');
-                }
-            } catch (e) {
-                ipv6El.innerText = "NOT DETECTED"; ipv6El.classList.add('opacity-50');
-            }
         }
 
         async function init() {
@@ -803,11 +285,68 @@
                 const res = await fetch('https://api.ipify.org?format=json');
                 const d = await res.json();
                 document.getElementById('ipv4-display').innerText = d.ip;
-                updateIPTypeUI(d.ip);
-                const geo = await getGeoMultiSource(d.ip);
+                const geo = await (await fetch(`https://ipapi.co/${d.ip}/json/`)).json();
                 updateUI(geo);
-            } catch(e) { document.getElementById('ipv4-display').innerText = "ERROR"; }
-            fetchIPv6();
+                
+                const v6Res = await fetch('https://api64.ipify.org?format=json');
+                const v6Data = await v6Res.json();
+                document.getElementById('ipv6-display').innerText = v6Data.ip.includes(':') ? v6Data.ip : "NOT DETECTED";
+            } catch(e) { console.error(e); }
+            document.getElementById('terminal-out').innerText = "Pronto para análise.";
+        }
+
+        async function manualLookup() {
+            const input = document.getElementById('ip-lookup-input').value.trim();
+            if (!input) return;
+            document.getElementById('btn-lookup').disabled = true;
+            try {
+                const geo = await (await fetch(`https://ipapi.co/${input}/json/`)).json();
+                if (geo.error) throw new Error("IP Inválido");
+                updateUI(geo);
+                document.getElementById('terminal-out').innerText = `Dados de ${input} carregados.`;
+            } catch (e) {
+                document.getElementById('terminal-out').innerText = `Erro: ${e.message}`;
+            } finally {
+                document.getElementById('btn-lookup').disabled = false;
+            }
+        }
+
+        function copyPageSummary() {
+            const summary = `
+IP Análise Summary:
+- IPv4: ${document.getElementById('ipv4-display').innerText}
+- ISP: ${document.getElementById('info-isp').innerText}
+- Org: ${document.getElementById('info-org').innerText}
+- Location: ${document.getElementById('info-city').innerText}, ${document.getElementById('info-country').innerText}
+            `.trim();
+            legacyCopy(summary);
+        }
+
+        function downloadInfo(format) {
+            const content = format === 'json' 
+                ? JSON.stringify(currentData, null, 2)
+                : `CHECKMYIP REPORT\n${"-".repeat(20)}\n${JSON.stringify(currentData, null, 2)}`;
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ip-report-${currentData.geo?.ip || 'data'}.${format}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function legacyCopy(text) {
+            const el = document.createElement('textarea'); 
+            el.value = text;
+            document.body.appendChild(el); 
+            el.select(); 
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            const t = document.getElementById('copy-toast');
+            t.style.display = 'block'; 
+            setTimeout(() => t.style.display = 'none', 2000);
         }
 
         window.onload = init;
