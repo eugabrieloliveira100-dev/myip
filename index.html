@@ -147,7 +147,6 @@
                         <span id="info-country" class="text-white font-bold text-sm">...</span>
                     </div>
                 </div>
-                <!-- Technical Note Updated -->
                 <div class="mt-auto pt-6 border-t border-white/5">
                     <p class="text-[13px] text-white/90 leading-relaxed italic">
                         <strong class="text-blue-400">Note:</strong> This reflects the geographical location where the IP address was officially registered by its owner (ISP/Provider).
@@ -211,10 +210,39 @@
                 <div id="terminal-out" class="mt-4 text-blue-400 opacity-70">> System ready.</div>
             </div>
         </section>
+
+        <!-- FOOTER ADDED HERE -->
+        <footer class="mt-8 pb-12 text-center">
+            <div class="flex flex-col items-center gap-4">
+                <div class="h-px w-24 bg-gradient-to-r from-transparent via-slate-700 to-transparent mb-4"></div>
+                <nav class="flex gap-6 text-xs font-bold uppercase tracking-widest text-slate-500">
+                    <a href="index.html" class="hover:text-blue-400 transition-colors">Home</a>
+                    <a href="privacy.html" class="hover:text-blue-400 transition-colors">Privacy & Terms</a>
+                </nav>
+                <p class="text-[10px] text-slate-600 font-mono mt-2">
+                    &copy; 2024 CheckMyIP.Today - Reliable Network Intelligence
+                </p>
+            </div>
+        </footer>
     </div>
 
     <script>
         let currentData = {};
+
+        // Função para download dos dados
+        function downloadInfo(format) {
+            if (!currentData || Object.keys(currentData).length === 0) return;
+            const dataStr = JSON.stringify(currentData, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `network_report_${currentData.ip || 'ip'}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
 
         async function fetchRegistryDetails(ip) {
             try {
@@ -222,7 +250,6 @@
                 if(!response.ok) throw new Error();
                 const data = await response.json();
                 const events = data.events || [];
-                
                 const regDate = events.find(e => e.eventAction === 'registration')?.eventDate;
                 const lastUpdate = events.find(e => e.eventAction === 'last changed')?.eventDate;
 
@@ -298,9 +325,7 @@
                 } catch(e) {
                     document.getElementById('ipv6-display').innerText = "Not available";
                 }
-
             } catch(e) { 
-                console.error("Initial load error:", e);
                 document.getElementById('terminal-out').innerText = "> Error loading data. Check connection.";
             }
         }
@@ -330,9 +355,7 @@
             const country = document.getElementById('info-country').innerText;
             const isp = document.getElementById('info-isp').innerText;
             const asn = document.getElementById('info-asn').innerText;
-
             const summary = `--- NETWORK REPORT ---\nIPv4: ${ipV4}\nIPv6: ${ipV6}\nISP: ${isp}\nASN: ${asn}\nLocation: ${city}, ${country}\n----------------------`;
-            
             legacyCopy(summary);
         }
 
@@ -346,7 +369,6 @@
             el.select(); 
             document.execCommand('copy');
             document.body.removeChild(el);
-            
             const t = document.getElementById('copy-toast');
             t.style.display = 'block'; 
             setTimeout(() => t.style.display = 'none', 2000);
