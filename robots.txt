@@ -1,1 +1,6 @@
+User-agent: *
+Allow: /
 
+Link direto para o seu sitemap
+
+Sitemap: https://www.google.com/search?q=https://checkmyip.today/sitemap.xml
