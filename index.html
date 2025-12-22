@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -39,11 +39,12 @@
             font-size: 12px;
             font-weight: bold;
             z-index: 2000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
     </style>
 </head>
 <body>
-    <div id="copy-toast">✅ RELATÓRIO COPIADO COM SUCESSO</div>
+    <div id="copy-toast">✅ REPORT COPIED SUCCESSFULLY</div>
 
     <div class="max-w-5xl mx-auto flex flex-col gap-6">
         
@@ -68,7 +69,7 @@
                     <i class="fas fa-shield-alt text-blue-500/30"></i>
                 </div>
                 <h2 class="text-slate-500 text-xs font-bold mb-1 uppercase text-blue-500/80">Public IPv4:</h2>
-                <div id="ipv4-display" class="text-3xl md:text-4xl font-black tracking-tighter text-white font-mono break-all">A detetar...</div>
+                <div id="ipv4-display" class="text-3xl md:text-4xl font-black tracking-tighter text-white font-mono break-all">Detecting...</div>
             </div>
 
             <div class="glass-card p-8 rounded-3xl relative overflow-hidden">
@@ -77,7 +78,7 @@
                     <i class="fas fa-globe-americas text-purple-500/30"></i>
                 </div>
                 <h2 class="text-slate-500 text-xs font-bold mb-1 uppercase text-purple-500/80">Public IPv6:</h2>
-                <div id="ipv6-display" class="text-lg md:text-xl lg:text-2xl font-black font-mono text-purple-200 break-all leading-snug min-h-[3.5rem]">A detetar...</div>
+                <div id="ipv6-display" class="text-lg md:text-xl lg:text-2xl font-black font-mono text-purple-200 break-all leading-snug min-h-[3.5rem]">Detecting...</div>
             </div>
         </div>
 
@@ -89,11 +90,11 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
                     <span class="text-[10px] text-slate-500 uppercase block mb-1">Registration Date</span>
-                    <span id="registry-created" class="text-white font-bold text-sm">A carregar...</span>
+                    <span id="registry-created" class="text-white font-bold text-sm">Loading...</span>
                 </div>
                 <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
                     <span class="text-[10px] text-slate-500 uppercase block mb-1">Last Update</span>
-                    <span id="registry-updated" class="text-white font-bold text-sm">A carregar...</span>
+                    <span id="registry-updated" class="text-white font-bold text-sm">Loading...</span>
                 </div>
             </div>
         </div>
@@ -106,11 +107,11 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
                     <span class="text-[10px] text-slate-500 uppercase block mb-1">Support Email</span>
-                    <span id="registry-email" class="text-blue-400 font-bold text-sm truncate block">Pesquisando...</span>
+                    <span id="registry-email" class="text-blue-400 font-bold text-sm truncate block">Searching...</span>
                 </div>
                 <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
                     <span class="text-[10px] text-slate-500 uppercase block mb-1">Abuse Email</span>
-                    <span id="registry-abuse" class="text-red-400 font-bold text-sm truncate block">Pesquisando...</span>
+                    <span id="registry-abuse" class="text-red-400 font-bold text-sm truncate block">Searching...</span>
                 </div>
             </div>
         </div>
@@ -125,15 +126,15 @@
                 <div class="space-y-4">
                     <div class="flex justify-between border-b border-white/5 pb-2">
                         <span class="text-slate-500 text-sm">City</span>
-                        <span id="info-city" class="text-white font-bold text-sm">Carregando...</span>
+                        <span id="info-city" class="text-white font-bold text-sm">Loading...</span>
                     </div>
                     <div class="flex justify-between border-b border-white/5 pb-2">
                         <span class="text-slate-500 text-sm">Region</span>
-                        <span id="info-region" class="text-white font-bold text-sm">Carregando...</span>
+                        <span id="info-region" class="text-white font-bold text-sm">Loading...</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-slate-500 text-sm">Country</span>
-                        <span id="info-country" class="text-white font-bold text-sm">Carregando...</span>
+                        <span id="info-country" class="text-white font-bold text-sm">Loading...</span>
                     </div>
                 </div>
             </div>
@@ -146,11 +147,11 @@
                 <div class="space-y-4">
                     <div class="flex flex-col gap-1 border-b border-white/5 pb-2">
                         <span class="text-slate-500 text-[10px] uppercase font-bold">ISP (Internet Service Provider)</span>
-                        <span id="info-isp" class="text-white font-bold text-sm truncate">A carregar...</span>
+                        <span id="info-isp" class="text-white font-bold text-sm truncate">Loading...</span>
                     </div>
                     <div class="flex flex-col gap-1">
                         <span class="text-slate-500 text-[10px] uppercase font-bold">Organization</span>
-                        <span id="info-org" class="text-white font-bold text-sm truncate">...</span>
+                        <span id="info-org" class="text-white font-bold text-sm truncate">Loading...</span>
                     </div>
                 </div>
             </div>
@@ -220,7 +221,7 @@
         }
 
         async function fetchRegistryDetails(ip) {
-            if (!ip || ip.includes("A detetar")) return;
+            if (!ip || ip.includes("Detecting")) return;
             try {
                 const response = await fetch(`https://rdap.db.ripe.net/ip/${ip}`);
                 if(!response.ok) throw new Error();
@@ -228,11 +229,13 @@
                 const events = data.events || [];
                 const regEvent = events.find(e => e.eventAction === 'registration');
                 const lastEvent = events.find(e => e.eventAction === 'last changed');
-                document.getElementById('registry-created').innerText = regEvent ? new Date(regEvent.eventDate).toLocaleDateString('pt-PT') : "Não disponível";
-                document.getElementById('registry-updated').innerText = lastEvent ? new Date(lastEvent.eventDate).toLocaleDateString('pt-PT') : "Não disponível";
+                
+                document.getElementById('registry-created').innerText = regEvent ? new Date(regEvent.eventDate).toLocaleDateString() : "Not available";
+                document.getElementById('registry-updated').innerText = lastEvent ? new Date(lastEvent.eventDate).toLocaleDateString() : "Not available";
 
-                let abuse = "Não listado";
-                let support = "Não listado";
+                let abuse = "Not listed";
+                let support = "Not listed";
+                
                 const extractEmails = (entities) => {
                     if (!entities) return;
                     for (const ent of entities) {
@@ -240,7 +243,7 @@
                         const emailData = vcards.find(v => v[0] === 'email');
                         if (emailData) {
                             if (ent.roles?.includes('abuse')) abuse = emailData[3];
-                            else if (support === "Não listado") support = emailData[3];
+                            else if (support === "Not listed") support = emailData[3];
                         }
                         if (ent.entities) extractEmails(ent.entities);
                     }
@@ -251,6 +254,8 @@
             } catch (e) {
                 document.getElementById('registry-email').innerText = "N/A";
                 document.getElementById('registry-abuse').innerText = "N/A";
+                document.getElementById('registry-created').innerText = "N/A";
+                document.getElementById('registry-updated').innerText = "N/A";
             }
         }
 
@@ -265,10 +270,8 @@
                 document.getElementById('info-host').innerText = ip;
             };
 
-            // Reset visual
-            setFields("Carregando...", "Carregando...", "Carregando...", "Carregando...", "Carregando...", "...");
+            setFields("Loading...", "Loading...", "Loading...", "Loading...", "Loading...", "...");
 
-            // TENTATIVA 1: ipwho.is
             try {
                 const res = await fetch(`https://ipwho.is/${ip}`);
                 const d = await res.json();
@@ -277,16 +280,6 @@
                 }
             } catch(e) {}
 
-            // TENTATIVA 2: ip-api.com
-            try {
-                const res = await fetch(`http://ip-api.com/json/${ip}`);
-                const d = await res.json();
-                if (d.status === "success") {
-                    return setFields(d.city, d.regionName, d.country, d.isp, d.org, d.as);
-                }
-            } catch(e) {}
-
-            // TENTATIVA 3: ipapi.co
             try {
                 const res = await fetch(`https://ipapi.co/${ip}/json/`);
                 const d = await res.json();
@@ -295,7 +288,7 @@
                 }
             } catch(e) {}
 
-            setFields("Erro", "Erro", "Erro", "Erro", "Erro", "Erro");
+            setFields("Error", "Error", "Error", "Error", "Error", "Error");
         }
 
         async function init() {
@@ -311,11 +304,11 @@
                 fetch('https://api64.ipify.org?format=json')
                     .then(r => r.json())
                     .then(d => {
-                        document.getElementById('ipv6-display').innerText = d.ip.includes(':') ? d.ip : "Apenas IPv4";
+                        document.getElementById('ipv6-display').innerText = d.ip.includes(':') ? d.ip : "IPv4 Only";
                     })
                     .catch(() => document.getElementById('ipv6-display').innerText = "N/A");
             } catch(e) {
-                document.getElementById('ipv4-display').innerText = "Erro ao detetar IP";
+                document.getElementById('ipv4-display').innerText = "Detection Error";
             }
         }
 
@@ -325,8 +318,42 @@
         }
 
         function copyPageSummary() {
-            const val = (id) => document.getElementById(id)?.innerText || "N/A";
-            legacyCopy(`IP: ${val('ipv4-display')}\nLocal: ${val('info-city')}, ${val('info-country')}\nISP: ${val('info-isp')}`);
+            const val = (id) => {
+                const el = document.getElementById(id);
+                return el ? el.innerText : "N/A";
+            };
+
+            const summary = `--- CHECKMYIP.TODAY REPORT ---
+IP ADDRESSES:
+- Public IPv4: ${val('ipv4-display')}
+- Public IPv6: ${val('ipv6-display')}
+
+REGISTRY & ALLOCATION (RDAP):
+- Registration Date: ${val('registry-created')}
+- Last Update: ${val('registry-updated')}
+
+ABUSE CONTACTS (RDAP):
+- Support Email: ${val('registry-email')}
+- Abuse Email: ${val('registry-abuse')}
+
+LOCATION:
+- City: ${val('info-city')}
+- Region: ${val('info-region')}
+- Country: ${val('info-country')}
+
+PROVIDER INFORMATION:
+- ISP: ${val('info-isp')}
+- Organization: ${val('info-org')}
+
+NETWORK DETAILS:
+- ASN: ${val('info-asn')}
+- Hostname: ${val('info-host')}
+
+TERMINAL QUERY:
+- Command: curl -s checkmyip.today/api
+-------------------------------`;
+
+            legacyCopy(summary);
         }
 
         window.onload = init;
