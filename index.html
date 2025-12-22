@@ -3,7 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Check My IP - Global Analysis</title>
+    
+    <!-- Bing Webmaster Tools Verification -->
+    <meta name="msvalidate.01" content="5EAB4C8CA2D80D5D39E667FE79DB6751" />
+    
+    <!-- SEO Basic Tags -->
+    <title>Check My IP - Global Analysis & Network Intelligence</title>
+    <meta name="description" content="Discover your public IPv4 and IPv6 addresses instantly. Get detailed network analysis, ISP info, and security reputation data.">
+    <meta name="keywords" content="check my ip, what is my ip, ipv4, ipv6, networking tools, ip lookup, asn lookup">
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -118,7 +126,6 @@
 
         <!-- Location & Provider Section -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Location -->
             <div class="glass-card p-6 rounded-3xl flex flex-col">
                 <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center">
                     <i class="fas fa-map-marker-alt mr-2 text-blue-500"></i> Location
@@ -139,7 +146,6 @@
                 </div>
             </div>
 
-            <!-- Provider -->
             <div class="glass-card p-6 rounded-3xl flex flex-col">
                 <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center">
                     <i class="fas fa-server mr-2 text-blue-500"></i> Provider Information
@@ -208,6 +214,7 @@
     </div>
 
     <script>
+        // Função de cópia compatível
         function legacyCopy(text) {
             const el = document.createElement('textarea'); 
             el.value = text;
@@ -220,12 +227,14 @@
             setTimeout(() => t.style.display = 'none', 2500);
         }
 
+        // RDAP Fetch (Mais robusto para Firefox)
         async function fetchRegistryDetails(ip) {
             if (!ip || ip.includes("Detecting")) return;
             try {
-                const response = await fetch(`https://rdap.db.ripe.net/ip/${ip}`);
+                const response = await fetch(`https://rdap.db.ripe.net/ip/${ip}`, { mode: 'cors' });
                 if(!response.ok) throw new Error();
                 const data = await response.json();
+                
                 const events = data.events || [];
                 const regEvent = events.find(e => e.eventAction === 'registration');
                 const lastEvent = events.find(e => e.eventAction === 'last changed');
@@ -252,13 +261,14 @@
                 document.getElementById('registry-email').innerText = support;
                 document.getElementById('registry-abuse').innerText = abuse;
             } catch (e) {
-                document.getElementById('registry-email').innerText = "N/A";
-                document.getElementById('registry-abuse').innerText = "N/A";
-                document.getElementById('registry-created').innerText = "N/A";
-                document.getElementById('registry-updated').innerText = "N/A";
+                console.error("RDAP fail:", e);
+                ["registry-email", "registry-abuse", "registry-created", "registry-updated"].forEach(id => {
+                    document.getElementById(id).innerText = "N/A (CORS Blocked)";
+                });
             }
         }
 
+        // Geo Fetch com Fallback para Firefox
         async function fetchGeo(ip) {
             const setFields = (city, reg, cou, isp, org, asn) => {
                 document.getElementById('info-city').innerText = city || "N/A";
@@ -270,15 +280,13 @@
                 document.getElementById('info-host').innerText = ip;
             };
 
-            setFields("Loading...", "Loading...", "Loading...", "Loading...", "Loading...", "...");
-
             try {
                 const res = await fetch(`https://ipwho.is/${ip}`);
                 const d = await res.json();
                 if (d.success) {
                     return setFields(d.city, d.region, d.country, d.connection?.isp, d.connection?.org, d.connection?.asn);
                 }
-            } catch(e) {}
+            } catch(e) { console.warn("Primary API failed, trying fallback..."); }
 
             try {
                 const res = await fetch(`https://ipapi.co/${ip}/json/`);
@@ -286,29 +294,46 @@
                 if (!d.error) {
                     return setFields(d.city, d.region, d.country_name, d.org, d.org, d.asn);
                 }
-            } catch(e) {}
-
-            setFields("Error", "Error", "Error", "Error", "Error", "Error");
+            } catch(e) { 
+                setFields("Blocked by Browser", "Check Extensions", "Blocked", "N/A", "N/A", "N/A");
+            }
         }
 
         async function init() {
-            try {
-                const response = await fetch('https://api.ipify.org?format=json');
-                const data = await response.json();
-                const ip = data.ip;
-                document.getElementById('ipv4-display').innerText = ip;
-                
-                fetchGeo(ip);
-                fetchRegistryDetails(ip);
+            const ipv4Display = document.getElementById('ipv4-display');
+            const ipv6Display = document.getElementById('ipv6-display');
 
-                fetch('https://api64.ipify.org?format=json')
-                    .then(r => r.json())
-                    .then(d => {
-                        document.getElementById('ipv6-display').innerText = d.ip.includes(':') ? d.ip : "IPv4 Only";
-                    })
-                    .catch(() => document.getElementById('ipv6-display').innerText = "N/A");
+            const sources = [
+                'https://api.ipify.org?format=json',
+                'https://ipinfo.io/json',
+                'https://api.viewer.ip/index.php'
+            ];
+
+            let detectedIp = null;
+
+            for (let source of sources) {
+                try {
+                    const response = await fetch(source);
+                    const data = await response.json();
+                    detectedIp = data.ip || data.query;
+                    if (detectedIp) break;
+                } catch(e) { continue; }
+            }
+
+            if (detectedIp) {
+                ipv4Display.innerText = detectedIp;
+                fetchGeo(detectedIp);
+                fetchRegistryDetails(detectedIp);
+            } else {
+                ipv4Display.innerText = "Check Connection";
+            }
+
+            try {
+                const res = await fetch('https://api64.ipify.org?format=json');
+                const d = await res.json();
+                ipv6Display.innerText = d.ip.includes(':') ? d.ip : "IPv4 Only";
             } catch(e) {
-                document.getElementById('ipv4-display').innerText = "Detection Error";
+                ipv6Display.innerText = "Not Detected";
             }
         }
 
@@ -318,41 +343,8 @@
         }
 
         function copyPageSummary() {
-            const val = (id) => {
-                const el = document.getElementById(id);
-                return el ? el.innerText : "N/A";
-            };
-
-            const summary = `--- CHECKMYIP.TODAY REPORT ---
-IP ADDRESSES:
-- Public IPv4: ${val('ipv4-display')}
-- Public IPv6: ${val('ipv6-display')}
-
-REGISTRY & ALLOCATION (RDAP):
-- Registration Date: ${val('registry-created')}
-- Last Update: ${val('registry-updated')}
-
-ABUSE CONTACTS (RDAP):
-- Support Email: ${val('registry-email')}
-- Abuse Email: ${val('registry-abuse')}
-
-LOCATION:
-- City: ${val('info-city')}
-- Region: ${val('info-region')}
-- Country: ${val('info-country')}
-
-PROVIDER INFORMATION:
-- ISP: ${val('info-isp')}
-- Organization: ${val('info-org')}
-
-NETWORK DETAILS:
-- ASN: ${val('info-asn')}
-- Hostname: ${val('info-host')}
-
-TERMINAL QUERY:
-- Command: curl -s checkmyip.today/api
--------------------------------`;
-
+            const val = (id) => document.getElementById(id)?.innerText || "N/A";
+            const summary = `--- CHECKMYIP.TODAY REPORT ---\nIP: ${val('ipv4-display')}\nIPv6: ${val('ipv6-display')}\nLocation: ${val('info-city')}, ${val('info-country')}\nISP: ${val('info-isp')}\nASN: ${val('info-asn')}\n-------------------------------`;
             legacyCopy(summary);
         }
 
