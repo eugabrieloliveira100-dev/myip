@@ -78,20 +78,6 @@
     </style>
 </head>
 <body>
-    <!-- Yandex.Metrika counter -->
-    <script type="text/javascript">
-        (function(m,e,t,r,i,k,a){
-            m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-            m[i].l=1*new Date();
-            for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
-            k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
-        })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=105986136', 'ym');
-
-        ym(105986136, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", accurateTrackBounce:true, trackLinks:true});
-    </script>
-    <noscript><div><img src="https://mc.yandex.ru/watch/105986136" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
-    <!-- /Yandex.Metrika counter -->
-
     <div id="copy-toast">✅ REPORT COPIED</div>
 
     <div class="max-w-5xl mx-auto flex flex-col gap-6">
@@ -188,6 +174,10 @@
                         <span id="info-country" class="text-white font-bold text-sm">...</span>
                     </div>
                 </div>
+                <!-- Nota Explicativa -->
+                <p id="location-note" class="mt-6 text-white text-sm leading-relaxed italic border-t border-white/10 pt-4">
+                    Note: The geographical location displayed represents the administrative region and city where this IP address was officially registered by its owner or provider in the global database.
+                </p>
             </div>
 
             <div class="glass-card p-6 rounded-3xl flex flex-col">
@@ -260,6 +250,7 @@
                 city: "City",
                 region: "Region",
                 country: "Country",
+                locationNote: "Note: The geographical location displayed represents the administrative region and city where this IP address was officially registered by its owner or provider in the global database.",
                 provider: "Provider Information",
                 isp: "ISP (Internet Service Provider)",
                 org: "Organization",
@@ -285,6 +276,7 @@
                 city: "Город",
                 region: "Регион",
                 country: "Страна",
+                locationNote: "Примечание: Отображаемое географическое положение представляет собой административный регион и город, в котором этот IP-адрес был официально зарегистрирован его владельцем или провайдером в глобальной базе данных.",
                 provider: "Информация о провайдере",
                 isp: "ISP (Интернет-провайдер)",
                 org: "Организация",
@@ -317,6 +309,7 @@
             document.getElementById('label-city').innerText = t.city;
             document.getElementById('label-region').innerText = t.region;
             document.getElementById('label-country').innerText = t.country;
+            document.getElementById('location-note').innerText = t.locationNote;
             document.getElementById('title-provider').innerText = t.provider;
             document.getElementById('label-isp').innerText = t.isp;
             document.getElementById('label-org').innerText = t.org;
@@ -428,7 +421,6 @@
         function copyPageSummary() {
             const val = (id) => document.getElementById(id)?.innerText || "N/A";
             
-            // Coleta de dados expandida incluindo contatos de suporte e abuso
             const summary = `--- CHECKMYIP.TODAY REPORT ---
 IP (v4): ${val('ipv4-display')}
 IP (v6): ${val('ipv6-display')}
