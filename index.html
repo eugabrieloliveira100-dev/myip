@@ -7,20 +7,18 @@
     <!-- Bing Webmaster Tools Verification -->
     <meta name="msvalidate.01" content="5EAB4C8CA2D80D5D39E667FE79DB6751" />
 
+    <!-- Structured Data for Google/Yandex AI -->
     <script type="application/ld+json">
-{
-   <script type="application/ld+json">
-{
-  "@context": "[https://schema.org](https://schema.org)",
-  "@type": "WebApplication",
-  "name": "CheckMyIP Today",
-  "url": "[https://checkmyip.today](https://checkmyip.today)",
-  "applicationCategory": "NetworkingTool",
-  "operatingSystem": "All",
-  "description": "Global Network Intelligence tool for IPv4/IPv6, RDAP, ASN and WHOIS analysis."
-}
-</script>
-
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "CheckMyIP Today",
+      "url": "https://checkmyip.today",
+      "applicationCategory": "NetworkingTool",
+      "operatingSystem": "All",
+      "description": "Global Network Intelligence tool for IPv4/IPv6, RDAP, ASN and WHOIS analysis."
+    }
+    </script>
     
     <!-- SEO Basic Tags -->
     <title>Check My IP - Global Analysis & Network Intelligence</title>
@@ -229,7 +227,6 @@
     </div>
 
     <script>
-        // Função de cópia compatível
         function legacyCopy(text) {
             const el = document.createElement('textarea'); 
             el.value = text;
@@ -242,7 +239,6 @@
             setTimeout(() => t.style.display = 'none', 2500);
         }
 
-        // RDAP Fetch (Mais robusto para Firefox)
         async function fetchRegistryDetails(ip) {
             if (!ip || ip.includes("Detecting")) return;
             try {
@@ -283,7 +279,6 @@
             }
         }
 
-        // Geo Fetch com Fallback para Firefox
         async function fetchGeo(ip) {
             const setFields = (city, reg, cou, isp, org, asn) => {
                 document.getElementById('info-city').innerText = city || "N/A";
@@ -320,8 +315,7 @@
 
             const sources = [
                 'https://api.ipify.org?format=json',
-                'https://ipinfo.io/json',
-                'https://api.viewer.ip/index.php'
+                'https://ipinfo.io/json'
             ];
 
             let detectedIp = null;
