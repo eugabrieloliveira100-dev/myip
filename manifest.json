@@ -1,0 +1,22 @@
+{
+  "name": "CheckMyIP Global Analysis",
+  "short_name": "CheckMyIP",
+  "description": "Ferramenta de análise de rede global para IPv4/IPv6, RDAP e ASN.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#3b82f6",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3067/3067451.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3067/3067451.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
