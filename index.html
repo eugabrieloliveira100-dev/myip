@@ -4,10 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
+    <!-- PWA Meta Tags (CONEXÃO COM MANIFEST) -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3b82f6">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3067/3067451.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <!-- Bing Webmaster Tools Verification -->
     <meta name="msvalidate.01" content="5EAB4C8CA2D80D5D39E667FE79DB6751" />
 
-    <!-- Structured Data for Google/Yandex AI -->
+    <!-- Structured Data -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -20,7 +27,6 @@
     }
     </script>
     
-    <!-- SEO Basic Tags -->
     <title>Check My IP - Global Analysis & Network Intelligence</title>
     <meta name="description" content="Discover your public IPv4 and IPv6 addresses instantly. Get detailed network analysis, ISP info, and security reputation data.">
     <meta name="keywords" content="check my ip, what is my ip, ipv4, ipv6, networking tools, ip lookup, asn lookup">
@@ -227,6 +233,25 @@
     </div>
 
     <script>
+        // PWA SERVICE WORKER REGISTRATION (CORREÇÃO DE PROTOCOLO)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // Verificação de segurança para protocolos suportados (http/https)
+                const isSupportedProtocol = window.location.protocol.startsWith('http');
+                
+                if (isSupportedProtocol) {
+                    navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker registrado!', reg))
+                    .catch(err => {
+                        // Log informativo se falhar em ambientes não-standard
+                        console.warn('Registro do SW ignorado ou falhou neste ambiente:', err.message);
+                    });
+                } else {
+                    console.log('Ambiente local/blob detectado. Service Worker não será registrado para evitar erros de protocolo.');
+                }
+            });
+        }
+
         function legacyCopy(text) {
             const el = document.createElement('textarea'); 
             el.value = text;
