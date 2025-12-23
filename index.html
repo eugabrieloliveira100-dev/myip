@@ -355,7 +355,7 @@
                         const emailData = vcards.find(v => v[0] === 'email');
                         if (emailData) {
                             if (ent.roles?.includes('abuse')) abuse = emailData[3];
-                            else support = emailData[3];
+                            else if (!support || support === "N/A") support = emailData[3];
                         }
                         if (ent.entities) extractEmails(ent.entities);
                     }
@@ -413,7 +413,22 @@
 
         function copyPageSummary() {
             const val = (id) => document.getElementById(id)?.innerText || "N/A";
-            const summary = `--- CHECKMYIP.TODAY ---\nIP: ${val('ipv4-display')}\nIPv6: ${val('ipv6-display')}\nLocation: ${val('info-city')}, ${val('info-country')}\nISP: ${val('info-isp')}\n-----------------------`;
+            
+            // Coleta de dados expandida incluindo contatos de suporte e abuso
+            const summary = `--- CHECKMYIP.TODAY REPORT ---
+IP (v4): ${val('ipv4-display')}
+IP (v6): ${val('ipv6-display')}
+ISP: ${val('info-isp')}
+Location: ${val('info-city')}, ${val('info-region')}, ${val('info-country')}
+ASN: ${val('info-asn')}
+
+[CONTACTS & REGISTRY]
+Support Email: ${val('registry-email')}
+Abuse Email: ${val('registry-abuse')}
+Reg. Date: ${val('registry-created')}
+Last Update: ${val('registry-updated')}
+-------------------------------`.trim();
+
             legacyCopy(summary);
         }
 
