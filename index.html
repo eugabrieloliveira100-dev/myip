@@ -13,8 +13,34 @@
 
     <!-- SEO Meta Tags -->
     <title>Check My IP Today - Public IP Address & Network Intelligence Tool</title>
-    <meta name="description" content="Instantly find your public IPv4 and IPv6 addresses. Get detailed ISP, ASN, RDAP, and geographic location data with our global network intelligence tool.">
+    <meta name="description" content="CheckMyIP.Today is a simple, lightweight web tool designed to instantly display your current public IP address (IPv4/IPv6) and detailed network intelligence.">
     <meta name="keywords" content="check my ip, what is my ip, ipv4 lookup, ipv6 lookup, asn lookup, rdap registry, network intelligence, ip location">
+
+    <!-- Schema.org (Structured Data for SEO) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "CheckMyIP.Today",
+      "alternateName": "Check My IP Today",
+      "url": "https://checkmyip.today",
+      "description": "A professional IP Lookup Tool that displays public IPv4, IPv6, ISP, and detailed ASN network information.",
+      "applicationCategory": "UtilitiesApplication, WebTool",
+      "operatingSystem": "Windows, macOS, Linux, iOS, Android",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "Instant Public IP Detection",
+        "IPv4 and IPv6 support",
+        "ISP and ASN Identification",
+        "RDAP/WHOIS Registry Data",
+        "Geographic Location Mapping"
+      ]
+    }
+    </script>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -220,19 +246,47 @@
             </div>
         </section>
 
-        <!-- Educational Content -->
-        <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
-            <div class="glass-card p-6 rounded-3xl border border-blue-500/10">
-                <h4 id="edu-q1" class="text-blue-400 font-bold text-sm mb-3">What is an IP Address?</h4>
-                <p id="edu-a1" class="text-slate-400 text-xs leading-relaxed">An IP address is a unique numerical label assigned to each device connected to a computer network.</p>
+        <!-- Educational Content Section -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+            <div class="glass-card p-8 rounded-3xl border border-blue-500/10 col-span-1 md:col-span-2">
+                <h2 class="text-xl font-extrabold text-white mb-4 uppercase tracking-tight">About CheckMyIP.<span class="text-blue-500">Today</span></h2>
+                <p class="text-white/90 text-base leading-relaxed mb-6">
+                    <strong>checkmyip.today</strong> is a simple, lightweight web tool designed to instantly display your current <strong>public IP address</strong>. 
+                    Whether you are testing a VPN connection, troubleshooting network settings, or simply curious about your digital footprint, our tool provides 
+                    high-speed reflection of your network data without intrusive tracking.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+                        <h4 class="text-blue-400 font-bold text-sm uppercase mb-3">Key Features</h4>
+                        <ul class="text-white/80 text-sm space-y-3">
+                            <li>• <strong class="text-white">IP Address:</strong> Your unique identifier (IPv4 or IPv6).</li>
+                            <li>• <strong class="text-white">ISP:</strong> The company providing your internet (e.g., Comcast, AT&T).</li>
+                            <li>• <strong class="text-white">Approximate Location:</strong> City, region, and country based on IP.</li>
+                            <li>• <strong class="text-white">VPN/Proxy Detection:</strong> Checks if traffic is routed via a secure tunnel.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
+                        <h4 class="text-blue-400 font-bold text-sm uppercase mb-3">Local vs. Public IP</h4>
+                        <p class="text-white/80 text-sm leading-relaxed">
+                            This site shows your <strong class="text-white">public IP</strong>—the one the world sees. To find your local (private) IP:
+                            <br><br><strong class="text-white">Windows:</strong> CMD > <code>ipconfig</code>
+                            <br><strong class="text-white">Mac/Linux:</strong> Terminal > <code>ip addr</code>
+                        </p>
+                    </div>
+                </div>
             </div>
-            <div class="glass-card p-6 rounded-3xl border border-blue-500/10">
-                <h4 id="edu-q2" class="text-blue-400 font-bold text-sm mb-3">What is ASN?</h4>
-                <p id="edu-a2" class="text-slate-400 text-xs leading-relaxed">An Autonomous System Number (ASN) is a unique ID for a collection of IP networks managed by one entity.</p>
+            
+            <div class="glass-card p-8 rounded-3xl border border-blue-500/10">
+                <h4 id="edu-q1" class="text-blue-400 font-bold text-base mb-4">What is an IP Address?</h4>
+                <p id="edu-a1" class="text-white/80 text-sm leading-relaxed">An IP address is a unique numerical label assigned to each device connected to a computer network.</p>
             </div>
-            <div class="glass-card p-6 rounded-3xl border border-blue-500/10">
-                <h4 id="edu-q3" class="text-blue-400 font-bold text-sm mb-3">IPv4 vs IPv6</h4>
-                <p id="edu-a3" class="text-slate-400 text-xs leading-relaxed">IPv4 is the 32-bit standard. IPv6 is the modern 128-bit standard created to provide trillions of additional addresses.</p>
+            <div class="glass-card p-8 rounded-3xl border border-blue-500/10">
+                <h4 id="edu-q2" class="text-blue-400 font-bold text-base mb-4">Alternative Trusted Checkers</h4>
+                <ul class="text-white/80 text-sm space-y-3">
+                    <li>• <strong class="text-white">IPinfo.io:</strong> Excellent for detailed ASN and organizational data.</li>
+                    <li>• <strong class="text-white">icanhazip.com:</strong> Minimalist tool ideal for command-line use.</li>
+                    <li>• <strong class="text-white">WhatIsMyIP.com:</strong> Comprehensive tool with blacklist checks.</li>
+                </ul>
             </div>
         </section>
 
@@ -325,10 +379,6 @@
             document.getElementById('footer-tag').innerText = t.footer;
             document.getElementById('edu-q1').innerText = t.eduQ1;
             document.getElementById('edu-a1').innerText = t.eduA1;
-            document.getElementById('edu-q2').innerText = t.eduQ2;
-            document.getElementById('edu-a2').innerText = t.eduA2;
-            document.getElementById('edu-q3').innerText = t.eduQ3;
-            document.getElementById('edu-a3').innerText = t.eduA3;
             document.getElementById('v6-note').innerText = t.v6Note;
             
             const v6display = document.getElementById('ipv6-display').innerText;
@@ -436,18 +486,12 @@
         }
 
         function getIPFromURL() {
-            // Regex for IPv4 and IPv6
             const ipv4Pattern = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
             const ipv6Pattern = /(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:))/;
-
-            // 1. Check Query String (e.g. ?8.8.8.8) - Recommended for GitHub Pages
             const query = window.location.search.substring(1);
             if (query && (ipv4Pattern.test(query) || ipv6Pattern.test(query))) return query;
-
-            // 2. Check Path (e.g. /8.8.8.8) - Works if 404.html trick is used
             const path = window.location.pathname.split('/').filter(p => p !== "").pop();
             if (path && (ipv4Pattern.test(path) || ipv6Pattern.test(path))) return path;
-
             return null;
         }
 
@@ -455,12 +499,10 @@
             changeLanguage();
             const targetIP = getIPFromURL();
             detectIPv6();
-
             try {
                 const res = await fetch('https://api.ipify.org?format=json');
                 const data = await res.json();
                 detectedIPv4 = data.ip;
-                
                 if (!targetIP) {
                     document.getElementById('ipv4-display').innerText = data.ip;
                     document.getElementById('info-host').innerText = `curl checkmyip.today/${data.ip}`;
@@ -470,7 +512,6 @@
             } catch(e) { 
                 if(!targetIP) document.getElementById('ipv4-display').innerText = "Not Detected";
             }
-
             if (targetIP) {
                 updateDisplaysForIP(targetIP, true);
                 fetchGeo(targetIP);
@@ -483,7 +524,6 @@
             const v4El = document.getElementById('ipv4-display');
             const v6El = document.getElementById('ipv6-display');
             const v6Note = document.getElementById('v6-note');
-
             if (isIPv4) {
                 v4El.innerText = ip;
                 v4El.classList.remove('text-slate-500', 'text-sm');
@@ -508,10 +548,8 @@
                     window.history.pushState({}, document.title, "/");
                 }
             } catch (e) {}
-
             document.getElementById('ip-lookup-input').value = "";
             document.getElementById('v6-note').classList.add('hidden');
-            
             if (detectedIPv4) {
                 updateDisplaysForIP(detectedIPv4, false);
                 fetchGeo(detectedIPv4);
