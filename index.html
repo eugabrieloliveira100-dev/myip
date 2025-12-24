@@ -71,7 +71,7 @@
         
         <!-- Header -->
         <header class="flex flex-col md:flex-row justify-between items-center gap-4 bg-slate-900/50 p-6 rounded-3xl border border-white/5">
-            <div class="cursor-pointer" onclick="location.reload()">
+            <div class="cursor-pointer" onclick="resetToMyIP()">
                 <h1 class="text-2xl font-extrabold tracking-tight text-white uppercase">CHECKMYIP.<span class="text-blue-500">TODAY</span></h1>
                 <p id="tagline" class="text-slate-500 text-[10px] font-mono uppercase tracking-widest">Global Network Intelligence</p>
             </div>
@@ -220,7 +220,7 @@
             </div>
         </section>
 
-        <!-- Educational Content - Default to English -->
+        <!-- Educational Content -->
         <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
             <div class="glass-card p-6 rounded-3xl border border-blue-500/10">
                 <h4 id="edu-q1" class="text-blue-400 font-bold text-sm mb-3">What is an IP Address?</h4>
@@ -300,14 +300,10 @@
         function changeLanguage() {
             currentLang = document.getElementById('lang-select').value;
             const t = translations[currentLang];
-            
-            // Header & Buttons
             document.getElementById('tagline').innerText = t.tagline;
             document.getElementById('btn-copy').innerText = t.btnCopy;
             document.getElementById('btn-reset').innerText = t.btnReset;
             document.getElementById('copy-toast').innerText = t.toast;
-
-            // Labels
             document.getElementById('label-v4').innerText = t.ipv4;
             document.getElementById('label-v6').innerText = t.ipv6;
             document.getElementById('title-rdap').innerText = t.rdap;
@@ -327,16 +323,12 @@
             document.getElementById('sub-search').innerText = t.subSearch;
             document.getElementById('label-terminal').innerText = t.terminal;
             document.getElementById('footer-tag').innerText = t.footer;
-
-            // Education Content
             document.getElementById('edu-q1').innerText = t.eduQ1;
             document.getElementById('edu-a1').innerText = t.eduA1;
             document.getElementById('edu-q2').innerText = t.eduQ2;
             document.getElementById('edu-a2').innerText = t.eduA2;
             document.getElementById('edu-q3').innerText = t.eduQ3;
             document.getElementById('edu-a3').innerText = t.eduA3;
-
-            // Dynamic Notes
             document.getElementById('v6-note').innerText = t.v6Note;
             
             const v6display = document.getElementById('ipv6-display').innerText;
@@ -357,7 +349,6 @@
                 const lastEvent = events.find(e => e.eventAction === 'last changed');
                 document.getElementById('registry-created').innerText = regEvent ? new Date(regEvent.eventDate).toLocaleDateString() : "N/A";
                 document.getElementById('registry-updated').innerText = lastEvent ? new Date(lastEvent.eventDate).toLocaleDateString() : "N/A";
-                
                 let abuse = "N/A"; let support = "N/A";
                 const extractEmails = (entities) => {
                     if (!entities) return;
@@ -382,16 +373,11 @@
         async function fetchGeo(ip) {
             const fields = ['info-city', 'info-region', 'info-country', 'info-isp', 'info-org', 'info-asn'];
             fields.forEach(f => document.getElementById(f).classList.add('loading-text'));
-
             try {
                 const res = await fetch(`https://ipwho.is/${ip}?lang=${currentLang === 'ru' ? 'ru' : (currentLang === 'pt' ? 'pt-PT' : 'en')}`);
                 const d = await res.json();
-                if (d.success) {
-                    fillGeoFields(d);
-                    return;
-                }
+                if (d.success) { fillGeoFields(d); return; }
             } catch(e) {}
-
             try {
                 const res = await fetch(`https://ipapi.co/${ip}/json/`);
                 const d = await res.json();
@@ -406,12 +392,9 @@
                     return;
                 }
             } catch(e) {}
-
             fields.forEach(f => {
                 const el = document.getElementById(f);
-                if (el && (el.innerText === translations[currentLang].searching || el.innerText === "...")) {
-                    el.innerText = "N/A";
-                }
+                if (el && (el.innerText === translations[currentLang].searching || el.innerText === "...")) el.innerText = "N/A";
                 el.classList.remove('loading-text');
             });
         }
@@ -428,12 +411,7 @@
 
         async function detectIPv6() {
             const el = document.getElementById('ipv6-display');
-            const sources = [
-                'https://api64.ipify.org?format=json',
-                'https://v6.ident.me/.json',
-                'https://api6.ipify.org?format=json'
-            ];
-            
+            const sources = ['https://api64.ipify.org?format=json', 'https://v6.ident.me/.json'];
             for (let source of sources) {
                 try {
                     const controller = new AbortController();
@@ -443,7 +421,7 @@
                     const data = await res.json();
                     if (data.ip && data.ip.includes(':')) {
                         detectedIPv6 = data.ip;
-                        if (!window.location.search) {
+                        if (!isViewingSpecificIP()) {
                             el.innerText = data.ip;
                             el.classList.remove('text-slate-500', 'text-sm');
                         }
@@ -451,21 +429,31 @@
                     }
                 } catch(e) {}
             }
-            
-            if (!detectedIPv6 && !window.location.search) {
+            if (!detectedIPv6 && !isViewingSpecificIP()) {
                 el.innerText = translations[currentLang].noIPv6;
                 el.classList.add('text-slate-500', 'text-sm');
             }
         }
 
-        async function init() {
-            // Force first translation pass to ensure UI matches the default lang-select value
-            changeLanguage();
+        function isViewingSpecificIP() {
+            const urlIP = getIPFromURL();
+            return !!urlIP;
+        }
 
-            const urlParams = window.location.search.substring(1);
+        function getIPFromURL() {
+            const searchIP = window.location.search.substring(1);
+            const pathIP = window.location.pathname.split('/').filter(p => p !== "").pop();
             const ipv4Pattern = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
             const ipv6Pattern = /(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:))/;
             
+            if (searchIP && (ipv4Pattern.test(searchIP) || ipv6Pattern.test(searchIP))) return searchIP;
+            if (pathIP && (ipv4Pattern.test(pathIP) || ipv6Pattern.test(pathIP))) return pathIP;
+            return null;
+        }
+
+        async function init() {
+            changeLanguage();
+            const targetIP = getIPFromURL();
             detectIPv6();
 
             try {
@@ -473,28 +461,25 @@
                 const data = await res.json();
                 detectedIPv4 = data.ip;
                 
-                if (!urlParams) {
+                if (!targetIP) {
                     document.getElementById('ipv4-display').innerText = data.ip;
                     document.getElementById('info-host').innerText = `curl checkmyip.today/${data.ip}`;
                     fetchGeo(data.ip);
                     fetchRegistryDetails(data.ip);
                 }
             } catch(e) { 
-                if(!urlParams) document.getElementById('ipv4-display').innerText = "Not Detected";
+                if(!targetIP) document.getElementById('ipv4-display').innerText = "Not Detected";
             }
 
-            if (urlParams && (ipv4Pattern.test(urlParams) || ipv6Pattern.test(urlParams))) {
-                updateDisplaysForIP(urlParams, true);
-                fetchGeo(urlParams);
-                fetchRegistryDetails(urlParams);
+            if (targetIP) {
+                updateDisplaysForIP(targetIP, true);
+                fetchGeo(targetIP);
+                fetchRegistryDetails(targetIP);
             }
         }
 
         function updateDisplaysForIP(ip, isManual = false) {
-            const ipv4Pattern = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
-            const isIPv4 = ipv4Pattern.test(ip);
-            const isIPv6 = ip.includes(':');
-            
+            const isIPv4 = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(ip);
             const v4El = document.getElementById('ipv4-display');
             const v6El = document.getElementById('ipv6-display');
             const v6Note = document.getElementById('v6-note');
@@ -507,7 +492,7 @@
                     v6El.classList.add('text-slate-500', 'text-sm');
                     v6Note.classList.remove('hidden');
                 }
-            } else if (isIPv6) {
+            } else {
                 v4El.innerText = "IPv6 Targeted";
                 v4El.classList.add('text-slate-500', 'text-sm');
                 v6El.innerText = ip;
@@ -518,20 +503,586 @@
         }
 
         function resetToMyIP() {
-            if (window.location.search) window.history.pushState({}, document.title, window.location.pathname);
+            // Em ambientes de blob/sandbox, pushState pode causar SecurityError.
+            // Vamos apenas resetar o estado interno do app.
+            try {
+                if (window.location.origin !== 'null' && !window.location.href.startsWith('blob:')) {
+                    window.history.pushState({}, document.title, "/");
+                }
+            } catch (e) {
+                console.warn("Navigation API restricted in this environment.");
+            }
+
             document.getElementById('ip-lookup-input').value = "";
             document.getElementById('v6-note').classList.add('hidden');
+            
             if (detectedIPv4) {
                 updateDisplaysForIP(detectedIPv4, false);
                 fetchGeo(detectedIPv4);
                 fetchRegistryDetails(detectedIPv4);
-            } else {
-                init();
             }
             if (detectedIPv6) {
                 const v6El = document.getElementById('ipv6-display');
                 v6El.innerText = detectedIPv6;
                 v6El.classList.remove('text-slate-500', 'text-sm');
+            } else {
+                document.getElementById('ipv6-display').innerText = translations[currentLang].noIPv6;
+                document.getElementById('ipv6-display').classList.add('text-slate-500', 'text-sm');
+            }
+        }
+
+        function manualLookup() {
+            const input = document.getElementById('ip-lookup-input').value.trim();
+            if (input) {
+                updateDisplaysForIP(input, true);
+                ['info-city', 'info-region', 'info-country', 'info-isp', 'info-org', 'info-asn', 'registry-created', 'registry-updated', 'registry-email', 'registry-abuse'].forEach(id => {
+                    document.getElementById(id).innerText = translations[currentLang].searching;
+                });
+                fetchGeo(input);
+                fetchRegistryDetails(input);
+            }
+        }
+
+        function copyPageSummary() {
+            const val = (id) => document.getElementById(id)?.innerText || "N/A";
+            const summary = `--- CHECKMYIP.TODAY REPORT ---\nIPv4: ${val('ipv4-display')}\nIPv6: ${val('ipv6-display')}\nISP: ${val('info-isp')}\nLocation: ${val('info-city')}, ${val('info-country')}\nASN: ${val('info-asn')}\n-------------------------------`;
+            const el = document.createElement('textarea'); el.value = summary; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+            const t = document.getElementById('copy-toast'); t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2500);
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3b82f6">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3067/3067451.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- SEO Meta Tags -->
+    <title>Check My IP Today - Public IP Address & Network Intelligence Tool</title>
+    <meta name="description" content="Instantly find your public IPv4 and IPv6 addresses. Get detailed ISP, ASN, RDAP, and geographic location data with our global network intelligence tool.">
+    <meta name="keywords" content="check my ip, what is my ip, ipv4 lookup, ipv6 lookup, asn lookup, rdap registry, network intelligence, ip location">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        
+        :root { --bg-deep: #020617; --accent: #3b82f6; }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: var(--bg-deep);
+            color: #f1f5f9;
+            padding: 2rem 1rem;
+            margin: 0;
+        }
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover { transform: translateY(-2px); border-color: rgba(59, 130, 246, 0.2); }
+        
+        #copy-toast {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #10b981;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 2000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+            background-size: 1em;
+        }
+        .loading-text { color: #3b82f6; font-style: italic; opacity: 0.7; }
+    </style>
+</head>
+<body>
+    <div id="copy-toast">✅ REPORT COPIED</div>
+
+    <div class="max-w-5xl mx-auto flex flex-col gap-6">
+        
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row justify-between items-center gap-4 bg-slate-900/50 p-6 rounded-3xl border border-white/5">
+            <div class="cursor-pointer" onclick="resetToMyIP()">
+                <h1 class="text-2xl font-extrabold tracking-tight text-white uppercase">CHECKMYIP.<span class="text-blue-500">TODAY</span></h1>
+                <p id="tagline" class="text-slate-500 text-[10px] font-mono uppercase tracking-widest">Global Network Intelligence</p>
+            </div>
+            <div class="flex flex-wrap items-center justify-center gap-3">
+                <button onclick="resetToMyIP()" class="bg-slate-800 hover:bg-slate-700 text-white text-[10px] font-extrabold px-4 py-2 rounded-full flex items-center gap-2 border border-white/10 transition-all active:scale-95">
+                    <i class="fas fa-sync-alt"></i> <span id="btn-reset">MY CONNECTION</span>
+                </button>
+
+                <select id="lang-select" onchange="changeLanguage()" class="bg-slate-800 text-white text-[10px] font-bold px-4 py-2 pr-8 rounded-full border border-white/10 outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
+                    <option value="en">ENGLISH</option>
+                    <option value="pt">PORTUGUÊS</option>
+                    <option value="ru">РУССКИЙ</option>
+                </select>
+                
+                <button onclick="copyPageSummary()" class="bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-extrabold px-4 py-2 rounded-full flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-blue-500/20">
+                    <i class="fas fa-copy"></i> <span id="btn-copy">COPY SUMMARY</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Display -->
+        <main class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="glass-card p-8 rounded-3xl relative overflow-hidden">
+                <div class="flex justify-between items-start mb-4">
+                    <span id="label-v4-tag" class="bg-blue-500/10 text-blue-400 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">IPv4 Address</span>
+                    <i class="fas fa-shield-alt text-blue-500/30"></i>
+                </div>
+                <h2 id="label-v4" class="text-slate-500 text-xs font-bold mb-1 uppercase text-blue-500/80">Public IPv4:</h2>
+                <div id="ipv4-display" class="text-3xl md:text-4xl font-black tracking-tighter text-white font-mono break-all">Detecting...</div>
+            </div>
+
+            <div class="glass-card p-8 rounded-3xl relative overflow-hidden">
+                <div class="flex justify-between items-start mb-4">
+                    <span id="label-v6-tag" class="bg-purple-500/10 text-purple-400 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">IPv6 Address</span>
+                    <i class="fas fa-globe-americas text-purple-500/30"></i>
+                </div>
+                <h2 id="label-v6" class="text-slate-500 text-xs font-bold mb-1 uppercase text-purple-500/80">Public IPv6:</h2>
+                <div id="ipv6-display" class="text-lg md:text-xl lg:text-2xl font-black font-mono text-purple-200 break-all leading-snug min-h-[3.5rem]">Detecting...</div>
+                
+                <div id="v6-note" class="hidden mt-2 text-white text-xs font-semibold leading-relaxed">
+                    Note: IPv6 switched to Query Mode because there is no direct link between the searched IPv4 and your local IPv6 stack during a manual lookup.
+                </div>
+            </div>
+        </main>
+
+        <!-- RDAP Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="glass-card p-6 rounded-3xl border-l-4 border-l-purple-500">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center">
+                    <i class="fas fa-calendar-alt mr-2 text-purple-500"></i> <span id="title-rdap">Registry & Allocation (RDAP)</span>
+                </h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
+                        <span id="label-reg-date" class="text-[10px] text-slate-500 uppercase block mb-1">Registration</span>
+                        <span id="registry-created" class="text-white font-bold text-sm">...</span>
+                    </div>
+                    <div class="bg-black/20 p-4 rounded-2xl border border-white/5">
+                        <span id="label-last-update" class="text-[10px] text-slate-500 uppercase block mb-1">Last Update</span>
+                        <span id="registry-updated" class="text-white font-bold text-sm">...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card p-6 rounded-3xl border-l-4 border-l-red-500">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center">
+                    <i class="fas fa-envelope-open-text mr-2 text-red-500"></i> <span id="title-abuse">Abuse Contacts (RDAP)</span>
+                </h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-black/20 p-4 rounded-2xl border border-white/5 overflow-hidden">
+                        <span id="label-support" class="text-[10px] text-slate-500 uppercase block mb-1">Support Email</span>
+                        <span id="registry-email" class="text-blue-400 font-bold text-xs truncate block">...</span>
+                    </div>
+                    <div class="bg-black/20 p-4 rounded-2xl border border-white/5 overflow-hidden">
+                        <span id="label-abuse-email" class="text-[10px] text-slate-500 uppercase block mb-1">Abuse Email</span>
+                        <span id="registry-abuse" class="text-red-400 font-bold text-xs truncate block">...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Geo/Provider -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="glass-card p-6 rounded-3xl flex flex-col">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center">
+                    <i class="fas fa-map-marker-alt mr-2 text-blue-500"></i> <span id="title-location">Location Details</span>
+                </h3>
+                <div class="space-y-4">
+                    <div class="flex justify-between border-b border-white/5 pb-2">
+                        <span id="label-city" class="text-slate-500 text-sm">City</span>
+                        <span id="info-city" class="text-white font-bold text-sm">...</span>
+                    </div>
+                    <div class="flex justify-between border-b border-white/5 pb-2">
+                        <span id="label-region" class="text-slate-500 text-sm">Region</span>
+                        <span id="info-region" class="text-white font-bold text-sm">...</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span id="label-country" class="text-slate-500 text-sm">Country</span>
+                        <span id="info-country" class="text-white font-bold text-sm">...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card p-6 rounded-3xl flex flex-col">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center">
+                    <i class="fas fa-server mr-2 text-blue-500"></i> <span id="title-provider">Provider Information</span>
+                </h3>
+                <div class="space-y-4">
+                    <div class="flex flex-col gap-1 border-b border-white/5 pb-2">
+                        <span id="label-isp" class="text-slate-500 text-[10px] uppercase font-bold">ISP (Internet Service Provider)</span>
+                        <span id="info-isp" class="text-white font-bold text-sm truncate">...</span>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <span id="label-org" class="text-slate-500 text-[10px] uppercase font-bold">Organization</span>
+                        <span id="info-org" class="text-white font-bold text-sm truncate">...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search -->
+        <section class="glass-card p-8 rounded-3xl">
+            <div class="flex flex-col md:flex-row justify-between gap-6 mb-8">
+                <div>
+                    <h2 class="text-lg font-bold flex items-center gap-2">🔍 <span id="title-search">Network Details</span></h2>
+                    <p id="sub-search" class="text-slate-500 text-xs">Query ASN and WHOIS for any IP Address.</p>
+                </div>
+                <div class="flex bg-black/40 border border-white/10 rounded-2xl overflow-hidden focus-within:border-blue-500 transition-colors">
+                    <input type="text" id="ip-lookup-input" placeholder="8.8.8.8" class="bg-transparent px-4 py-2 text-sm outline-none w-48 font-mono text-white">
+                    <button onclick="manualLookup()" class="bg-blue-600 px-6 hover:bg-blue-500 transition-all active:scale-95">
+                        <i class="fas fa-search text-xs"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white/5 p-5 rounded-2xl border border-white/5">
+                    <span class="text-[10px] text-slate-500 block uppercase font-bold mb-1 tracking-widest">Autonomous System (ASN)</span>
+                    <span id="info-asn" class="text-blue-400 font-mono font-bold text-lg">...</span>
+                </div>
+                <div class="bg-slate-950 p-5 rounded-2xl border border-white/5 font-mono">
+                    <span id="label-terminal" class="text-[10px] text-slate-500 block uppercase font-bold mb-2 tracking-widest">💻 Terminal Query</span>
+                    <div class="flex items-center gap-2 text-blue-500 text-xs">
+                        <span>$</span>
+                        <code id="info-host" class="text-slate-300">curl checkmyip.today</code>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Educational Content -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+            <div class="glass-card p-6 rounded-3xl border border-blue-500/10">
+                <h4 id="edu-q1" class="text-blue-400 font-bold text-sm mb-3">What is an IP Address?</h4>
+                <p id="edu-a1" class="text-slate-400 text-xs leading-relaxed">An IP address is a unique numerical label assigned to each device connected to a computer network.</p>
+            </div>
+            <div class="glass-card p-6 rounded-3xl border border-blue-500/10">
+                <h4 id="edu-q2" class="text-blue-400 font-bold text-sm mb-3">What is ASN?</h4>
+                <p id="edu-a2" class="text-slate-400 text-xs leading-relaxed">An Autonomous System Number (ASN) is a unique ID for a collection of IP networks managed by one entity.</p>
+            </div>
+            <div class="glass-card p-6 rounded-3xl border border-blue-500/10">
+                <h4 id="edu-q3" class="text-blue-400 font-bold text-sm mb-3">IPv4 vs IPv6</h4>
+                <p id="edu-a3" class="text-slate-400 text-xs leading-relaxed">IPv4 is the 32-bit standard. IPv6 is the modern 128-bit standard created to provide trillions of additional addresses.</p>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="mt-8 mb-12 py-8 border-t border-white/5 text-center">
+            <div class="text-[10px] font-mono text-slate-600 uppercase tracking-widest">
+                &copy; 2024 CheckMyIP.Today • <span id="footer-tag">Global Network Intelligence Tool</span>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const translations = {
+            en: {
+                tagline: "Global Network Intelligence", btnCopy: "COPY SUMMARY", btnReset: "MY CONNECTION", detecting: "Detecting...",
+                ipv4: "Public IPv4:", ipv6: "Public IPv6:", rdap: "Registry & Allocation (RDAP)",
+                abuse: "Abuse Contacts (RDAP)", regDate: "Registration", lastUpdate: "Last Update",
+                support: "Support Email", abuseEmail: "Abuse Email", location: "Location Details",
+                city: "City", region: "Region", country: "Country", provider: "Provider Information",
+                isp: "ISP (Internet Service Provider)", org: "Organization", search: "Network Details",
+                subSearch: "Query ASN and WHOIS for any IP Address.", terminal: "💻 Terminal Query",
+                footer: "Global Network Intelligence Tool", toast: "✅ REPORT COPIED", searching: "Searching...",
+                eduQ1: "What is an IP Address?", eduA1: "An IP address is a unique numerical label assigned to each device connected to a computer network.",
+                eduQ2: "What is ASN?", eduA2: "An Autonomous System Number (ASN) is a unique ID for a collection of IP networks managed by one entity.",
+                eduQ3: "IPv4 vs IPv6", eduA3: "IPv4 is 32-bit, IPv6 is 128-bit, providing trillions more addresses.",
+                queryMode: "Query Mode (Manual Lookup)", noIPv6: "IPv4 Only / No IPv6",
+                v6Note: "Note: IPv6 switched to Query Mode because there is no direct link between the searched IPv4 and your local IPv6 stack during a manual lookup."
+            },
+            pt: {
+                tagline: "Inteligência de Rede Global", btnCopy: "COPIAR RESUMO", btnReset: "MINHA CONEXÃO", detecting: "A detectar...",
+                ipv4: "IPv4 Público:", ipv6: "IPv6 Público:", rdap: "Registo e Alocação (RDAP)",
+                abuse: "Contactos de Abuso (RDAP)", regDate: "Data de Registo", lastUpdate: "Última Atualização",
+                support: "Email de Suporte", abuseEmail: "Email de Abuso", location: "Detalhes de Localização",
+                city: "Cidade", region: "Região", country: "País", provider: "Informação do Provedor",
+                isp: "ISP (Provedor de Internet)", org: "Organização", search: "Detalhes de Rede",
+                subSearch: "Consulte ASN e WHOIS para qualquer endereço IP.", terminal: "💻 Consulta Terminal",
+                footer: "Ferramenta de Inteligência de Rede Global", toast: "✅ RELATÓRIO COPIADO", searching: "A pesquisar...",
+                eduQ1: "O que é um Endereço IP?", eduA1: "Um endereço IP é um rótulo numérico único atribuído a cada dispositivo ligado a uma rede informática.",
+                eduQ2: "O que é ASN?", eduA2: "Um Número de Sistema Autónomo (ASN) é um ID único para um conjunto de redes IP geridas por uma única entidade.",
+                eduQ3: "IPv4 vs IPv6", eduA3: "O IPv4 utiliza 32 bits, o IPv6 utiliza 128 bits, garantindo triliões de endereços extra.",
+                queryMode: "Modo Consulta (Pesquisa Manual)", noIPv6: "Apenas IPv4 / Sem IPv6",
+                v6Note: "Nota: O IPv6 mudou para o Modo de Consulta porque não existe uma ligação direta entre o IPv4 pesquisado e a sua pilha IPv6 local durante uma pesquisa manual."
+            },
+            ru: {
+                tagline: "Глобальная сетевая разведка", btnCopy: "КОПИРОВАТЬ ОТЧЕТ", btnReset: "МОЕ СОЕДИНЕНИЕ", detecting: "Определение...",
+                ipv4: "Публичный IPv4:", ipv6: "Публичный IPv6:", rdap: "Регистрация и распределение (RDAP)",
+                abuse: "Контакты для жалоб (RDAP)", regDate: "Регистрация", lastUpdate: "Обновлено",
+                support: "Email Поддержки", abuseEmail: "Email Жалоб", location: "Местоположение",
+                city: "Город", region: "Регион", country: "Страна", provider: "Информация о провайдере",
+                isp: "ISP (Провайдер)", org: "Организация", search: "Сетевые детали",
+                subSearch: "Запрос ASN и WHOIS для любого IP.", terminal: "💻 Терминал",
+                footer: "Инструмент сетевой разведки", toast: "✅ ОТЧЕТ СКОПИРОВАН", searching: "Поиск...",
+                eduQ1: "Что такое IP-адрес?", eduA1: "IP-адрес — это уникальный числовой идентификатор устройства в сети.",
+                eduQ2: "Что такое ASN?", eduA2: "ASN — уникальный номер автономной системы, идентифицирующий группы сетей.",
+                eduQ3: "IPv4 против IPv6", eduA3: "IPv4 использует 32 бита, IPv6 — 128 бит для неограниченных адресов.",
+                queryMode: "Режим запроса (поиск вручную)", noIPv6: "Только IPv4 / Нет IPv6",
+                v6Note: "Примечание: IPv6 переключен в режим запроса, так как при поиске вручную отсутствует прямая связь между запрашиваемым IPv4 и вашим локальным стеком IPv6."
+            }
+        };
+
+        let currentLang = 'en';
+        let detectedIPv6 = null; 
+        let detectedIPv4 = null;
+
+        function changeLanguage() {
+            currentLang = document.getElementById('lang-select').value;
+            const t = translations[currentLang];
+            document.getElementById('tagline').innerText = t.tagline;
+            document.getElementById('btn-copy').innerText = t.btnCopy;
+            document.getElementById('btn-reset').innerText = t.btnReset;
+            document.getElementById('copy-toast').innerText = t.toast;
+            document.getElementById('label-v4').innerText = t.ipv4;
+            document.getElementById('label-v6').innerText = t.ipv6;
+            document.getElementById('title-rdap').innerText = t.rdap;
+            document.getElementById('title-abuse').innerText = t.abuse;
+            document.getElementById('label-reg-date').innerText = t.regDate;
+            document.getElementById('label-last-update').innerText = t.lastUpdate;
+            document.getElementById('label-support').innerText = t.support;
+            document.getElementById('label-abuse-email').innerText = t.abuseEmail;
+            document.getElementById('title-location').innerText = t.location;
+            document.getElementById('label-city').innerText = t.city;
+            document.getElementById('label-region').innerText = t.region;
+            document.getElementById('label-country').innerText = t.country;
+            document.getElementById('title-provider').innerText = t.provider;
+            document.getElementById('label-isp').innerText = t.isp;
+            document.getElementById('label-org').innerText = t.org;
+            document.getElementById('title-search').innerText = t.search;
+            document.getElementById('sub-search').innerText = t.subSearch;
+            document.getElementById('label-terminal').innerText = t.terminal;
+            document.getElementById('footer-tag').innerText = t.footer;
+            document.getElementById('edu-q1').innerText = t.eduQ1;
+            document.getElementById('edu-a1').innerText = t.eduA1;
+            document.getElementById('edu-q2').innerText = t.eduQ2;
+            document.getElementById('edu-a2').innerText = t.eduA2;
+            document.getElementById('edu-q3').innerText = t.eduQ3;
+            document.getElementById('edu-a3').innerText = t.eduA3;
+            document.getElementById('v6-note').innerText = t.v6Note;
+            
+            const v6display = document.getElementById('ipv6-display').innerText;
+            if (v6display.includes('Only') || v6display.includes('Apenas') || v6display.includes('Только') || v6display.includes('IPv4')) {
+                document.getElementById('ipv6-display').innerText = t.noIPv6;
+            } else if (v6display.includes('Query') || v6display.includes('Modo') || v6display.includes('Режим')) {
+                document.getElementById('ipv6-display').innerText = t.queryMode;
+            }
+        }
+
+        async function fetchRegistryDetails(ip) {
+            if (!ip) return;
+            try {
+                const response = await fetch(`https://rdap.db.ripe.net/ip/${ip}`, { mode: 'cors' });
+                const data = await response.json();
+                const events = data.events || [];
+                const regEvent = events.find(e => e.eventAction === 'registration');
+                const lastEvent = events.find(e => e.eventAction === 'last changed');
+                document.getElementById('registry-created').innerText = regEvent ? new Date(regEvent.eventDate).toLocaleDateString() : "N/A";
+                document.getElementById('registry-updated').innerText = lastEvent ? new Date(lastEvent.eventDate).toLocaleDateString() : "N/A";
+                let abuse = "N/A"; let support = "N/A";
+                const extractEmails = (entities) => {
+                    if (!entities) return;
+                    for (const ent of entities) {
+                        const vcards = ent.vcardArray?.[1] || [];
+                        const emailData = vcards.find(v => v[0] === 'email');
+                        if (emailData) {
+                            if (ent.roles?.includes('abuse')) abuse = emailData[3];
+                            else if (!support || support === "N/A") support = emailData[3];
+                        }
+                        if (ent.entities) extractEmails(ent.entities);
+                    }
+                };
+                extractEmails(data.entities);
+                document.getElementById('registry-email').innerText = support;
+                document.getElementById('registry-abuse').innerText = abuse;
+            } catch (e) {
+                ['registry-created', 'registry-updated', 'registry-email', 'registry-abuse'].forEach(id => document.getElementById(id).innerText = "N/A");
+            }
+        }
+
+        async function fetchGeo(ip) {
+            const fields = ['info-city', 'info-region', 'info-country', 'info-isp', 'info-org', 'info-asn'];
+            fields.forEach(f => document.getElementById(f).classList.add('loading-text'));
+            try {
+                const res = await fetch(`https://ipwho.is/${ip}?lang=${currentLang === 'ru' ? 'ru' : (currentLang === 'pt' ? 'pt-PT' : 'en')}`);
+                const d = await res.json();
+                if (d.success) { fillGeoFields(d); return; }
+            } catch(e) {}
+            try {
+                const res = await fetch(`https://ipapi.co/${ip}/json/`);
+                const d = await res.json();
+                if (!d.error) {
+                    document.getElementById('info-city').innerText = d.city || "N/A";
+                    document.getElementById('info-region').innerText = d.region || "N/A";
+                    document.getElementById('info-country').innerText = d.country_name || "N/A";
+                    document.getElementById('info-isp').innerText = d.org || "N/A";
+                    document.getElementById('info-org').innerText = d.org || "N/A";
+                    document.getElementById('info-asn').innerText = d.asn || "N/A";
+                    fields.forEach(f => document.getElementById(f).classList.remove('loading-text'));
+                    return;
+                }
+            } catch(e) {}
+            fields.forEach(f => {
+                const el = document.getElementById(f);
+                if (el && (el.innerText === translations[currentLang].searching || el.innerText === "...")) el.innerText = "N/A";
+                el.classList.remove('loading-text');
+            });
+        }
+
+        function fillGeoFields(d) {
+            document.getElementById('info-city').innerText = d.city || "N/A";
+            document.getElementById('info-region').innerText = d.region || "N/A";
+            document.getElementById('info-country').innerText = d.country || "N/A";
+            document.getElementById('info-isp').innerText = d.connection?.isp || "N/A";
+            document.getElementById('info-org').innerText = d.connection?.org || "N/A";
+            document.getElementById('info-asn').innerText = d.connection?.asn ? `AS${d.connection.asn}` : "N/A";
+            ['info-city', 'info-region', 'info-country', 'info-isp', 'info-org', 'info-asn'].forEach(f => document.getElementById(f).classList.remove('loading-text'));
+        }
+
+        async function detectIPv6() {
+            const el = document.getElementById('ipv6-display');
+            const sources = ['https://api64.ipify.org?format=json', 'https://v6.ident.me/.json'];
+            for (let source of sources) {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 3500);
+                    const res = await fetch(source, { signal: controller.signal });
+                    clearTimeout(timeoutId);
+                    const data = await res.json();
+                    if (data.ip && data.ip.includes(':')) {
+                        detectedIPv6 = data.ip;
+                        if (!isViewingSpecificIP()) {
+                            el.innerText = data.ip;
+                            el.classList.remove('text-slate-500', 'text-sm');
+                        }
+                        return;
+                    }
+                } catch(e) {}
+            }
+            if (!detectedIPv6 && !isViewingSpecificIP()) {
+                el.innerText = translations[currentLang].noIPv6;
+                el.classList.add('text-slate-500', 'text-sm');
+            }
+        }
+
+        function isViewingSpecificIP() {
+            const urlIP = getIPFromURL();
+            return !!urlIP;
+        }
+
+        function getIPFromURL() {
+            const searchIP = window.location.search.substring(1);
+            const pathIP = window.location.pathname.split('/').filter(p => p !== "").pop();
+            const ipv4Pattern = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
+            const ipv6Pattern = /(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:))/;
+            
+            if (searchIP && (ipv4Pattern.test(searchIP) || ipv6Pattern.test(searchIP))) return searchIP;
+            if (pathIP && (ipv4Pattern.test(pathIP) || ipv6Pattern.test(pathIP))) return pathIP;
+            return null;
+        }
+
+        async function init() {
+            changeLanguage();
+            const targetIP = getIPFromURL();
+            detectIPv6();
+
+            try {
+                const res = await fetch('https://api.ipify.org?format=json');
+                const data = await res.json();
+                detectedIPv4 = data.ip;
+                
+                if (!targetIP) {
+                    document.getElementById('ipv4-display').innerText = data.ip;
+                    document.getElementById('info-host').innerText = `curl checkmyip.today/${data.ip}`;
+                    fetchGeo(data.ip);
+                    fetchRegistryDetails(data.ip);
+                }
+            } catch(e) { 
+                if(!targetIP) document.getElementById('ipv4-display').innerText = "Not Detected";
+            }
+
+            if (targetIP) {
+                updateDisplaysForIP(targetIP, true);
+                fetchGeo(targetIP);
+                fetchRegistryDetails(targetIP);
+            }
+        }
+
+        function updateDisplaysForIP(ip, isManual = false) {
+            const isIPv4 = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(ip);
+            const v4El = document.getElementById('ipv4-display');
+            const v6El = document.getElementById('ipv6-display');
+            const v6Note = document.getElementById('v6-note');
+
+            if (isIPv4) {
+                v4El.innerText = ip;
+                v4El.classList.remove('text-slate-500', 'text-sm');
+                if (isManual) {
+                    v6El.innerText = translations[currentLang].queryMode;
+                    v6El.classList.add('text-slate-500', 'text-sm');
+                    v6Note.classList.remove('hidden');
+                }
+            } else {
+                v4El.innerText = "IPv6 Targeted";
+                v4El.classList.add('text-slate-500', 'text-sm');
+                v6El.innerText = ip;
+                v6El.classList.remove('text-slate-500', 'text-sm');
+                v6Note.classList.add('hidden');
+            }
+            document.getElementById('info-host').innerText = `curl checkmyip.today/${ip}`;
+        }
+
+        function resetToMyIP() {
+            // Em ambientes de blob/sandbox, pushState pode causar SecurityError.
+            // Vamos apenas resetar o estado interno do app.
+            try {
+                if (window.location.origin !== 'null' && !window.location.href.startsWith('blob:')) {
+                    window.history.pushState({}, document.title, "/");
+                }
+            } catch (e) {
+                console.warn("Navigation API restricted in this environment.");
+            }
+
+            document.getElementById('ip-lookup-input').value = "";
+            document.getElementById('v6-note').classList.add('hidden');
+            
+            if (detectedIPv4) {
+                updateDisplaysForIP(detectedIPv4, false);
+                fetchGeo(detectedIPv4);
+                fetchRegistryDetails(detectedIPv4);
+            }
+            if (detectedIPv6) {
+                const v6El = document.getElementById('ipv6-display');
+                v6El.innerText = detectedIPv6;
+                v6El.classList.remove('text-slate-500', 'text-sm');
+            } else {
+                document.getElementById('ipv6-display').innerText = translations[currentLang].noIPv6;
+                document.getElementById('ipv6-display').classList.add('text-slate-500', 'text-sm');
             }
         }
 
