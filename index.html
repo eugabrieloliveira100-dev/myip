@@ -14,34 +14,7 @@
     <!-- SEO Meta Tags -->
     <title>Check My IP Today - Public IP Address & Network Intelligence Tool</title>
     <meta name="description" content="CheckMyIP.Today is a simple, lightweight web tool designed to instantly display your current public IP address (IPv4/IPv6) and detailed network intelligence.">
-    <meta name="keywords" content="check my ip, what is my ip, ipv4 lookup, ipv6 lookup, asn lookup, rdap registry, network intelligence, ip location">
-
-    <!-- Schema.org (Structured Data for SEO) -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "CheckMyIP.Today",
-      "alternateName": "Check My IP Today",
-      "url": "https://checkmyip.today",
-      "description": "A professional IP Lookup Tool that displays public IPv4, IPv6, ISP, and detailed ASN network information.",
-      "applicationCategory": "UtilitiesApplication, WebTool",
-      "operatingSystem": "Windows, macOS, Linux, iOS, Android",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      },
-      "featureList": [
-        "Instant Public IP Detection",
-        "IPv4 and IPv6 support",
-        "ISP and ASN Identification",
-        "RDAP/WHOIS Registry Data",
-        "Geographic Location Mapping"
-      ]
-    }
-    </script>
-
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -88,6 +61,18 @@
             background-size: 1em;
         }
         .loading-text { color: #3b82f6; font-style: italic; opacity: 0.7; }
+        .status-badge { font-size: 9px; padding: 2px 8px; border-radius: 4px; font-weight: 800; text-transform: uppercase; }
+        
+        .prose-content h2 { font-size: 1.25rem; font-weight: 800; color: #fff; margin-bottom: 1rem; border-left: 4px solid #3b82f6; padding-left: 1rem; }
+        .prose-content h3 { font-size: 1rem; font-weight: 700; color: #cbd5e1; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+        .prose-content p { color: #94a3b8; line-height: 1.6; margin-bottom: 1rem; font-size: 0.9rem; }
+        .prose-content ul { list-style: none; padding: 0; margin-bottom: 1.5rem; }
+        .prose-content li { display: flex; align-items: flex-start; gap: 0.75rem; color: #94a3b8; font-size: 0.9rem; margin-bottom: 0.5rem; }
+        .prose-content li::before { content: "•"; color: #3b82f6; font-weight: bold; }
+        .prose-content strong { color: #f1f5f9; }
+        .prose-content code { background: rgba(59, 130, 246, 0.1); color: #60a5fa; padding: 0.1rem 0.4rem; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; }
+        .prose-content a { color: #3b82f6; text-decoration: none; border-bottom: 1px solid transparent; transition: border 0.2s; }
+        .prose-content a:hover { border-bottom-color: #3b82f6; }
     </style>
 </head>
 <body>
@@ -126,7 +111,7 @@
                     <i class="fas fa-shield-alt text-blue-500/30"></i>
                 </div>
                 <h2 id="label-v4" class="text-slate-500 text-xs font-bold mb-1 uppercase text-blue-500/80">Public IPv4:</h2>
-                <div id="ipv4-display" class="text-3xl md:text-4xl font-black tracking-tighter text-white font-mono break-all">Detecting...</div>
+                <div id="ipv4-display" class="text-3xl md:text-4xl font-black tracking-tighter text-white font-mono break-all uppercase">Detecting...</div>
             </div>
 
             <div class="glass-card p-8 rounded-3xl relative overflow-hidden">
@@ -135,9 +120,11 @@
                     <i class="fas fa-globe-americas text-purple-500/30"></i>
                 </div>
                 <h2 id="label-v6" class="text-slate-500 text-xs font-bold mb-1 uppercase text-purple-500/80">Public IPv6:</h2>
-                <div id="ipv6-display" class="text-lg md:text-xl lg:text-2xl font-black font-mono text-purple-200 break-all leading-snug min-h-[3.5rem]">Detecting...</div>
+                <div id="ipv6-display" class="text-lg md:text-xl lg:text-2xl font-black font-mono text-purple-200 break-all leading-snug min-h-[3.5rem] flex items-center">
+                    Detecting...
+                </div>
                 
-                <div id="v6-note" class="hidden mt-2 text-white text-xs font-semibold leading-relaxed">
+                <div id="v6-note" class="hidden mt-2 text-white/60 text-[10px] leading-relaxed italic">
                     Note: IPv6 switched to Query Mode because there is no direct link between the searched IP and your local network stack.
                 </div>
             </div>
@@ -246,49 +233,43 @@
             </div>
         </section>
 
-        <!-- Educational Content Section -->
-        <section class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-            <div class="glass-card p-8 rounded-3xl border border-blue-500/10 col-span-1 md:col-span-2">
-                <h2 class="text-xl font-extrabold text-white mb-4 uppercase tracking-tight">About CheckMyIP.<span class="text-blue-500">Today</span></h2>
-                <p class="text-white/90 text-base leading-relaxed mb-6">
-                    <strong>checkmyip.today</strong> is a simple, lightweight web tool designed to instantly display your current <strong>public IP address</strong>. 
-                    Whether you are testing a VPN connection, troubleshooting network settings, or simply curious about your digital footprint, our tool provides 
-                    high-speed reflection of your network data without intrusive tracking.
-                </p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                    <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
-                        <h4 class="text-blue-400 font-bold text-sm uppercase mb-3">Key Features</h4>
-                        <ul class="text-white/80 text-sm space-y-3">
-                            <li>• <strong class="text-white">IP Address:</strong> Your unique identifier (IPv4 or IPv6).</li>
-                            <li>• <strong class="text-white">ISP:</strong> The company providing your internet (e.g., Comcast, AT&T).</li>
-                            <li>• <strong class="text-white">Approximate Location:</strong> City, region, and country based on IP.</li>
-                            <li>• <strong class="text-white">VPN/Proxy Detection:</strong> Checks if traffic is routed via a secure tunnel.</li>
-                        </ul>
-                    </div>
-                    <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
-                        <h4 class="text-blue-400 font-bold text-sm uppercase mb-3">Local vs. Public IP</h4>
-                        <p class="text-white/80 text-sm leading-relaxed">
-                            This site shows your <strong class="text-white">public IP</strong>—the one the world sees. To find your local (private) IP:
-                            <br><br><strong class="text-white">Windows:</strong> CMD > <code>ipconfig</code>
-                            <br><strong class="text-white">Mac/Linux:</strong> Terminal > <code>ip addr</code>
-                        </p>
-                    </div>
-                </div>
-            </div>
+        <!-- About Section -->
+        <article class="glass-card p-8 md:p-12 rounded-[2rem] prose-content">
+            <h2 id="about-title">About CheckMyIP.Today</h2>
+            <p id="about-intro">
+                <code>checkmyip.today</code> is a simple, lightweight web tool designed to instantly display your current <strong>public IP address</strong>. 
+                Whether you are testing a VPN connection, troubleshooting network settings, or simply curious about your digital footprint, our tool provides high-speed reflection of your network data without intrusive tracking.
+            </p>
             
-            <div class="glass-card p-8 rounded-3xl border border-blue-500/10">
-                <h4 id="edu-q1" class="text-blue-400 font-bold text-base mb-4">What is an IP Address?</h4>
-                <p id="edu-a1" class="text-white/80 text-sm leading-relaxed">An IP address is a unique numerical label assigned to each device connected to a computer network.</p>
-            </div>
-            <div class="glass-card p-8 rounded-3xl border border-blue-500/10">
-                <h4 id="edu-q2" class="text-blue-400 font-bold text-base mb-4">Alternative Trusted Checkers</h4>
-                <ul class="text-white/80 text-sm space-y-3">
-                    <li>• <strong class="text-white">IPinfo.io:</strong> Excellent for detailed ASN and organizational data.</li>
-                    <li>• <strong class="text-white">icanhazip.com:</strong> Minimalist tool ideal for command-line use.</li>
-                    <li>• <strong class="text-white">WhatIsMyIP.com:</strong> Comprehensive tool with blacklist checks.</li>
-                </ul>
-            </div>
-        </section>
+            <h3 id="about-features-title">Key Features</h3>
+            <ul>
+                <li id="feat-1"><strong>IP Address:</strong> Your unique identifier (IPv4 or IPv6).</li>
+                <li id="feat-2"><strong>ISP:</strong> The company providing your internet (e.g., Comcast, AT&T).</li>
+                <li id="feat-3"><strong>Approximate Location:</strong> City, region, and country based on IP.</li>
+                <li id="feat-4"><strong>VPN/Proxy Detection:</strong> Checks if traffic is routed via a secure tunnel.</li>
+            </ul>
+
+            <h3 id="about-local-title">Local vs. Public IP</h3>
+            <p id="about-local-desc">
+                This site shows your <strong>public IP</strong>—the one the world sees. To find your local (private) IP:
+            </p>
+            <ul>
+                <li id="local-win"><strong>Windows:</strong> <code>CMD > ipconfig</code></li>
+                <li id="local-mac"><strong>Mac/Linux:</strong> <code>Terminal > ip addr</code></li>
+            </ul>
+
+            <h3 id="about-what-title">What is an IP Address?</h3>
+            <p id="about-what-desc">
+                An IP address is a unique numerical label assigned to each device connected to a computer network.
+            </p>
+
+            <h3 id="about-alt-title">Alternative Trusted Checkers</h3>
+            <ul>
+                <li><a href="https://ipinfo.io" target="_blank">IPinfo.io</a>: Excellent for detailed ASN and organizational data.</li>
+                <li><a href="https://icanhazip.com" target="_blank">icanhazip.com</a>: Minimalist tool ideal for command-line use.</li>
+                <li><a href="https://whatismyip.com" target="_blank">WhatIsMyIP.com</a>: Comprehensive tool with blacklist checks.</li>
+            </ul>
+        </article>
 
         <!-- Footer -->
         <footer class="mt-8 mb-12 py-8 border-t border-white/5 text-center">
@@ -309,26 +290,44 @@
                 isp: "ISP (Internet Service Provider)", org: "Organization", search: "Network Details",
                 subSearch: "Query ASN and WHOIS for any IP Address.", terminal: "💻 Terminal Query",
                 footer: "Global Network Intelligence Tool", toast: "✅ REPORT COPIED", searching: "Searching...",
-                eduQ1: "What is an IP Address?", eduA1: "An IP address is a unique numerical label assigned to each device connected to a computer network.",
-                eduQ2: "What is ASN?", eduA2: "An Autonomous System Number (ASN) is a unique ID for a collection of IP networks managed by one entity.",
-                eduQ3: "IPv4 vs IPv6", eduA3: "IPv4 is 32-bit, IPv6 is 128-bit, providing trillions more addresses.",
-                queryMode: "Query Mode (External IP)", noIPv6: "IPv4 Only / No IPv6",
-                v6Note: "Note: IPv6 switched to Query Mode because there is no direct link between the searched IP and your local network stack."
+                queryMode: "Query Mode (External IP)", noIPv6: "Not Detected / IPv4 Only",
+                v6Note: "Note: IPv6 is not active on your current network or ISP.",
+                aboutTitle: "About CheckMyIP.Today",
+                aboutIntro: "<code>checkmyip.today</code> is a simple, lightweight web tool designed to instantly display your current <strong>public IP address</strong>. Whether you are testing a VPN connection, troubleshooting network settings, or simply curious about your digital footprint, our tool provides high-speed reflection of your network data without intrusive tracking.",
+                featTitle: "Key Features",
+                feat1: "<strong>IP Address:</strong> Your unique identifier (IPv4 or IPv6).",
+                feat2: "<strong>ISP:</strong> The company providing your internet (e.g., Comcast, AT&T).",
+                feat3: "<strong>Approximate Location:</strong> City, region, and country based on IP.",
+                feat4: "<strong>VPN/Proxy Detection:</strong> Checks if traffic is routed via a secure tunnel.",
+                localTitle: "Local vs. Public IP",
+                localDesc: "This site shows your <strong>public IP</strong>—the one the world sees. To find your local (private) IP:",
+                whatTitle: "What is an IP Address?",
+                whatDesc: "An IP address is a unique numerical label assigned to each device connected to a computer network.",
+                altTitle: "Alternative Trusted Checkers"
             },
             pt: {
-                tagline: "Inteligência de Rede Global", btnCopy: "COPIAR RESUMO", btnReset: "MINHA CONEXÃO", detecting: "A detectar...",
+                tagline: "Inteligência de Rede Global", btnCopy: "COPIAR RESUMO", btnReset: "MINHA CONEXÃO", detecting: "Detectando...",
                 ipv4: "IPv4 Público:", ipv6: "IPv6 Público:", rdap: "Registo e Alocação (RDAP)",
                 abuse: "Contactos de Abuso (RDAP)", regDate: "Data de Registo", lastUpdate: "Última Atualização",
                 support: "Email de Suporte", abuseEmail: "Email de Abuso", location: "Detalhes de Localização",
                 city: "Cidade", region: "Região", country: "País", provider: "Informação do Provedor",
                 isp: "ISP (Provedor de Internet)", org: "Organização", search: "Detalhes de Rede",
                 subSearch: "Consulte ASN e WHOIS para qualquer endereço IP.", terminal: "💻 Consulta Terminal",
-                footer: "Ferramenta de Inteligência de Rede Global", toast: "✅ RELATÓRIO COPIADO", searching: "A pesquisar...",
-                eduQ1: "O que é um Endereço IP?", eduA1: "Um endereço IP é um rótulo numérico único atribuído a cada dispositivo ligado a uma rede informática.",
-                eduQ2: "O que é ASN?", eduA2: "Um Número de Sistema Autónomo (ASN) é um ID único para um conjunto de redes IP geridas por uma única entidade.",
-                eduQ3: "IPv4 vs IPv6", eduA3: "O IPv4 utiliza 32 bits, o IPv6 utiliza 128 bits, garantindo triliões de endereços extra.",
-                queryMode: "Modo Consulta (IP Externo)", noIPv6: "Apenas IPv4 / Sem IPv6",
-                v6Note: "Nota: O IPv6 mudou para o Modo de Consulta porque não existe uma ligação direta entre o IP pesquisado e a sua rede local."
+                footer: "Ferramenta de Inteligência de Rede Global", toast: "✅ RELATÓRIO COPIADO", searching: "Pesquisando...",
+                queryMode: "Modo Consulta (IP Externo)", noIPv6: "Não Detectado / Apenas IPv4",
+                v6Note: "Nota: O IPv6 não está ativo na sua rede atual ou provedor.",
+                aboutTitle: "Sobre o CheckMyIP.Today",
+                aboutIntro: "<code>checkmyip.today</code> é uma ferramenta web simples e leve projetada para exibir instantaneamente seu <strong>endereço IP público</strong> atual. Se você está testando uma conexão VPN, resolvendo problemas de rede ou apenas curioso sobre sua pegada digital, nossa ferramenta fornece reflexão de alta velocidade dos seus dados de rede sem rastreamento intrusivo.",
+                featTitle: "Recursos Principais",
+                feat1: "<strong>Endereço IP:</strong> Seu identificador único (IPv4 ou IPv6).",
+                feat2: "<strong>ISP:</strong> A empresa que fornece sua internet (ex: Vivo, Claro, Comcast).",
+                feat3: "<strong>Localização Aproximada:</strong> Cidade, região e país com base no IP.",
+                feat4: "<strong>Detecção de VPN/Proxy:</strong> Verifica se o tráfego é roteado por um túnel seguro.",
+                localTitle: "IP Local vs. Público",
+                localDesc: "Este site mostra seu <strong>IP público</strong> — aquele que o mundo vê. Para encontrar seu IP local (privado):",
+                whatTitle: "O que é um Endereço IP?",
+                whatDesc: "Um endereço IP é um rótulo numérico exclusivo atribuído a cada dispositivo conectado a uma rede de computadores.",
+                altTitle: "Alternativas Confiáveis"
             },
             ru: {
                 tagline: "Глобальная сетевая разведка", btnCopy: "КОПИРОВАТЬ ОТЧЕТ", btnReset: "МОЕ СОЕДИНЕНИЕ", detecting: "Определение...",
@@ -339,11 +338,20 @@
                 isp: "ISP (Провайдер)", org: "Организация", search: "Сетевые детали",
                 subSearch: "Запрос ASN и WHOIS для любого IP.", terminal: "💻 Терминал",
                 footer: "Инструмент сетевой разведки", toast: "✅ ОТЧЕТ СКОПИРОВАН", searching: "Поиск...",
-                eduQ1: "Что такое IP-адрес?", eduA1: "IP-адрес — это уникальный числовой идентификатор устройства в сети.",
-                eduQ2: "Что такое ASN?", eduA2: "ASN — уникальный номер автономной системы, идентифицирующий группы сетей.",
-                eduQ3: "IPv4 против IPv6", eduA3: "IPv4 использует 32 бита, IPv6 — 128 бит для неограниченных адресов.",
-                queryMode: "Режим запроса (внешний IP)", noIPv6: "Только IPv4 / Нет IPv6",
-                v6Note: "Примечание: IPv6 переключен в режим запроса, так как отсутствует прямая связь между запрашиваемым IP и вашей локальной сетью."
+                queryMode: "Режим запроса (внешний IP)", noIPv6: "Не обнаружено / Только IPv4",
+                v6Note: "Примечание: IPv6 не активен в вашей сети или у провайдера.",
+                aboutTitle: "О проекте CheckMyIP.Today",
+                aboutIntro: "<code>checkmyip.today</code> — это простой и легкий веб-инструмент, предназначенный для мгновенного отображения вашего текущего <strong>публичного IP-адреса</strong>. Если вы тестируете VPN-соединение или настраиваете сеть, наш инструмент обеспечит быстрое получение данных без навязчивого отслеживания.",
+                featTitle: "Ключевые особенности",
+                feat1: "<strong>IP-адрес:</strong> Ваш уникальный идентификатор (IPv4 или IPv6).",
+                feat2: "<strong>Провайдер:</strong> Компания, предоставляющая доступ в интернет.",
+                feat3: "<strong>Местоположение:</strong> Город, регион и страна на основе IP.",
+                feat4: "<strong>VPN/Proxy:</strong> Проверка использования защищенных туннелей.",
+                localTitle: "Локальный vs Публичный IP",
+                localDesc: "Этот сайт показывает ваш <strong>публичный IP</strong>. Чтобы найти локальный IP:",
+                whatTitle: "Что такое IP-адрес?",
+                whatDesc: "IP-адрес — это уникальный числовой идентификатор устройства в компьютерной сети.",
+                altTitle: "Другие надежные сервисы"
             }
         };
 
@@ -377,20 +385,48 @@
             document.getElementById('sub-search').innerText = t.subSearch;
             document.getElementById('label-terminal').innerText = t.terminal;
             document.getElementById('footer-tag').innerText = t.footer;
-            document.getElementById('edu-q1').innerText = t.eduQ1;
-            document.getElementById('edu-a1').innerText = t.eduA1;
             document.getElementById('v6-note').innerText = t.v6Note;
             
-            const v6display = document.getElementById('ipv6-display').innerText;
-            if (v6display.includes('Only') || v6display.includes('Apenas') || v6display.includes('Только')) {
-                document.getElementById('ipv6-display').innerText = t.noIPv6;
-            } else if (v6display.includes('Query') || v6display.includes('Modo') || v6display.includes('Режим')) {
-                document.getElementById('ipv6-display').innerText = t.queryMode;
+            // Restore About Content Translations
+            document.getElementById('about-title').innerText = t.aboutTitle;
+            document.getElementById('about-intro').innerHTML = t.aboutIntro;
+            document.getElementById('about-features-title').innerText = t.featTitle;
+            document.getElementById('feat-1').innerHTML = t.feat1;
+            document.getElementById('feat-2').innerHTML = t.feat2;
+            document.getElementById('feat-3').innerHTML = t.feat3;
+            document.getElementById('feat-4').innerHTML = t.feat4;
+            document.getElementById('about-local-title').innerText = t.localTitle;
+            document.getElementById('about-local-desc').innerText = t.localDesc;
+            document.getElementById('about-what-title').innerText = t.whatTitle;
+            document.getElementById('about-what-desc').innerText = t.whatDesc;
+            document.getElementById('about-alt-title').innerText = t.altTitle;
+            
+            // Re-render IPv6 display text if it's in a special state
+            const v6display = document.getElementById('ipv6-display');
+            if (v6display.querySelector('.status-badge')) {
+                updateIPv6StatusUI(false);
+            }
+        }
+
+        function updateIPv6StatusUI(hasIP, ipValue = "") {
+            const el = document.getElementById('ipv6-display');
+            const t = translations[currentLang];
+            if (hasIP) {
+                el.innerHTML = `<span class="break-all">${ipValue}</span>`;
+                el.className = "text-lg md:text-xl lg:text-2xl font-black font-mono text-purple-200 break-all leading-snug min-h-[3.5rem] flex items-center";
+            } else {
+                el.innerHTML = `
+                    <div class="flex flex-col gap-1">
+                        <span class="text-sm text-slate-500 font-bold">${t.noIPv6}</span>
+                        <span class="status-badge bg-slate-800 text-slate-500 w-fit">Incompatible Network</span>
+                    </div>
+                `;
             }
         }
 
         async function fetchRegistryDetails(ip) {
             if (!ip) return;
+            const t = translations[currentLang];
             try {
                 const response = await fetch(`https://rdap.db.ripe.net/ip/${ip}`, { mode: 'cors' });
                 const data = await response.json();
@@ -444,7 +480,7 @@
             } catch(e) {}
             fields.forEach(f => {
                 const el = document.getElementById(f);
-                if (el && (el.innerText === translations[currentLang].searching || el.innerText === "...")) el.innerText = "N/A";
+                if (el) el.innerText = "N/A";
                 el.classList.remove('loading-text');
             });
         }
@@ -460,28 +496,25 @@
         }
 
         async function detectIPv6() {
-            const el = document.getElementById('ipv6-display');
             const sources = ['https://api64.ipify.org?format=json', 'https://v6.ident.me/.json'];
             for (let source of sources) {
                 try {
                     const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 3500);
+                    const timeoutId = setTimeout(() => controller.abort(), 3000);
                     const res = await fetch(source, { signal: controller.signal });
                     clearTimeout(timeoutId);
                     const data = await res.json();
                     if (data.ip && data.ip.includes(':')) {
                         detectedIPv6 = data.ip;
                         if (!getIPFromURL()) {
-                            el.innerText = data.ip;
-                            el.classList.remove('text-slate-500', 'text-sm');
+                            updateIPv6StatusUI(true, data.ip);
                         }
                         return;
                     }
                 } catch(e) {}
             }
             if (!detectedIPv6 && !getIPFromURL()) {
-                el.innerText = translations[currentLang].noIPv6;
-                el.classList.add('text-slate-500', 'text-sm');
+                updateIPv6StatusUI(false);
             }
         }
 
@@ -490,8 +523,6 @@
             const ipv6Pattern = /(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:))/;
             const query = window.location.search.substring(1);
             if (query && (ipv4Pattern.test(query) || ipv6Pattern.test(query))) return query;
-            const path = window.location.pathname.split('/').filter(p => p !== "").pop();
-            if (path && (ipv4Pattern.test(path) || ipv6Pattern.test(path))) return path;
             return null;
         }
 
@@ -510,7 +541,7 @@
                     fetchRegistryDetails(data.ip);
                 }
             } catch(e) { 
-                if(!targetIP) document.getElementById('ipv4-display').innerText = "Not Detected";
+                if(!targetIP) document.getElementById('ipv4-display').innerText = "N/A";
             }
             if (targetIP) {
                 updateDisplaysForIP(targetIP, true);
@@ -524,30 +555,30 @@
             const v4El = document.getElementById('ipv4-display');
             const v6El = document.getElementById('ipv6-display');
             const v6Note = document.getElementById('v6-note');
+            const t = translations[currentLang];
+
             if (isIPv4) {
                 v4El.innerText = ip;
                 v4El.classList.remove('text-slate-500', 'text-sm');
                 if (isManual) {
-                    v6El.innerText = translations[currentLang].queryMode;
-                    v6El.classList.add('text-slate-500', 'text-sm');
+                    v6El.innerHTML = `
+                        <div class="flex flex-col gap-1">
+                            <span class="text-sm text-slate-500 font-bold">${t.queryMode}</span>
+                            <span class="status-badge bg-blue-500/10 text-blue-400 w-fit">External Query</span>
+                        </div>
+                    `;
                     v6Note.classList.remove('hidden');
                 }
             } else {
-                v4El.innerText = "IPv6 Targeted";
+                v4El.innerText = "IPv6 TARGETED";
                 v4El.classList.add('text-slate-500', 'text-sm');
-                v6El.innerText = ip;
-                v6El.classList.remove('text-slate-500', 'text-sm');
+                updateIPv6StatusUI(true, ip);
                 v6Note.classList.add('hidden');
             }
             document.getElementById('info-host').innerText = `curl checkmyip.today/${ip}`;
         }
 
         function resetToMyIP() {
-            try {
-                if (window.location.origin !== 'null' && !window.location.href.startsWith('blob:')) {
-                    window.history.pushState({}, document.title, "/");
-                }
-            } catch (e) {}
             document.getElementById('ip-lookup-input').value = "";
             document.getElementById('v6-note').classList.add('hidden');
             if (detectedIPv4) {
@@ -556,12 +587,9 @@
                 fetchRegistryDetails(detectedIPv4);
             }
             if (detectedIPv6) {
-                const v6El = document.getElementById('ipv6-display');
-                v6El.innerText = detectedIPv6;
-                v6El.classList.remove('text-slate-500', 'text-sm');
+                updateIPv6StatusUI(true, detectedIPv6);
             } else {
-                document.getElementById('ipv6-display').innerText = translations[currentLang].noIPv6;
-                document.getElementById('ipv6-display').classList.add('text-slate-500', 'text-sm');
+                updateIPv6StatusUI(false);
             }
         }
 
@@ -579,7 +607,7 @@
 
         function copyPageSummary() {
             const val = (id) => document.getElementById(id)?.innerText || "N/A";
-            const summary = `--- CHECKMYIP.TODAY REPORT ---\nIPv4: ${val('ipv4-display')}\nIPv6: ${val('ipv6-display')}\nISP: ${val('info-isp')}\nLocation: ${val('info-city')}, ${val('info-country')}\nASN: ${val('info-asn')}\n-------------------------------`;
+            const summary = `--- CHECKMYIP.TODAY REPORT ---\nIPv4: ${val('ipv4-display')}\nIPv6: ${detectedIPv6 || "N/A"}\nISP: ${val('info-isp')}\nLocation: ${val('info-city')}, ${val('info-country')}\nASN: ${val('info-asn')}\n-------------------------------`;
             const el = document.createElement('textarea'); el.value = summary; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
             const t = document.getElementById('copy-toast'); t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2500);
         }
