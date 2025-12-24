@@ -61,12 +61,11 @@
             background-position: right 0.5rem center;
             background-size: 1em;
         }
-        /* Removido a animação pulse-text para evitar o piscar solicitado pelo usuário */
         .loading-text { color: #3b82f6; font-style: italic; opacity: 0.7; }
     </style>
 </head>
 <body>
-    <div id="copy-toast">✅ REPORT COPIED</div>
+    <div id="copy-toast">✅ RELATÓRIO COPIADO</div>
 
     <div class="max-w-5xl mx-auto flex flex-col gap-6">
         
@@ -79,6 +78,7 @@
             <div class="flex flex-wrap items-center gap-3">
                 <select id="lang-select" onchange="changeLanguage()" class="bg-slate-800 text-white text-[10px] font-bold px-4 py-2 pr-8 rounded-full border border-white/10 outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
                     <option value="en">ENGLISH</option>
+                    <option value="pt">PORTUGUÊS</option>
                     <option value="ru">РУССКИЙ</option>
                 </select>
                 <button onclick="copyPageSummary()" class="bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-extrabold px-4 py-2 rounded-full flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-blue-500/20">
@@ -214,16 +214,16 @@
         <!-- Educational Content -->
         <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
             <div class="glass-card p-6 rounded-3xl border border-blue-500/10">
-                <h4 id="edu-q1" class="text-blue-400 font-bold text-sm mb-3">What is an IP Address?</h4>
-                <p id="edu-a1" class="text-slate-400 text-xs leading-relaxed">An IP address is a unique numerical label assigned to each device connected to a computer network. It serves as a digital identity for routing data.</p>
+                <h4 id="edu-q1" class="text-blue-400 font-bold text-sm mb-3">O que é um Endereço IP?</h4>
+                <p id="edu-a1" class="text-slate-400 text-xs leading-relaxed">Um endereço IP é um rótulo numérico único atribuído a cada dispositivo ligado a uma rede informática. Serve como identidade digital.</p>
             </div>
             <div class="glass-card p-6 rounded-3xl border border-blue-500/10">
-                <h4 id="edu-q2" class="text-blue-400 font-bold text-sm mb-3">What is ASN?</h4>
-                <p id="edu-a2" class="text-slate-400 text-xs leading-relaxed">An Autonomous System Number (ASN) is a unique ID for a collection of IP networks managed by one entity. It allows networks to exchange routing info globally.</p>
+                <h4 id="edu-q2" class="text-blue-400 font-bold text-sm mb-3">O que é ASN?</h4>
+                <p id="edu-a2" class="text-slate-400 text-xs leading-relaxed">Um Número de Sistema Autónomo (ASN) é um ID único para um conjunto de redes IP geridas por uma entidade. Permite a troca global de rotas.</p>
             </div>
             <div class="glass-card p-6 rounded-3xl border border-blue-500/10">
                 <h4 id="edu-q3" class="text-blue-400 font-bold text-sm mb-3">IPv4 vs IPv6</h4>
-                <p id="edu-a3" class="text-slate-400 text-xs leading-relaxed">IPv4 is the older 32-bit standard, while IPv6 is the modern 128-bit standard created to provide trillions of more addresses for the Internet of Things.</p>
+                <p id="edu-a3" class="text-slate-400 text-xs leading-relaxed">O IPv4 é o padrão de 32 bits. O IPv6 é o padrão moderno de 128 bits criado para fornecer triliões de endereços adicionais.</p>
             </div>
         </section>
 
@@ -248,7 +248,22 @@
                 footer: "Global Network Intelligence Tool", toast: "✅ REPORT COPIED", searching: "Searching...",
                 eduQ1: "What is an IP Address?", eduA1: "An IP address is a unique numerical label assigned to each device connected to a computer network.",
                 eduQ2: "What is ASN?", eduA2: "An Autonomous System Number (ASN) is a unique ID for a collection of IP networks managed by one entity.",
-                eduQ3: "IPv4 vs IPv6", eduA3: "IPv4 is 32-bit, IPv6 is 128-bit, providing trillions more addresses."
+                eduQ3: "IPv4 vs IPv6", eduA3: "IPv4 is 32-bit, IPv6 is 128-bit, providing trillions more addresses.",
+                queryMode: "Query Mode (Manual Lookup)", noIPv6: "IPv4 Only / No IPv6"
+            },
+            pt: {
+                tagline: "Inteligência de Rede Global", btnCopy: "COPIAR RESUMO", detecting: "A detetar...",
+                ipv4: "IPv4 Público:", ipv6: "IPv6 Público:", rdap: "Registo e Alocação (RDAP)",
+                abuse: "Contactos de Abuso (RDAP)", regDate: "Data de Registo", lastUpdate: "Última Atualização",
+                support: "Email de Suporte", abuseEmail: "Email de Abuso", location: "Detalhes de Localização",
+                city: "Cidade", region: "Região", country: "País", provider: "Informação do Provedor",
+                isp: "ISP (Provedor de Internet)", org: "Organização", search: "Detalhes de Rede",
+                subSearch: "Consulte ASN e WHOIS para qualquer endereço IP.", terminal: "💻 Consulta Terminal",
+                footer: "Ferramenta de Inteligência de Rede Global", toast: "✅ RELATÓRIO COPIADO", searching: "A pesquisar...",
+                eduQ1: "O que é um Endereço IP?", eduA1: "Um endereço IP é um rótulo numérico único atribuído a cada dispositivo ligado a uma rede informática.",
+                eduQ2: "O que é ASN?", eduA2: "Um Número de Sistema Autónomo (ASN) é um ID único para um conjunto de redes IP geridas por uma única entidade.",
+                eduQ3: "IPv4 vs IPv6", eduA3: "O IPv4 utiliza 32 bits, o IPv6 utiliza 128 bits, garantindo triliões de endereços extra.",
+                queryMode: "Modo Consulta (Pesquisa Manual)", noIPv6: "Apenas IPv4 / Sem IPv6"
             },
             ru: {
                 tagline: "Глобальная сетевая разведка", btnCopy: "КОПИРОВАТЬ ОТЧЕТ", detecting: "Определение...",
@@ -261,15 +276,18 @@
                 footer: "Инструмент сетевой разведки", toast: "✅ ОТЧЕТ СКОПИРОВАН", searching: "Поиск...",
                 eduQ1: "Что такое IP-адрес?", eduA1: "IP-адрес — это уникальный числовой идентификатор устройства в сети.",
                 eduQ2: "Что такое ASN?", eduA2: "ASN — уникальный номер автономной системы, идентифицирующий группы сетей.",
-                eduQ3: "IPv4 против IPv6", eduA3: "IPv4 использует 32 бита, IPv6 — 128 бит для неограниченных адресов."
+                eduQ3: "IPv4 против IPv6", eduA3: "IPv4 использует 32 бита, IPv6 — 128 бит для неограниченных адресов.",
+                queryMode: "Режим запроса (поиск вручную)", noIPv6: "Только IPv4 / Нет IPv6"
             }
         };
 
         let currentLang = 'en';
+        let detectedIPv6 = null; // Variável global para persistir o IPv6 real detectado
 
         function changeLanguage() {
             currentLang = document.getElementById('lang-select').value;
             const t = translations[currentLang];
+            // Atualizar elementos de UI
             document.getElementById('tagline').innerText = t.tagline;
             document.getElementById('btn-copy').innerText = t.btnCopy;
             document.getElementById('label-v4').innerText = t.ipv4;
@@ -297,6 +315,15 @@
             document.getElementById('edu-a2').innerText = t.eduA2;
             document.getElementById('edu-q3').innerText = t.eduQ3;
             document.getElementById('edu-a3').innerText = t.eduA3;
+            document.getElementById('copy-toast').innerText = t.toast;
+            
+            // Re-renderizar o estado dos IPs com as traduções novas
+            const v6display = document.getElementById('ipv6-display').innerText;
+            if (v6display.includes('Only') || v6display.includes('Apenas') || v6display.includes('Только')) {
+                document.getElementById('ipv6-display').innerText = t.noIPv6;
+            } else if (v6display.includes('Query') || v6display.includes('Modo') || v6display.includes('Режим')) {
+                document.getElementById('ipv6-display').innerText = t.queryMode;
+            }
         }
 
         async function fetchRegistryDetails(ip) {
@@ -333,12 +360,13 @@
 
         async function fetchGeo(ip) {
             const fields = ['info-city', 'info-region', 'info-country', 'info-isp', 'info-org', 'info-asn'];
-            // Estilo fixo durante o carregamento, removendo o "pulse-text" que fazia piscar
-            fields.forEach(f => document.getElementById(f).classList.add('loading-text'));
+            fields.forEach(f => {
+                const el = document.getElementById(f);
+                if(el) el.classList.add('loading-text');
+            });
 
-            // Tenta Provedor 1 (ipwho.is)
             try {
-                const res = await fetch(`https://ipwho.is/${ip}?lang=${currentLang === 'ru' ? 'ru' : 'en'}`);
+                const res = await fetch(`https://ipwho.is/${ip}?lang=${currentLang === 'ru' ? 'ru' : (currentLang === 'pt' ? 'pt-PT' : 'en')}`);
                 const d = await res.json();
                 if (d.success) {
                     fillGeoFields(d);
@@ -346,7 +374,6 @@
                 }
             } catch(e) {}
 
-            // Tenta Provedor 2 (ipapi.co) se o 1 falhar
             try {
                 const res = await fetch(`https://ipapi.co/${ip}/json/`);
                 const d = await res.json();
@@ -362,13 +389,12 @@
                 }
             } catch(e) {}
 
-            // Se tudo falhar
             fields.forEach(f => {
                 const el = document.getElementById(f);
-                if (el.innerText === translations[currentLang].searching || el.innerText === "...") {
+                if (el && (el.innerText === translations[currentLang].searching || el.innerText === "...")) {
                     el.innerText = "N/A";
                 }
-                el.classList.remove('loading-text');
+                if(el) el.classList.remove('loading-text');
             });
         }
 
@@ -384,26 +410,60 @@
 
         async function detectIPv6() {
             const el = document.getElementById('ipv6-display');
+            
             const sources = [
                 'https://api64.ipify.org?format=json',
-                'https://v6.ident.me/.json'
+                'https://v6.ident.me/.json',
+                'https://api6.ipify.org?format=json',
+                'https://ipv6.icanhazip.com'
             ];
+            
             for (let source of sources) {
                 try {
-                    const res = await fetch(source);
-                    const data = await res.json();
-                    if (data.ip && data.ip.includes(':')) {
-                        el.innerText = data.ip;
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 4000);
+                    const res = await fetch(source, { signal: controller.signal });
+                    clearTimeout(timeoutId);
+                    
+                    let ip = "";
+                    if (source.includes('json')) {
+                        const data = await res.json();
+                        ip = data.ip;
+                    } else {
+                        ip = (await res.text()).trim();
+                    }
+
+                    if (ip && (ip.includes(':') || ip.length > 15)) {
+                        detectedIPv6 = ip; // Salva globalmente
+                        el.innerText = ip;
+                        el.classList.remove('text-slate-500', 'text-sm');
                         return;
                     }
                 } catch(e) {}
             }
-            el.innerText = "IPv4 Only / No IPv6";
-            el.classList.add('text-slate-500', 'text-sm');
+            
+            if (!detectedIPv6) {
+                el.innerText = translations[currentLang].noIPv6;
+                el.classList.add('text-slate-500', 'text-sm');
+            }
         }
 
         async function init() {
-            // IPv4 Detection
+            const urlParams = window.location.search.substring(1);
+            const ipv4Pattern = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
+            const ipv6Pattern = /(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))/;
+            
+            if (urlParams && (ipv4Pattern.test(urlParams) || ipv6Pattern.test(urlParams))) {
+                const targetIp = urlParams;
+                updateDisplaysForIP(targetIp, true);
+                fetchGeo(targetIp);
+                fetchRegistryDetails(targetIp);
+                return;
+            }
+
+            // Iniciar deteção de IPv6 IMEDIATAMENTE e em paralelo
+            detectIPv6();
+
             try {
                 const res = await fetch('https://api.ipify.org?format=json');
                 const data = await res.json();
@@ -415,19 +475,55 @@
                 document.getElementById('ipv4-display').innerText = "Not Detected";
                 fetchGeo(""); 
             }
+        }
+
+        function updateDisplaysForIP(ip, isManual = false) {
+            const ipv4Pattern = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
+            const ipv6Pattern = /:/; // Verificação simples para IPv6
+            const isIPv4 = ipv4Pattern.test(ip);
+            const isIPv6 = ipv6Pattern.test(ip);
             
-            // IPv6 Detection
-            detectIPv6();
+            const v4El = document.getElementById('ipv4-display');
+            const v6El = document.getElementById('ipv6-display');
+
+            if (isIPv4) {
+                // Se o IP buscado for IPv4, atualizamos o display IPv4 principal
+                v4El.innerText = ip;
+                v4El.classList.remove('text-slate-500', 'text-sm');
+                
+                // Se for uma busca manual de um IP externo (Network Details), 
+                // e nós NÃO tivermos um IPv6 real detectado na máquina local, 
+                // aí sim mostramos Query Mode. 
+                // Caso contrário (se detectamos um IPv6 real), MANTEMOS o IPv6 real lá.
+                if (isManual && !detectedIPv6) {
+                    v6El.innerText = translations[currentLang].queryMode;
+                    v6El.classList.add('text-slate-500', 'text-sm');
+                } else if (detectedIPv6) {
+                    v6El.innerText = detectedIPv6;
+                    v6El.classList.remove('text-slate-500', 'text-sm');
+                }
+            } else if (isIPv6) {
+                // Se o IP buscado manualmente for um IPv6, ele assume o display principal de IPv6
+                v4El.innerText = "IPv6 Targeted";
+                v4El.classList.add('text-slate-500', 'text-sm');
+                v6El.innerText = ip;
+                v6El.classList.remove('text-slate-500', 'text-sm');
+            }
+            
+            document.getElementById('info-host').innerText = `curl checkmyip.today/${ip}`;
         }
 
         function manualLookup() {
             const input = document.getElementById('ip-lookup-input').value.trim();
             if (input) {
                 const t = translations[currentLang];
-                document.getElementById('ipv4-display').innerText = input;
+                updateDisplaysForIP(input, true);
+                
                 ['info-city', 'info-region', 'info-country', 'info-isp', 'info-org', 'info-asn', 'registry-created', 'registry-updated', 'registry-email', 'registry-abuse'].forEach(id => {
-                    document.getElementById(id).innerText = t.searching;
+                    const el = document.getElementById(id);
+                    if(el) el.innerText = t.searching;
                 });
+                
                 fetchGeo(input);
                 fetchRegistryDetails(input);
             }
