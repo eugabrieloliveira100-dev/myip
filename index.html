@@ -194,6 +194,9 @@
     </div>
 
     <script>
+        // Variável de controle global para persistência de idioma
+        window.manualLang = false;
+
         const translations = {
             en: { 
                 tagline: "Global Network Intelligence", btnCopy: "COPY SUMMARY", btnReset: "MY CONNECTION", ipv4: "Your Public IP Address:", ipv6: "Your IPv6 Connectivity:", location: "Location", city: "City", region: "Region", country: "Country", noteLocation: "Important Note: The geographic location displayed is based on the official registry of the IP owner (ISP). This info represents the network termination point and may not match your exact GPS location, serving as an infrastructure technical reference.", provider: "Provider Information", isp: "ISP (Internet Service Provider)", org: "Organization", search: "Network Details", subSearch: "Query ASN and WHOIS for any IP.", terminal: "💻 Terminal Query", toast: "✅ REPORT COPIED", rdap: "Registry & Allocation (RDAP)", abuse: "Abuse Contacts (RDAP)", regDate: "Registration Date", lastUpdate: "Last Update", support: "Support Email", abuseEmail: "Abuse Email", asnDetails: "ASN & Routing", asTitle: "Autonomous System Number",
@@ -256,7 +259,7 @@
                 ]
             },
             vi: {
-                tagline: "Tình báo mạng toàn cầu", btnCopy: "SAO CHÉP TÓM TẮT", btnReset: "KẾT NỐI CỦA TÔI", ipv4: "Địa chỉ IP Công cộng:", ipv6: "Kết nối IPv6:", location: VietnameseTranslate("Vị trí"), city: "Thành phố", region: "Vùng", country: "Quốc gia", noteLocation: "Ghi chú: Vị trí dựa trên cơ sở dữ liệu ISP.", provider: "Thông tin nhà cung cấp", isp: "ISP (Nhà cung cấp Internet)", org: "Tổ chức", search: "Chi tiết mạng", subSearch: "Truy vấn ASN và WHOIS.", terminal: "💻 Truy vấn Terminal", toast: "✅ ĐÃ SAO CHÉP", rdap: "Đăng ký & Cấp phát (RDAP)", abuse: "Liên hệ lạm dụng", regDate: "Ngày đăng ký", lastUpdate: "Cập nhật cuối", support: "Email hỗ trợ", abuseEmail: "Email lạm dụng", asnDetails: "ASN & Định tuyến", asTitle: "Số hiệu mạng tự trị",
+                tagline: "Tình báo mạng toàn cầu", btnCopy: "SAO CHÉP TÓM TẮT", btnReset: "KẾT NỐI CỦA TÔI", ipv4: "Địa chỉ IP Công cộng:", ipv6: "Kết nối IPv6:", location: "Vị trí", city: "Thành phố", region: "Vùng", country: "Quốc gia", noteLocation: "Ghi chú: Vị trí dựa trên cơ sở dữ liệu ISP.", provider: "Thông tin nhà cung cấp", isp: "ISP (Nhà cung cấp Internet)", org: "Tổ chức", search: "Chi tiết mạng", subSearch: "Truy vấn ASN và WHOIS.", terminal: "💻 Truy vấn Terminal", toast: "✅ ĐÃ SAO CHÉP", rdap: "Đăng ký & Cấp phát (RDAP)", abuse: "Liên hệ lạm dụng", regDate: "Ngày đăng ký", lastUpdate: "Cập nhật cuối", support: "Email hỗ trợ", abuseEmail: "Email lạm dụng", asnDetails: "ASN & Định tuyến", asTitle: "Số hiệu mạng tự trị",
                 ipv6Query: "TRUY VẤN: IPv6 không tương thích với IPv4",
                 edu: [
                     { h: "Địa chỉ IP là gì?", p: "Địa chỉ IP là mã định danh duy nhất cho các thiết bị." },
@@ -274,14 +277,14 @@
                     { h: "आईपी एड्रेस क्या है?", p: "आईपी एड्रेस नेटवर्क पर उपकरणों के लिए एक विशिष्ट पहचानकर्ता है।" },
                     { h: "CheckMyIP.Today के बारे में", p: "हम आपके नेटवर्क कनेक्शन पर तत्काल विश्लेषण प्रदान करते हैं।" },
                     { h: "प्रमुख विशेषताएं", p: "IPv4/IPv6 का पता लगाना और ASN विश्लेषण।" },
-                    { h: "स्थानीय बनाम सार्वजनिक आईपी", p: "आपका सार्वजनिक आईपी आपकी web पहचान है।" },
-                    { h: "जियो-लोकेशन कैसे काम करता है?", p: "डिजिटल कनेक्शन को भौतिक स्थान से मैप करता है।" },
+                    { h: HindiTranslate("स्थानीय बनाम सार्वजनिक आईपी"), p: "आपका सार्वजनिक आईपी आपकी web पहचान है।" },
+                    { h: "जियो-लोकेशन कैसे काम करता है?", p: "डिजital कनेक्शन को भौतिक स्थान से मैप करता है।" },
                     { h: "वैकल्पिक चेकर्स", p: "विश्वसनीय मानकों में IPinfo.io और Google शामिल हैं।" }
                 ]
             }
         };
 
-        function VietnameseTranslate(txt) { return txt; }
+        function HindiTranslate(txt) { return txt; }
 
         function updateUI(lang) {
             const t = translations[lang] || translations['en'];
@@ -317,7 +320,10 @@
         async function fetchNetworkData(ip) {
             if (!ip || ip === "...") return;
             
-            // OTIMIZAÇÃO: Timeout curto para não deixar o usuário esperando uma API lenta
+            // Forçamos a UI a manter o idioma atual do seletor antes da requisição
+            const currentLang = document.getElementById('lang-select').value;
+            updateUI(currentLang);
+
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 6000);
 
@@ -361,11 +367,15 @@
             document.getElementById('info-org').innerText = d.org || d.isp || "N/A";
             document.getElementById('info-asn').innerText = d.asn ? `AS${d.asn}` : "N/A";
 
+            // Só altera o idioma automaticamente se o usuário ainda não tocou no seletor ou fez busca
             if(!window.manualLang && d.cc) {
                 const map = { 'BR': 'pt', 'PT': 'pt', 'RU': 'ru', 'BY': 'ru', 'TR': 'tr', 'ID': 'id', 'VN': 'vi', 'IN': 'hi' };
                 const target = map[d.cc] || 'en';
                 document.getElementById('lang-select').value = target;
                 updateUI(target);
+            } else {
+                // Se já houver escolha manual, reafirmamos o idioma selecionado
+                updateUI(document.getElementById('lang-select').value);
             }
         }
 
@@ -408,14 +418,23 @@
         function manualLookup() {
             const ip = document.getElementById('ip-lookup-input').value.trim();
             if(!ip) return;
+            
+            // Ao buscar manualmente, travamos a preferência de idioma atual
+            window.manualLang = true;
+            
             const v4El = document.getElementById('ipv4-display');
             v4El.innerText = ip;
             const v6El = document.getElementById('ipv6-display');
+            
             const lang = document.getElementById('lang-select').value;
             const t = translations[lang] || translations['en'];
+            
             v6El.innerText = t.ipv6Query; 
             v6El.setAttribute('data-is-query', 'true');
             v6El.classList.remove('loading-pulse');
+            
+            // Atualizamos a UI antes da requisição para garantir consistência
+            updateUI(lang);
             fetchNetworkData(ip);
         }
 
@@ -444,9 +463,10 @@
 
         window.onload = () => {
             document.getElementById('main-body').classList.add('ready');
-            updateUI('en');
             
-            // OTIMIZAÇÃO: Disparo em paralelo
+            // Inicializamos a UI com o idioma padrão do seletor
+            updateUI(document.getElementById('lang-select').value);
+            
             Promise.all([
                 fetch('https://api.ipify.org?format=json').then(r => r.json()),
                 detectIPv6()
