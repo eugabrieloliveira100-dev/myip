@@ -281,7 +281,6 @@
             }
         };
 
-        // Helper para evitar problemas de undefined caso alguma função externa seja chamada erroneamente
         function VietnameseTranslate(txt) { return txt; }
 
         function updateUI(lang) {
@@ -301,7 +300,6 @@
                 if(el) el.innerText = t[mapping[id]];
             }
 
-            // Atualiza a mensagem de erro/query de IPv6 caso o estado atual seja uma query manual
             const v6El = document.getElementById('ipv6-display');
             if (v6El && v6El.getAttribute('data-is-query') === 'true') {
                 v6El.innerText = t.ipv6Query;
@@ -319,12 +317,13 @@
         async function fetchNetworkData(ip) {
             if (!ip || ip === "...") return;
             
+            // OTIMIZAÇÃO: Timeout curto para não deixar o usuário esperando uma API lenta
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 6000);
+
             const providers = [
                 { url: `https://ipwho.is/${ip}`, parser: d => d.success ? {
                     city: d.city, region: d.region, country: d.country, isp: d.connection.isp, org: d.connection.org, asn: d.connection.asn, cc: d.country_code
-                } : null },
-                { url: `https://demo.ip-api.com/json/${ip}?fields=status,country,regionName,city,isp,org,as,countryCode`, parser: d => d.status === 'success' ? {
-                    city: d.city, region: d.regionName, country: d.country, isp: d.isp, org: d.org, asn: d.as?.split(' ')[0].replace('AS',''), cc: d.countryCode
                 } : null },
                 { url: `https://ipapi.co/${ip}/json/`, parser: d => !d.error ? {
                     city: d.city, region: d.region, country: d.country_name, isp: d.org, org: d.org, asn: d.asn, cc: d.country_code
@@ -333,15 +332,16 @@
 
             for (let p of providers) {
                 try {
-                    const res = await fetch(p.url);
+                    const res = await fetch(p.url, { signal: controller.signal });
                     const raw = await res.json();
                     const d = p.parser(raw);
                     if (d) {
                         applyData(d);
                         fetchRDAP(ip);
+                        clearTimeout(timeoutId);
                         return;
                     }
-                } catch(e) { console.warn("API attempt failed, trying next..."); }
+                } catch(e) { console.warn("API attempt failed or timed out..."); }
             }
             setNA();
         }
@@ -391,7 +391,7 @@
                 extract(d.entities);
                 document.getElementById('registry-email').innerText = emails.support;
                 document.getElementById('registry-abuse').innerText = emails.abuse !== "N/A" ? emails.abuse : emails.support;
-            } catch(e) { /* silent fail handled by initial state */ }
+            } catch(e) { }
         }
 
         async function detectIPv6() {
@@ -408,20 +408,14 @@
         function manualLookup() {
             const ip = document.getElementById('ip-lookup-input').value.trim();
             if(!ip) return;
-            
-            // Coloca IPv4 em visualização
             const v4El = document.getElementById('ipv4-display');
             v4El.innerText = ip;
-            
-            // IPv6 entra em modo de QUERY explicativo para evitar confusão entre protocolos
             const v6El = document.getElementById('ipv6-display');
             const lang = document.getElementById('lang-select').value;
             const t = translations[lang] || translations['en'];
-            
             v6El.innerText = t.ipv6Query; 
-            v6El.setAttribute('data-is-query', 'true'); // Marca como modo query para futuras mudanças de idioma
-            v6El.classList.remove('loading-pulse'); // Remove o piscar imediatamente
-            
+            v6El.setAttribute('data-is-query', 'true');
+            v6El.classList.remove('loading-pulse');
             fetchNetworkData(ip);
         }
 
@@ -436,42 +430,33 @@
             const loc = `${document.getElementById('info-city').innerText}, ${document.getElementById('info-country').innerText}`;
             const supportEmail = document.getElementById('registry-email').innerText;
             const abuseEmail = document.getElementById('registry-abuse').innerText;
-            
-            const summary = `CheckMyIP.Today Report\n` +
-                            `--------------------------\n` +
-                            `IP: ${ip}\n` +
-                            `ISP: ${isp}\n` +
-                            `Location: ${loc}\n` +
-                            `Support Email: ${supportEmail}\n` +
-                            `Abuse Email: ${abuseEmail}\n` +
-                            `--------------------------\n` +
-                            `Generated at: ${new Date().toISOString()}`;
-
+            const summary = `CheckMyIP.Today Report\n--------------------------\nIP: ${ip}\nISP: ${isp}\nLocation: ${loc}\nSupport Email: ${supportEmail}\nAbuse Email: ${abuseEmail}\n--------------------------\nGenerated at: ${new Date().toISOString()}`;
             const el = document.createElement('textarea');
             el.value = summary;
             document.body.appendChild(el);
             el.select();
             document.execCommand('copy');
             document.body.removeChild(el);
-            
             const toast = document.getElementById('copy-toast');
             toast.classList.remove('hidden');
             setTimeout(() => toast.classList.add('hidden'), 2000);
         }
 
-        window.onload = async () => {
+        window.onload = () => {
             document.getElementById('main-body').classList.add('ready');
             updateUI('en');
-            try {
-                const r = await fetch('https://api.ipify.org?format=json');
-                const d = await r.json();
-                document.getElementById('ipv4-display').innerText = d.ip;
+            
+            // OTIMIZAÇÃO: Disparo em paralelo
+            Promise.all([
+                fetch('https://api.ipify.org?format=json').then(r => r.json()),
+                detectIPv6()
+            ]).then(([d4]) => {
+                document.getElementById('ipv4-display').innerText = d4.ip;
                 document.getElementById('ipv4-display').classList.remove('loading-pulse');
-                fetchNetworkData(d.ip);
-            } catch(e) { 
+                fetchNetworkData(d4.ip);
+            }).catch(() => {
                 document.getElementById('ipv4-display').innerText = "ERROR";
-            }
-            detectIPv6();
+            });
         };
     </script>
 </body>
