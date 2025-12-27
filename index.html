@@ -8,7 +8,7 @@
     <title id="meta-title">Check My IP Today - IPv4, IPv6 & Network Intelligence</title>
     <meta name="description" id="meta-desc" content="Detect your public IPv4 and IPv6 addresses instantly. Get ISP details, ASN, and official RDAP/WHOIS records.">
     
-    <!-- CSS CRÍTICO - Resolve o erro de layout "bagunçado" no carregamento (FOUC) -->
+    <!-- CSS CRÍTICO - Performance & Visual -->
     <style>
         :root { --bg-deep: #020617; }
         html { background-color: #020617; }
@@ -17,17 +17,22 @@
             color: #f1f5f9; 
             margin: 0; 
             font-family: system-ui, -apple-system, sans-serif;
-            opacity: 0; /* Esconde o conteúdo até o CSS carregar */
+            opacity: 0; 
             transition: opacity 0.4s ease-in;
         }
         .ready { opacity: 1 !important; }
         .glass-card { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .loading-pulse { animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+        .truncate-custom { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        /* Ajuste para quebra de linha no IPv6 */
+        .ipv6-text-wrap { word-break: break-word; overflow-wrap: anywhere; line-height: 1.4; display: block; width: 100%; }
     </style>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Schema.org JSON-LD (SEO Invisível) -->
+    <!-- Schema.org JSON-LD -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -37,15 +42,9 @@
       "description": "Professional tool for IP address detection, geolocation and network forensics.",
       "applicationCategory": "NetworkingTool",
       "operatingSystem": "All",
-      "featureList": ["IPv4 Detection", "IPv6 Detection", "RDAP Lookup", "ASN Intelligence"]
+      "featureList": ["IPv4 Detection", "IPv6 Detection", "RDAP Lookup", "ASN Intelligence", "Multi-language Support"]
     }
     </script>
-
-    <style>
-        .loading-pulse { animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
-        .truncate-custom { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    </style>
 </head>
 <body id="main-body">
     <div id="copy-toast" class="hidden fixed top-5 left-1/2 -translate-x-1/2 bg-emerald-500 text-white px-6 py-2 rounded-full font-bold z-50 shadow-lg uppercase text-[10px]">✅ Report Copied</div>
@@ -89,7 +88,7 @@
                 <div class="absolute top-0 right-0 p-4 opacity-10 text-6xl font-black italic">v6</div>
                 <span id="label-v6-tag" class="bg-purple-500/10 text-purple-400 px-3 py-1 rounded-lg text-[10px] font-bold uppercase mb-4 inline-block italic">IPv6 Address</span>
                 <h2 id="label-v6" class="text-slate-500 text-xs font-bold mb-1 uppercase italic font-mono">Your IPv6 Connectivity:</h2>
-                <div id="ipv6-display" class="text-lg md:text-xl font-black font-mono text-purple-200 min-h-[3rem] flex items-center italic break-all loading-pulse">...</div>
+                <div id="ipv6-display" class="ipv6-text-wrap text-lg md:text-xl font-black font-mono text-purple-200 min-h-[3rem] flex items-center italic loading-pulse">...</div>
             </section>
         </main>
 
@@ -184,9 +183,9 @@
             </div>
         </section>
 
-        <!-- Educational Content (H1-H3 Hierarchy) -->
+        <!-- Educational Content (Hierarquia H3) -->
         <article id="edu-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            <!-- Dinâmico via JavaScript -->
+            <!-- Gerado via JS -->
         </article>
 
         <footer class="py-12 border-t border-white/5 text-center">
@@ -198,6 +197,7 @@
         const translations = {
             en: { 
                 tagline: "Global Network Intelligence", btnCopy: "COPY SUMMARY", btnReset: "MY CONNECTION", ipv4: "Your Public IP Address:", ipv6: "Your IPv6 Connectivity:", location: "Location", city: "City", region: "Region", country: "Country", noteLocation: "Important Note: The geographic location displayed is based on the official registry of the IP owner (ISP). This info represents the network termination point and may not match your exact GPS location, serving as an infrastructure technical reference.", provider: "Provider Information", isp: "ISP (Internet Service Provider)", org: "Organization", search: "Network Details", subSearch: "Query ASN and WHOIS for any IP.", terminal: "💻 Terminal Query", toast: "✅ REPORT COPIED", rdap: "Registry & Allocation (RDAP)", abuse: "Abuse Contacts (RDAP)", regDate: "Registration Date", lastUpdate: "Last Update", support: "Support Email", abuseEmail: "Abuse Email", asnDetails: "ASN & Routing", asTitle: "Autonomous System Number",
+                ipv6Query: "QUERY: IPv6 is incompatible with IPv4",
                 edu: [
                     { h: "What is an IP Address?", p: "An IP address is a unique identifier for devices on a network, allowing data to be sent via the Internet Protocol." },
                     { h: "About CheckMyIP.Today", p: "We provide instant forensics on your network connection, including geolocation and official RDAP records." },
@@ -209,6 +209,7 @@
             },
             pt: { 
                 tagline: "Inteligência de Rede Global", btnCopy: "COPIAR RESUMO", btnReset: "MINHA CONEXÃO", ipv4: "Seu IP Público:", ipv6: "Conectividade IPv6:", location: "Localização", city: "Cidade", region: "Região", country: "País", noteLocation: "Nota Importante: A localização geográfica exibida é baseada no registro oficial do proprietário do bloco de IP (ISP). Esta informação representa o ponto de terminação da rede e pode não coincidir com a sua localização GPS exata, servindo como uma referência técnica de infraestrutura.", provider: "Informação do Provedor", isp: "ISP (Provedor de Internet)", org: "Organização", search: "Detalhes de Rede", subSearch: "Consulte ASN e WHOIS para qualquer IP.", terminal: "💻 Terminal Query", toast: "✅ RELATÓRIO COPIADO", rdap: "Registro e Alocação (RDAP)", abuse: "Contatos de Abuso (RDAP)", regDate: "Data de Registro", lastUpdate: "Última Atualização", support: "Email Suporte", abuseEmail: "Email Abuso", asnDetails: "ASN e Roteamento", asTitle: "Número do Sistema Autônomo",
+                ipv6Query: "QUERY: O IPv6 é incompatível com o IPv4",
                 edu: [
                     { h: "O que é um Endereço IP?", p: "Um endereço IP é um identificador único para dispositivos em uma rede, permitindo a comunicação via Internet Protocol." },
                     { h: "Sobre o CheckMyIP.Today", p: "Fornecemos análise instantânea da sua conexão, incluindo geolocalização precisa e registros oficiais RDAP." },
@@ -220,6 +221,7 @@
             },
             ru: {
                 tagline: "Глобальная сетевая разведка", btnCopy: "КОПИРОВАТЬ ОТЧЕТ", btnReset: "МОЕ СОЕДИНЕНИЕ", ipv4: "Ваш IPv4 адрес:", ipv6: "Ваш IPv6 статус:", location: "Геолокация", city: "Город", region: "Регион", country: "Страна", noteLocation: "Важное примечание: Географическое положение основано на реестре ISP. Информация является технической справкой и может не совпадать с GPS.", provider: "Информация о провайдере", isp: "ISP (Провайдер)", org: "Организация", search: "Сетевые детали", subSearch: "Запрос ASN и WHOIS.", terminal: "💻 Терминал", toast: "✅ ОТЧЕТ СКОПИРОВАН", rdap: "Реестр (RDAP)", abuse: "Контакты (RDAP)", regDate: "Дата регистрации", lastUpdate: "Обновлено", support: "Email поддержки", abuseEmail: "Email жалоб", asnDetails: "ASN и маршрутизация", asTitle: "Номер ASN",
+                ipv6Query: "ЗАПРОС: IPv6 несовместим с IPv4",
                 edu: [
                     { h: "Что такое IP?", p: "IP-адрес — это уникальный идентификатор устройства в сети." },
                     { h: "О CheckMyIP.Today", p: "Мы предоставляем мгновенную криминалистику вашего соединения." },
@@ -230,50 +232,57 @@
                 ]
             },
             tr: {
-                tagline: "Küresel Ağ İstihbaratı", btnCopy: "ÖZETİ KOPYALA", btnReset: "BAĞLANTIM", ipv4: "Genel IPv4 Adresiniz:", ipv6: "IPv6 Bağlantınız:", location: "Konum", city: "Şehir", region: "Bölge", country: "Ülke", noteLocation: "Önemli Not: Coğrafi konum, ISP kayıtlarına dayalıdır ve tam GPS konumunuzla eşleşmeyebilir.", provider: "Sağlayıcı Bilgileri", isp: "ISP (İnternet Servis Sağlayıcı)", org: "Organizasyon", search: "Ağ Detayları", subSearch: "Herhangi bir IP için ASN ve WHOIS sorgulayın.", terminal: "💻 Terminal Sorgusu", toast: "✅ RAPOR KOPYALANDI", rdap: "Kayıt ve Tahsis (RDAP)", abuse: "Kötüye Kullanım İletişim (RDAP)", regDate: "Kayıt Tarihi", lastUpdate: "Son Güncelleme", support: "Destek E-postası", abuseEmail: "Kötüye Kullanım E-postası", asnDetails: "ASN ve Yönlendirme", asTitle: "Otonom Sistem Numarası",
+                tagline: "Küresel Ağ İstihbaratı", btnCopy: "ÖZETİ KOPYALA", btnReset: "BAĞLANTIM", ipv4: "Genel IP Adresiniz:", ipv6: "IPv6 Bağlantınız:", location: "Konum", city: "Şehir", region: "Bölge", country: "Ülke", noteLocation: "Önemli Not: Coğrafi konum, ISP kayıtlarına dayanır.", provider: "Sağlayıcı Bilgileri", isp: "ISP (İnternet Servis Sağlayıcı)", org: "Organizasyon", search: "Ağ Detayları", subSearch: "Herhangi bir IP için ASN ve WHOIS sorgulayın.", terminal: "💻 Terminal Sorgusu", toast: "✅ RAPOR KOPYALANDI", rdap: "Kayıt ve Tahsis (RDAP)", abuse: "Kötüye Kullanım Kişileri", regDate: "Kayıt Tarihi", lastUpdate: "Son Güncelleme", support: "Destek E-postası", abuseEmail: "Kötüye Kullanım E-postası", asnDetails: "ASN ve Yönlendirme", asTitle: "Otonom Sistem Numarası",
+                ipv6Query: "SORGULAMA: IPv6, IPv4 ile uyumsuzdur",
                 edu: [
                     { h: "IP Adresi Nedir?", p: "Bir IP adresi, bir ağdaki cihazlar için benzersiz bir tanımlayıcıdır." },
-                    { h: "CheckMyIP.Today Hakkında", p: "Ağ bağlantınız hakkında anında adli analiz sunuyoruz." },
-                    { h: "Ana Özellikler", p: "IPv4/IPv6 tespiti ve ASN analizi." },
+                    { h: "CheckMyIP.Today Hakkında", p: "Bağlantınız hakkında anında adli analiz sağlıyoruz." },
+                    { h: "Temel Özellikler", p: "IPv4/IPv6 tespiti ve ASN analizi." },
                     { h: "Yerel vs Genel IP", p: "Genel IP'niz web kimliğinizdir." },
-                    { h: "Coğrafi Konum Nasıl Çalışır?", p: "Dijital bağlantınızı fiziksel bir noktaya eşler." },
-                    { h: "Alternatifler", p: "IPinfo.io ve Google IP araçları." }
+                    { h: "Coğrafi Konum Nasıl Çalışır?", p: "Dijital bağlantınızı fiziksel bir noktaya haritalar." },
+                    { h: "Alternatif Kontrol Ediciler", p: "IPinfo.io, icanhazip.com e Google araçları." }
                 ]
             },
             id: {
-                tagline: "Intelijen Jaringan Global", btnCopy: "SALIN RINGKASAN", btnReset: "KONEKSI SAYA", ipv4: "Alamat IP Publik Anda:", ipv6: "Konektivitas IPv6 Anda:", location: "Lokasi", city: "Kota", region: "Wilayah", country: "Negara", noteLocation: "Catatan: Lokasi didasarkan pada basis data ISP dan mungkin tidak sesuai dengan GPS.", provider: "Informasi Penyedia", isp: "ISP (Penyedia Layanan Internet)", org: "Organisasi", search: "Detail Jaringan", subSearch: "Kueri ASN dan WHOIS untuk IP apa pun.", terminal: "💻 Kueri Terminal", toast: "✅ LAPORAN DISALIN", rdap: "Registrasi (RDAP)", abuse: "Kontak Penyalahgunaan (RDAP)", regDate: "Tanggal Registrasi", lastUpdate: "Pembaruan Terakhir", support: "Email Dukungan", abuseEmail: "Email Penyalahgunaan", asnDetails: "ASN & Perutean", asTitle: "Nomor Sistem Otonom",
+                tagline: "Intelijen Jaringan Global", btnCopy: "SALIN RINGKASAN", btnReset: "KONEKSI SAYA", ipv4: "Alamat IP Publik Anda:", ipv6: "Konektivitas IPv6:", location: "Lokasi", city: "Kota", region: "Wilayah", country: "Negara", noteLocation: "Catatan: Lokasi geografi berdasarkan registri ISP resmi.", provider: "Informasi Penyedia", isp: "ISP (Penyedia Layanan Internet)", org: "Organisasi", search: "Detail Jaringan", subSearch: "Kueri ASN dan WHOIS untuk IP apa pun.", terminal: "💻 Kueri Terminal", toast: "✅ LAPORAN DISALIN", rdap: "Registri & Alokasi (RDAP)", abuse: "Kontak Penyalahgunaan", regDate: "Tanggal Registrasi", lastUpdate: "Pembaruan Terakhir", support: "Email Dukungan", abuseEmail: "Email Penyalahgunaan", asnDetails: "ASN & Perutean", asTitle: "Nomor Sistem Otonom",
+                ipv6Query: "KUERI: IPv6 tidak kompatibel dengan IPv4",
                 edu: [
-                    { h: "Apa itu Alamat IP?", p: "Alamat IP adalah pengenal unik untuk perangkat di jaringan." },
+                    { h: "Apa itu Alamat IP?", p: "Alamat IP adalah pengidentifikasi unik untuk perangkat di jaringan." },
                     { h: "Tentang CheckMyIP.Today", p: "Kami menyediakan forensik instan pada koneksi jaringan Anda." },
-                    { h: "Fitur Utama", p: "Deteksi IPv4/IPv6 dan analisis perutean ASN." },
+                    { h: "Fitur Utama", p: "Deteksi IPv4/IPv6 dan analisis ASN." },
                     { h: "IP Lokal vs Publik", p: "IP Publik adalah identitas web Anda." },
                     { h: "Cara Kerja Geolocation", p: "Memetakan koneksi digital ke lokasi fisik." },
-                    { h: "Alternatif", p: "IPinfo.io dan alat IP Google." }
+                    { h: "Pemeriksa Alternatif", p: "Standar tepercaya meliputi IPinfo.io dan Google." }
                 ]
             },
             vi: {
-                tagline: "Thông tin mạng toàn cầu", btnCopy: "SAO CHÉP TÓM TẮT", btnReset: "KẾT NỐI CỦA TÔI", ipv4: "Địa chỉ IPv4 công cộng:", ipv6: "Kết nối IPv6 của bạn:", location: "Vị trí", city: "Thành phố", region: "Vùng", country: "Quốc gia", noteLocation: "Ghi chú: Vị trí địa lý dựa trên cơ sở dữ liệu ISP.", provider: "Thông tin nhà cung cấp", isp: "ISP (Nhà cung cấp Internet)", org: "Tổ chức", search: "Chi tiết mạng", subSearch: "Truy vấn ASN và WHOIS cho bất kỳ IP nào.", terminal: "💻 Truy vấn Terminal", toast: "✅ ĐÃ SAO CHÉP BÁO CÁO", rdap: "Đăng ký (RDAP)", abuse: "Liên hệ lạm dụng (RDAP)", regDate: "Ngày đăng ký", lastUpdate: "Cập nhật cuối", support: "Email hỗ trợ", abuseEmail: "Email lạm dụng", asnDetails: "ASN & Định tuyến", asTitle: "Số hiệu mạng tự trị",
+                tagline: "Tình báo mạng toàn cầu", btnCopy: "SAO CHÉP TÓM TẮT", btnReset: "KẾT NỐI CỦA TÔI", ipv4: "Địa chỉ IP Công cộng:", ipv6: "Kết nối IPv6:", location: VietnameseTranslate("Vị trí"), city: "Thành phố", region: "Vùng", country: "Quốc gia", noteLocation: "Ghi chú: Vị trí dựa trên cơ sở dữ liệu ISP.", provider: "Thông tin nhà cung cấp", isp: "ISP (Nhà cung cấp Internet)", org: "Tổ chức", search: "Chi tiết mạng", subSearch: "Truy vấn ASN và WHOIS.", terminal: "💻 Truy vấn Terminal", toast: "✅ ĐÃ SAO CHÉP", rdap: "Đăng ký & Cấp phát (RDAP)", abuse: "Liên hệ lạm dụng", regDate: "Ngày đăng ký", lastUpdate: "Cập nhật cuối", support: "Email hỗ trợ", abuseEmail: "Email lạm dụng", asnDetails: "ASN & Định tuyến", asTitle: "Số hiệu mạng tự trị",
+                ipv6Query: "TRUY VẤN: IPv6 không tương thích với IPv4",
                 edu: [
-                    { h: "Địa chỉ IP là gì?", p: "Địa chỉ IP là mã định danh duy nhất cho các thiết bị trong mạng." },
-                    { h: "Về CheckMyIP.Today", p: "Chúng tôi cung cấp phân tích tức thì về kết nối mạng của bạn." },
+                    { h: "Địa chỉ IP là gì?", p: "Địa chỉ IP là mã định danh duy nhất cho các thiết bị." },
+                    { h: "Về CheckMyIP.Today", p: "Cung cấp phân tích tức thì về kết nối của bạn." },
                     { h: "Tính năng chính", p: "Phát hiện IPv4/IPv6 và phân tích ASN." },
                     { h: "IP nội bộ vs công cộng", p: "IP công cộng là danh tính web của bạn." },
-                    { h: "Định vị hoạt động như thế nào?", p: "Ánh xạ kết nối kỹ thuật số với một điểm vật lý." },
-                    { h: "Các trình kiểm tra khác", p: "IPinfo.io và công cụ IP của Google." }
+                    { h: "Định vị hoạt động thế nào?", p: "Ánh xạ kết nối kỹ thuật số với vị trí vật lý." },
+                    { h: "Công cụ thay thế", p: "IPinfo.io, icanhazip.com và Google." }
                 ]
             },
             hi: {
-                tagline: "वैश्विक नेटवर्क इंटेलिजेंस", btnCopy: "सारांश कॉपी करें", btnReset: "मेरा कनेक्शन", ipv4: "आपका सार्वजनिक आईपी:", ipv6: "आपका IPv6 कनेक्शन:", location: "स्थान", city: "शहर", region: "क्षेत्र", country: "देश", noteLocation: "नोट: भौगोलिक स्थान ISP डेटाबेस पर आधारित है।", provider: "प्रदाता जानकारी", isp: "ISP (इंटरनेट सेवा प्रदाता)", org: "संगठन", search: "नेटवर्क विवरण", subSearch: "किसी भी IP के लिए ASN और WHOIS खोजें।", terminal: "💻 टर्मिनल क्वेरी", toast: "✅ रिपोर्ट कॉपी की गई", rdap: "पंजीकरण (RDAP)", abuse: "दुरुपयोग संपर्क (RDAP)", regDate: "पंजीकरण तिथि", lastUpdate: "अंतिम अपडेट", support: "सहायता ईमेल", abuseEmail: "दुरुपयोग ईमेल", asnDetails: "ASN और रूटिंग", asTitle: "स्वायत्त प्रणाली संख्या",
+                tagline: "ग्लोबल नेटवर्क इंटेलिजेंस", btnCopy: "सारांश कॉपी करें", btnReset: "मेरा कनेक्शन", ipv4: "आपका सार्वजनिक आईपी:", ipv6: "आईपीवी6 कनेक्टिविटी:", location: "स्थान", city: "शहर", region: "क्षेत्र", country: "देश", noteLocation: "नोट: भौगोलिक स्थान ISP डेटाबेस पर आधारित है।", provider: "प्रदाता जानकारी", isp: "ISP (इंटरनेट सेवा प्रदाता)", org: "संगठन", search: "नेटवर्क विवरण", subSearch: "किसी भी आईपी के लिए ASN और WHOIS खोजें।", terminal: "💻 टर्मिनल क्वेरी", toast: "✅ रिपोर्ट कॉपी की गई", rdap: "रजिस्ट्री और आवंटन (RDAP)", abuse: "दुरुपयोग संपर्क", regDate: "पंजीकरण तिथि", lastUpdate: "अंतिम अपडेट", support: "सहायता ईमेल", abuseEmail: "दुरुपयोग ईमेल", asnDetails: "ASN और रूटिंग", asTitle: "स्वायत्त प्रणाली संख्या",
+                ipv6Query: "क्वेरी: IPv6 IPv4 के साथ असंगत है",
                 edu: [
-                    { h: "आईपी एड्रेस क्या है?", p: "आईपी एड्रेस नेटवर्क पर उपकरणों के लिए एक अद्वितीय पहचानकर्ता है।" },
-                    { h: "CheckMyIP.Today के बारे में", p: "हम आपके नेटवर्क कनेक्शन पर त्वरित फोरेंसिक प्रदान करते हैं।" },
-                    { h: "प्रमुख विशेषताएं", p: "IPv4/IPv6 डिटेक्शन और ASN विश्लेषण।" },
-                    { h: "लोकल बनाम पब्लिक आईपी", p: "आपका पब्लिक आईपी आपकी वेब पहचान है।" },
+                    { h: "आईपी एड्रेस क्या है?", p: "आईपी एड्रेस नेटवर्क पर उपकरणों के लिए एक विशिष्ट पहचानकर्ता है।" },
+                    { h: "CheckMyIP.Today के बारे में", p: "हम आपके नेटवर्क कनेक्शन पर तत्काल विश्लेषण प्रदान करते हैं।" },
+                    { h: "प्रमुख विशेषताएं", p: "IPv4/IPv6 का पता लगाना और ASN विश्लेषण।" },
+                    { h: "स्थानीय बनाम सार्वजनिक आईपी", p: "आपका सार्वजनिक आईपी आपकी web पहचान है।" },
                     { h: "जियो-लोकेशन कैसे काम करता है?", p: "डिजिटल कनेक्शन को भौतिक स्थान से मैप करता है।" },
-                    { h: "अन्य विकल्प", p: "IPinfo.io और Google के IP टूल।" }
+                    { h: "वैकल्पिक चेकर्स", p: "विश्वसनीय मानकों में IPinfo.io और Google शामिल हैं।" }
                 ]
             }
         };
+
+        // Helper para evitar problemas de undefined caso alguma função externa seja chamada erroneamente
+        function VietnameseTranslate(txt) { return txt; }
 
         function updateUI(lang) {
             const t = translations[lang] || translations['en'];
@@ -292,6 +301,12 @@
                 if(el) el.innerText = t[mapping[id]];
             }
 
+            // Atualiza a mensagem de erro/query de IPv6 caso o estado atual seja uma query manual
+            const v6El = document.getElementById('ipv6-display');
+            if (v6El && v6El.getAttribute('data-is-query') === 'true') {
+                v6El.innerText = t.ipv6Query;
+            }
+
             const eduHtml = t.edu.map(item => `
                 <section class="bg-slate-900/30 p-6 rounded-3xl border border-white/5 h-full">
                     <h3 class="text-white font-bold text-lg mb-2 italic">${item.h}</h3>
@@ -304,55 +319,51 @@
         async function fetchNetworkData(ip) {
             if (!ip || ip === "...") return;
             
-            let success = false;
-            try {
-                const res = await fetch(`https://ipwho.is/${ip}`);
-                const d = await res.json();
-                if(d.success) {
-                    applyData(d);
-                    success = true;
-                }
-            } catch(e) { console.warn("Primary geo lookup failed..."); }
+            const providers = [
+                { url: `https://ipwho.is/${ip}`, parser: d => d.success ? {
+                    city: d.city, region: d.region, country: d.country, isp: d.connection.isp, org: d.connection.org, asn: d.connection.asn, cc: d.country_code
+                } : null },
+                { url: `https://demo.ip-api.com/json/${ip}?fields=status,country,regionName,city,isp,org,as,countryCode`, parser: d => d.status === 'success' ? {
+                    city: d.city, region: d.regionName, country: d.country, isp: d.isp, org: d.org, asn: d.as?.split(' ')[0].replace('AS',''), cc: d.countryCode
+                } : null },
+                { url: `https://ipapi.co/${ip}/json/`, parser: d => !d.error ? {
+                    city: d.city, region: d.region, country: d.country_name, isp: d.org, org: d.org, asn: d.asn, cc: d.country_code
+                } : null }
+            ];
 
-            if(!success) {
+            for (let p of providers) {
                 try {
-                    const res = await fetch(`https://ipapi.co/${ip}/json/`);
-                    const d = await res.json();
-                    if(!d.error) {
-                        applyData({
-                            city: d.city, region: d.region, country: d.country_name,
-                            connection: { isp: d.org, org: d.org, asn: d.asn ? d.asn.replace('AS', '') : null },
-                            country_code: d.country_code
-                        });
-                        success = true;
+                    const res = await fetch(p.url);
+                    const raw = await res.json();
+                    const d = p.parser(raw);
+                    if (d) {
+                        applyData(d);
+                        fetchRDAP(ip);
+                        return;
                     }
-                } catch(e) { console.warn("Secondary geo lookup failed..."); }
+                } catch(e) { console.warn("API attempt failed, trying next..."); }
             }
+            setNA();
+        }
 
-            if(success) fetchRDAP(ip);
-            else setNA();
+        function setNA() {
+            ['info-city', 'info-region', 'info-country', 'info-isp', 'info-org', 'info-asn', 'registry-created', 'registry-updated', 'registry-email', 'registry-abuse'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.innerText = "N/A";
+            });
         }
 
         function applyData(d) {
             document.getElementById('info-city').innerText = d.city || "N/A";
             document.getElementById('info-region').innerText = d.region || "N/A";
             document.getElementById('info-country').innerText = d.country || "N/A";
-            document.getElementById('info-isp').innerText = d.connection?.isp || "N/A";
-            document.getElementById('info-org').innerText = d.connection?.org || d.connection?.isp || "N/A";
-            document.getElementById('info-asn').innerText = d.connection?.asn ? `AS${d.connection.asn}` : "N/A";
+            document.getElementById('info-isp').innerText = d.isp || "N/A";
+            document.getElementById('info-org').innerText = d.org || d.isp || "N/A";
+            document.getElementById('info-asn').innerText = d.asn ? `AS${d.asn}` : "N/A";
 
-            if(!window.manualLang && d.country_code) {
-                const code = d.country_code;
-                let target = 'en';
-                const map = {
-                    'BR': 'pt', 'PT': 'pt',
-                    'RU': 'ru', 'BY': 'ru', 'KZ': 'ru',
-                    'TR': 'tr',
-                    'ID': 'id',
-                    'VN': 'vi',
-                    'IN': 'hi'
-                };
-                target = map[code] || 'en';
+            if(!window.manualLang && d.cc) {
+                const map = { 'BR': 'pt', 'PT': 'pt', 'RU': 'ru', 'BY': 'ru', 'TR': 'tr', 'ID': 'id', 'VN': 'vi', 'IN': 'hi' };
+                const target = map[d.cc] || 'en';
                 document.getElementById('lang-select').value = target;
                 updateUI(target);
             }
@@ -370,7 +381,7 @@
                     ents?.forEach(e => {
                         e.vcardArray?.[1].forEach(v => {
                             if(v[0] === 'email') {
-                                if(v[3].includes('abuse')) emails.abuse = v[3];
+                                if(v[3].toLowerCase().includes('abuse')) emails.abuse = v[3];
                                 else emails.support = v[3];
                             }
                         });
@@ -380,24 +391,37 @@
                 extract(d.entities);
                 document.getElementById('registry-email').innerText = emails.support;
                 document.getElementById('registry-abuse').innerText = emails.abuse !== "N/A" ? emails.abuse : emails.support;
-            } catch(e) { 
-                ['registry-created', 'registry-updated', 'registry-email', 'registry-abuse'].forEach(id => document.getElementById(id).innerText = "N/A");
-            }
+            } catch(e) { /* silent fail handled by initial state */ }
         }
 
         async function detectIPv6() {
+            const v6El = document.getElementById('ipv6-display');
             try {
                 const res = await fetch('https://api64.ipify.org?format=json');
                 const data = await res.json();
-                document.getElementById('ipv6-display').innerText = data.ip.includes(':') ? data.ip : "NOT DETECTED";
-            } catch (e) { document.getElementById('ipv6-display').innerText = "NOT DETECTED"; }
-            document.getElementById('ipv6-display').classList.remove('loading-pulse');
+                v6El.innerText = data.ip.includes(':') ? data.ip : "NOT DETECTED";
+            } catch (e) { v6El.innerText = "NOT DETECTED"; }
+            v6El.classList.remove('loading-pulse');
+            v6El.setAttribute('data-is-query', 'false');
         }
 
         function manualLookup() {
             const ip = document.getElementById('ip-lookup-input').value.trim();
             if(!ip) return;
-            document.getElementById('ipv4-display').innerText = ip;
+            
+            // Coloca IPv4 em visualização
+            const v4El = document.getElementById('ipv4-display');
+            v4El.innerText = ip;
+            
+            // IPv6 entra em modo de QUERY explicativo para evitar confusão entre protocolos
+            const v6El = document.getElementById('ipv6-display');
+            const lang = document.getElementById('lang-select').value;
+            const t = translations[lang] || translations['en'];
+            
+            v6El.innerText = t.ipv6Query; 
+            v6El.setAttribute('data-is-query', 'true'); // Marca como modo query para futuras mudanças de idioma
+            v6El.classList.remove('loading-pulse'); // Remove o piscar imediatamente
+            
             fetchNetworkData(ip);
         }
 
@@ -407,13 +431,29 @@
         }
 
         function copyPageSummary() {
-            const summary = `CheckMyIP.Today Report\nIP: ${document.getElementById('ipv4-display').innerText}\nISP: ${document.getElementById('info-isp').innerText}\nLocation: ${document.getElementById('info-city').innerText}, ${document.getElementById('info-country').innerText}`;
+            const ip = document.getElementById('ipv4-display').innerText;
+            const isp = document.getElementById('info-isp').innerText;
+            const loc = `${document.getElementById('info-city').innerText}, ${document.getElementById('info-country').innerText}`;
+            const supportEmail = document.getElementById('registry-email').innerText;
+            const abuseEmail = document.getElementById('registry-abuse').innerText;
+            
+            const summary = `CheckMyIP.Today Report\n` +
+                            `--------------------------\n` +
+                            `IP: ${ip}\n` +
+                            `ISP: ${isp}\n` +
+                            `Location: ${loc}\n` +
+                            `Support Email: ${supportEmail}\n` +
+                            `Abuse Email: ${abuseEmail}\n` +
+                            `--------------------------\n` +
+                            `Generated at: ${new Date().toISOString()}`;
+
             const el = document.createElement('textarea');
             el.value = summary;
             document.body.appendChild(el);
             el.select();
             document.execCommand('copy');
             document.body.removeChild(el);
+            
             const toast = document.getElementById('copy-toast');
             toast.classList.remove('hidden');
             setTimeout(() => toast.classList.add('hidden'), 2000);
@@ -430,7 +470,6 @@
                 fetchNetworkData(d.ip);
             } catch(e) { 
                 document.getElementById('ipv4-display').innerText = "ERROR";
-                document.getElementById('ipv4-display').classList.remove('loading-pulse');
             }
             detectIPv6();
         };
