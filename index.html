@@ -202,8 +202,8 @@
 
     <script>
         // Variável de controle global para persistência de idioma
-        // Se a Worker da Cloudflare injetar forceLang, ela domina
-        window.manualLang = window.forceLang ? true : false;
+        // Se a Worker da Cloudflare injetar manualLang=true, ela domina
+        window.manualLang = (typeof window.manualLang !== 'undefined') ? window.manualLang : false;
 
         const translations = {
             en: { 
@@ -258,7 +258,7 @@
                 tagline: "Intelijen Jaringan Global", btnCopy: "SALIN RINGKASAN", btnReset: "KONEKSI SAYA", ipv4: "Alamat IP Publik Anda:", ipv6: "Konektivitas IPv6:", location: "Lokasi", city: "Kota", region: "Wilayah", country: "Negara", noteLocation: "Catatan: Lokasi geografi berdasarkan registri ISP resmi.", provider: "Informasi Penyedia", isp: "ISP (Penyedia Layanan Internet)", org: "Organisasi", search: "Detail Jaringan", subSearch: "Kueri ASN dan WHOIS untuk IP apa pun.", terminal: "💻 Kueri Terminal", toast: "✅ LAPORAN DISALIN", rdap: "Registri & Alokasi (RDAP)", abuse: "Kontak Penyalahgunaan", regDate: "Tanggal Registrasi", lastUpdate: "Pembaruan Terakhir", support: "Email Dukungan", abuseEmail: "Email Penyalahgunaan", asnDetails: "ASN & Perutean", asTitle: "Nomor Sistem Otonom",
                 ipv6Query: "KUERI: IPv6 tidak kompatibel dengan IPv4",
                 edu: [
-                    { h: "Apa itu Alamat IP?", p: "Alamat IP adalah pengidentifikasi unik untuk perangkat di jaringan." },
+                    { h: "Apa itu Alamat IP?", p: "Alamat IP adalah pengidentifikasi unik para perangkat di jaringan." },
                     { h: "Tentang CheckMyIP.Today", p: "Kami menyediakan forensik instan pada koneksi jaringan Anda." },
                     { h: "Fitur Utama", p: "Deteksi IPv4/IPv6 dan analisis ASN." },
                     { h: "IP Lokal vs Publik", p: "IP Publik adalah identitas web Anda." },
@@ -360,7 +360,7 @@
             document.getElementById('info-org').innerText = d.org || d.isp || "N/A";
             document.getElementById('info-asn').innerText = d.asn ? `AS${d.asn}` : "N/A";
 
-            // Só altera idioma automaticamente se não houver trava de manualLang (ou forceLang da Worker)
+            // Só altera idioma automaticamente se NÃO houver trava de manualLang (subpastas ou clique manual)
             if(!window.manualLang && d.cc) {
                 const map = { 'BR': 'pt', 'PT': 'pt', 'RU': 'ru', 'TR': 'tr', 'ID': 'id', 'VN': 'vi', 'IN': 'hi' };
                 const target = map[d.cc] || 'en';
@@ -434,17 +434,30 @@
         window.onload = () => {
             document.getElementById('main-body').classList.add('ready');
             
-            // Se a Worker injetou um idioma, usamos ele primeiro
+            // 1. Prioridade para dados injetados pela Worker (Cloudflare)
+            if (window.cloudflareData) {
+                applyData(window.cloudflareData);
+                const ip = document.getElementById('ipv4-display').innerText;
+                if(ip !== "...") fetchRDAP(ip);
+            }
+
+            // 2. Se a Worker forçar um idioma (subpasta), definimos o seletor
             if (window.forceLang) {
                 document.getElementById('lang-select').value = window.forceLang;
             }
             
             updateUI(document.getElementById('lang-select').value);
             
+            // 3. Busca o IP para exibição real e backup de dados
             fetch('https://api.ipify.org?format=json').then(r => r.json()).then(d => {
                 document.getElementById('ipv4-display').innerText = d.ip;
                 document.getElementById('ipv4-display').classList.remove('loading-pulse');
-                fetchNetworkData(d.ip);
+                
+                if (!window.cloudflareData) {
+                    fetchNetworkData(d.ip);
+                } else {
+                    fetchRDAP(d.ip);
+                }
             });
             detectIPv6();
         };
