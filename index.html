@@ -8,7 +8,17 @@
     <title id="meta-title">Check My IP Today - IPv4, IPv6 & Network Intelligence</title>
     <meta name="description" id="meta-desc" content="Detect your public IPv4 and IPv6 addresses instantly. Get ISP details, ASN, and official RDAP/WHOIS records.">
     
-    <!-- CSS CRÍTICO - Performance & Visual -->
+    <!-- SEO Internacional: Hreflang Tags -->
+    <link rel="alternate" hreflang="x-default" href="https://checkmyip.today/" />
+    <link rel="alternate" hreflang="en" href="https://checkmyip.today/" />
+    <link rel="alternate" hreflang="pt" href="https://checkmyip.today/pt/" />
+    <link rel="alternate" hreflang="ru" href="https://checkmyip.today/ru/" />
+    <link rel="alternate" hreflang="tr" href="https://checkmyip.today/tr/" />
+    <link rel="alternate" hreflang="hi" href="https://checkmyip.today/hi/" />
+    <link rel="alternate" hreflang="id" href="https://checkmyip.today/id/" />
+    <link rel="alternate" hreflang="vi" href="https://checkmyip.today/vi/" />
+
+    <!-- CSS CRÍTICO -->
     <style>
         :root { --bg-deep: #020617; }
         html { background-color: #020617; }
@@ -24,25 +34,22 @@
         .glass-card { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .loading-pulse { animation: pulse 1.5s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
-        .truncate-custom { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        /* Ajuste para quebra de linha no IPv6 */
         .ipv6-text-wrap { word-break: break-word; overflow-wrap: anywhere; line-height: 1.4; display: block; width: 100%; }
+        .truncate-custom { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     </style>
 
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Schema.org JSON-LD -->
+    <!-- Schema.org -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
       "name": "CheckMyIP.Today",
       "url": "https://checkmyip.today",
-      "description": "Professional tool for IP address detection, geolocation and network forensics.",
+      "description": "Professional tool for IP address detection and network forensics.",
       "applicationCategory": "NetworkingTool",
-      "operatingSystem": "All",
-      "featureList": ["IPv4 Detection", "IPv6 Detection", "RDAP Lookup", "ASN Intelligence", "Multi-language Support"]
+      "operatingSystem": "All"
     }
     </script>
 </head>
@@ -52,7 +59,7 @@
     <div class="max-w-5xl mx-auto p-4 md:p-6 flex flex-col gap-6">
         <!-- Header -->
         <header class="flex flex-col md:flex-row justify-between items-center gap-4 bg-slate-900/50 p-6 rounded-3xl border border-white/5">
-            <div onclick="location.reload()" class="cursor-pointer">
+            <div onclick="location.href='/'" class="cursor-pointer">
                 <h1 class="text-2xl font-extrabold text-white italic">CHECKMYIP.<span class="text-blue-500 text-[10px] align-top">TODAY</span></h1>
                 <p id="tagline" class="text-slate-500 text-[10px] font-mono uppercase tracking-widest">Global Network Intelligence</p>
             </div>
@@ -75,7 +82,7 @@
             </nav>
         </header>
 
-        <!-- IP Displays -->
+        <!-- Main Content (IPs) -->
         <main class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <section class="glass-card p-8 rounded-3xl relative overflow-hidden">
                 <div class="absolute top-0 right-0 p-4 opacity-10 text-6xl font-black italic">v4</div>
@@ -92,7 +99,7 @@
             </section>
         </main>
 
-        <!-- Location & ISP Info -->
+        <!-- Location, ISP & ASN -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="glass-card p-6 rounded-3xl border-l-4 border-l-blue-500 flex flex-col">
                 <h3 id="title-location" class="text-[10px] font-bold text-slate-500 uppercase mb-4 italic">Location</h3>
@@ -139,7 +146,7 @@
             </div>
         </div>
 
-        <!-- RDAP Data -->
+        <!-- RDAP & Abuse Info -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="glass-card p-6 rounded-3xl">
                 <h3 id="title-rdap" class="text-[10px] text-slate-500 font-bold uppercase mb-4 italic">Registry & Allocation (RDAP)</h3>
@@ -169,7 +176,7 @@
             </div>
         </div>
 
-        <!-- Search -->
+        <!-- IP Lookup Section -->
         <section class="glass-card p-8 rounded-3xl">
             <div class="flex flex-col md:flex-row justify-between items-center gap-6">
                 <div>
@@ -183,9 +190,9 @@
             </div>
         </section>
 
-        <!-- Educational Content (Hierarquia H3) -->
+        <!-- Educational Content -->
         <article id="edu-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            <!-- Gerado via JS -->
+            <!-- JS Populated -->
         </article>
 
         <footer class="py-12 border-t border-white/5 text-center">
@@ -195,7 +202,8 @@
 
     <script>
         // Variável de controle global para persistência de idioma
-        window.manualLang = false;
+        // Se a Worker da Cloudflare injetar forceLang, ela domina
+        window.manualLang = window.forceLang ? true : false;
 
         const translations = {
             en: { 
@@ -271,20 +279,18 @@
                 ]
             },
             hi: {
-                tagline: "ग्लोबल नेटवर्क इंटेलिजेंस", btnCopy: "सारांश कॉपी करें", btnReset: "मेरा कनेक्शन", ipv4: "आपका सार्वजनिक आईपी:", ipv6: "आईपीवी6 कनेक्टिविटी:", location: "स्थान", city: "शहर", region: "क्षेत्र", country: "देश", noteLocation: "नोट: भौगोलिक स्थान ISP डेटाबेस पर आधारित है।", provider: "प्रदाता जानकारी", isp: "ISP (इंटरनेट सेवा प्रदाता)", org: "संगठन", search: "नेटवर्क विवरण", subSearch: "किसी भी आईपी के लिए ASN और WHOIS खोजें।", terminal: "💻 टर्मिनल क्वेरी", toast: "✅ रिपोर्ट कॉपी की गई", rdap: "रजिस्ट्री और आवंटन (RDAP)", abuse: "दुरुपयोग संपर्क", regDate: "पंजीकरण तिथि", lastUpdate: "अंतिम अपडेट", support: "सहायता ईमेल", abuseEmail: "दुरुपयोग ईमेल", asnDetails: "ASN और रूटिंग", asTitle: "स्वायत्त प्रणाली संख्या",
+                tagline: "ग्लोबल नेटवर्क इंटेलिजेंस", btnCopy: "सारांश कॉपी करें", btnReset: "मेरा कनेक्शन", ipv4: "आपका सार्वजनिक आईपी:", ipv6: "आईपीवी6 कनेक्टिविटी:", location: "स्थान", city: "शहर", region: "क्षेत्र", country: "देश", noteLocation: "नोट: भौगोलिक स्थान ISP डेटाबेस पर आधारित है।", provider: "प्रदाता जानकारी", isp: "ISP (इंटरनेट सेवा प्रदाता)", org: "संगठन", search: "नेटवर्क विवरण", subSearch: "किसी भी आईपी के लिए ASN और WHOIS खोजें।", terminal: "💻 टर्मिनल क्वेरी", toast: "✅ रिपोर्ट कॉपी की गई", rdap: "रजिस्ट्री और आवंटन (RDAP)", abuse: "दुरुपयोग संपर्क", regDate: "पंजीकरण तिथि", lastUpdate: "अंतिम अपडेट", support: "सहायata ईमेल", abuseEmail: "दुरुपयोग ईमेल", asnDetails: "ASN और रूटिंग", asTitle: "स्वायत्त प्रणाली संख्या",
                 ipv6Query: "क्वेरी: IPv6 IPv4 के साथ असंगत है",
                 edu: [
                     { h: "आईपी एड्रेस क्या है?", p: "आईपी एड्रेस नेटवर्क पर उपकरणों के लिए एक विशिष्ट पहचानकर्ता है।" },
                     { h: "CheckMyIP.Today के बारे में", p: "हम आपके नेटवर्क कनेक्शन पर तत्काल विश्लेषण प्रदान करते हैं।" },
                     { h: "प्रमुख विशेषताएं", p: "IPv4/IPv6 का पता लगाना और ASN विश्लेषण।" },
-                    { h: HindiTranslate("स्थानीय बनाम सार्वजनिक आईपी"), p: "आपका सार्वजनिक आईपी आपकी web पहचान है।" },
+                    { h: "स्थानीय बनाम सार्वजनिक आईपी", p: "आपका सार्वजनिक आईपी आपकी web पहचान है।" },
                     { h: "जियो-लोकेशन कैसे काम करता है?", p: "डिजital कनेक्शन को भौतिक स्थान से मैप करता है।" },
                     { h: "वैकल्पिक चेकर्स", p: "विश्वसनीय मानकों में IPinfo.io और Google शामिल हैं।" }
                 ]
             }
         };
-
-        function HindiTranslate(txt) { return txt; }
 
         function updateUI(lang) {
             const t = translations[lang] || translations['en'];
@@ -319,43 +325,30 @@
 
         async function fetchNetworkData(ip) {
             if (!ip || ip === "...") return;
-            
-            // Forçamos a UI a manter o idioma atual do seletor antes da requisição
             const currentLang = document.getElementById('lang-select').value;
             updateUI(currentLang);
 
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 6000);
 
-            const providers = [
-                { url: `https://ipwho.is/${ip}`, parser: d => d.success ? {
-                    city: d.city, region: d.region, country: d.country, isp: d.connection.isp, org: d.connection.org, asn: d.connection.asn, cc: d.country_code
-                } : null },
-                { url: `https://ipapi.co/${ip}/json/`, parser: d => !d.error ? {
-                    city: d.city, region: d.region, country: d.country_name, isp: d.org, org: d.org, asn: d.asn, cc: d.country_code
-                } : null }
-            ];
-
-            for (let p of providers) {
-                try {
-                    const res = await fetch(p.url, { signal: controller.signal });
-                    const raw = await res.json();
-                    const d = p.parser(raw);
-                    if (d) {
-                        applyData(d);
-                        fetchRDAP(ip);
-                        clearTimeout(timeoutId);
-                        return;
-                    }
-                } catch(e) { console.warn("API attempt failed or timed out..."); }
-            }
-            setNA();
+            try {
+                const res = await fetch(`https://ipwho.is/${ip}`, { signal: controller.signal });
+                const d = await res.json();
+                if (d.success) {
+                    applyData({
+                        city: d.city, region: d.region, country: d.country, 
+                        isp: d.connection.isp, org: d.connection.org, 
+                        asn: d.connection.asn, cc: d.country_code
+                    });
+                    fetchRDAP(ip);
+                }
+            } catch(e) { console.warn("API error..."); setNA(); }
+            clearTimeout(timeoutId);
         }
 
         function setNA() {
-            ['info-city', 'info-region', 'info-country', 'info-isp', 'info-org', 'info-asn', 'registry-created', 'registry-updated', 'registry-email', 'registry-abuse'].forEach(id => {
-                const el = document.getElementById(id);
-                if(el) el.innerText = "N/A";
+            ['info-city', 'info-region', 'info-country', 'info-isp', 'info-org', 'info-asn'].forEach(id => {
+                document.getElementById(id).innerText = "N/A";
             });
         }
 
@@ -367,15 +360,12 @@
             document.getElementById('info-org').innerText = d.org || d.isp || "N/A";
             document.getElementById('info-asn').innerText = d.asn ? `AS${d.asn}` : "N/A";
 
-            // Só altera o idioma automaticamente se o usuário ainda não tocou no seletor ou fez busca
+            // Só altera idioma automaticamente se não houver trava de manualLang (ou forceLang da Worker)
             if(!window.manualLang && d.cc) {
-                const map = { 'BR': 'pt', 'PT': 'pt', 'RU': 'ru', 'BY': 'ru', 'TR': 'tr', 'ID': 'id', 'VN': 'vi', 'IN': 'hi' };
+                const map = { 'BR': 'pt', 'PT': 'pt', 'RU': 'ru', 'TR': 'tr', 'ID': 'id', 'VN': 'vi', 'IN': 'hi' };
                 const target = map[d.cc] || 'en';
                 document.getElementById('lang-select').value = target;
                 updateUI(target);
-            } else {
-                // Se já houver escolha manual, reafirmamos o idioma selecionado
-                updateUI(document.getElementById('lang-select').value);
             }
         }
 
@@ -385,7 +375,6 @@
                 const d = await res.json();
                 document.getElementById('registry-created').innerText = (d.events?.find(e => e.eventAction === 'registration')?.eventDate || "N/A").split('T')[0];
                 document.getElementById('registry-updated').innerText = (d.events?.find(e => e.eventAction === 'last changed')?.eventDate || "N/A").split('T')[0];
-                
                 let emails = { support: "N/A", abuse: "N/A" };
                 const extract = (ents) => {
                     ents?.forEach(e => {
@@ -401,7 +390,7 @@
                 extract(d.entities);
                 document.getElementById('registry-email').innerText = emails.support;
                 document.getElementById('registry-abuse').innerText = emails.abuse !== "N/A" ? emails.abuse : emails.support;
-            } catch(e) { }
+            } catch(e) {}
         }
 
         async function detectIPv6() {
@@ -418,23 +407,8 @@
         function manualLookup() {
             const ip = document.getElementById('ip-lookup-input').value.trim();
             if(!ip) return;
-            
-            // Ao buscar manualmente, travamos a preferência de idioma atual
             window.manualLang = true;
-            
-            const v4El = document.getElementById('ipv4-display');
-            v4El.innerText = ip;
-            const v6El = document.getElementById('ipv6-display');
-            
-            const lang = document.getElementById('lang-select').value;
-            const t = translations[lang] || translations['en'];
-            
-            v6El.innerText = t.ipv6Query; 
-            v6El.setAttribute('data-is-query', 'true');
-            v6El.classList.remove('loading-pulse');
-            
-            // Atualizamos a UI antes da requisição para garantir consistência
-            updateUI(lang);
+            document.getElementById('ipv4-display').innerText = ip;
             fetchNetworkData(ip);
         }
 
@@ -445,11 +419,7 @@
 
         function copyPageSummary() {
             const ip = document.getElementById('ipv4-display').innerText;
-            const isp = document.getElementById('info-isp').innerText;
-            const loc = `${document.getElementById('info-city').innerText}, ${document.getElementById('info-country').innerText}`;
-            const supportEmail = document.getElementById('registry-email').innerText;
-            const abuseEmail = document.getElementById('registry-abuse').innerText;
-            const summary = `CheckMyIP.Today Report\n--------------------------\nIP: ${ip}\nISP: ${isp}\nLocation: ${loc}\nSupport Email: ${supportEmail}\nAbuse Email: ${abuseEmail}\n--------------------------\nGenerated at: ${new Date().toISOString()}`;
+            const summary = `CheckMyIP.Today Report\nIP: ${ip}\nGenerated: ${new Date().toISOString()}`;
             const el = document.createElement('textarea');
             el.value = summary;
             document.body.appendChild(el);
@@ -464,19 +434,19 @@
         window.onload = () => {
             document.getElementById('main-body').classList.add('ready');
             
-            // Inicializamos a UI com o idioma padrão do seletor
+            // Se a Worker injetou um idioma, usamos ele primeiro
+            if (window.forceLang) {
+                document.getElementById('lang-select').value = window.forceLang;
+            }
+            
             updateUI(document.getElementById('lang-select').value);
             
-            Promise.all([
-                fetch('https://api.ipify.org?format=json').then(r => r.json()),
-                detectIPv6()
-            ]).then(([d4]) => {
-                document.getElementById('ipv4-display').innerText = d4.ip;
+            fetch('https://api.ipify.org?format=json').then(r => r.json()).then(d => {
+                document.getElementById('ipv4-display').innerText = d.ip;
                 document.getElementById('ipv4-display').classList.remove('loading-pulse');
-                fetchNetworkData(d4.ip);
-            }).catch(() => {
-                document.getElementById('ipv4-display').innerText = "ERROR";
+                fetchNetworkData(d.ip);
             });
+            detectIPv6();
         };
     </script>
 </body>
