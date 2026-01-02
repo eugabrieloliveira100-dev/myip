@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
+    <!-- Forçar HTTPS automaticamente -->
+    <script>
+        if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+            window.location.href = 'https://' + window.location.hostname + window.location.pathname + window.location.search + window.location.hash;
+        }
+    </script>
+
     <!-- Google Analytics (GA4) - G-MNJRSCC6K3 -->
     <script async data-cfasync="false" src="https://www.googletagmanager.com/gtag/js?id=G-MNJRSCC6K3"></script>
     <script data-cfasync="false">
@@ -146,6 +153,17 @@
         
         .btn-refresh:hover .refresh-icon {
             transform: rotate(180deg);
+        }
+
+        /* Estilo para status de erro */
+        .error-status {
+            color: #ef4444 !important;
+            font-weight: bold;
+        }
+        
+        .warning-status {
+            color: #f59e0b !important;
+            font-weight: bold;
         }
 
  </style>
@@ -460,49 +478,171 @@
                 document.getElementById(field).innerText = 'Searching...';
             });
             
-            // Buscar IP atual novamente
+            // Buscar IP atual novamente com fallback e timeout
             let currentIP = null;
             try {
-                const res = await Promise.any([
-                    fetch('https://api.ipify.org?format=json').then(r => r.json()),
-                    fetch('https://api64.ipify.org?format=json').then(r => r.json())
-                ]);
-                currentIP = res.ip;
+                currentIP = await fetchCurrentIP();
+                if (currentIP) {
+                    document.getElementById('ipv4-display').innerText = currentIP;
+                    document.getElementById('ipv4-display').classList.remove('loading-pulse');
+                    
+                    // Buscar informações do IP
+                    fetchRDAP(currentIP);
+                    await fetchGeo(currentIP);
+                } else {
+                    showConnectionError('ipv4-display');
+                }
             } catch(e) {
                 console.error('Erro ao buscar IP:', e);
+                showConnectionError('ipv4-display');
             }
-
+            
+            // Buscar IPv6 novamente com fallback
+            await fetchIPv6();
+            
+            // Mostrar mensagem de sucesso se tudo funcionou
             if (currentIP) {
-                document.getElementById('ipv4-display').innerText = currentIP;
-                document.getElementById('ipv4-display').classList.remove('loading-pulse');
-                
-                // Buscar informações do IP
-                fetchRDAP(currentIP);
-                await fetchGeo(currentIP);
-            } else {
-                document.getElementById('ipv4-display').innerText = "OFFLINE/ERR";
-                document.getElementById('ipv4-display').classList.remove('loading-pulse');
+                showToast("✅ Connection Refreshed");
+            }
+        }
+
+        // Função para buscar IP atual com fallback e timeout
+        async function fetchCurrentIP() {
+            const primaryAPIs = [
+                'https://api.ipify.org?format=json',
+                'https://api64.ipify.org?format=json'
+            ];
+            
+            const fallbackAPIs = [
+                'https://api.ipify.org?format=json',
+                'https://ipinfo.io/json',
+                'https://api.my-ip.io/ip.json',
+                'https://ident.me/.json'
+            ];
+            
+            // Tentar APIs primárias primeiro
+            for (const api of primaryAPIs) {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 3000);
+                    
+                    const response = await fetch(api, { 
+                        signal: controller.signal,
+                        mode: 'cors'
+                    });
+                    clearTimeout(timeoutId);
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        return data.ip;
+                    }
+                } catch (error) {
+                    console.log(`API ${api} falhou, tentando próxima...`);
+                    continue;
+                }
             }
             
-            // Buscar IPv6 novamente
-            fetch('https://api64.ipify.org?format=json')
-                .then(r => r.json())
-                .then(d => {
-                    const el = document.getElementById('ipv6-display');
-                    if (!isManualSearch) {
-                        el.innerText = (d.ip && d.ip.includes(':')) ? d.ip : "NOT DETECTED";
-                        el.classList.remove('loading-pulse');
+            // Se as primárias falharem, tentar fallbacks
+            for (const api of fallbackAPIs) {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 3000);
+                    
+                    const response = await fetch(api, { 
+                        signal: controller.signal,
+                        mode: 'cors'
+                    });
+                    clearTimeout(timeoutId);
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        return data.ip || data.ip_address || data.address;
                     }
-                })
-                .catch(() => {
-                    if (!isManualSearch) {
-                        document.getElementById('ipv6-display').innerText = "NOT DETECTED";
-                        document.getElementById('ipv6-display').classList.remove('loading-pulse');
-                    }
-                });
+                } catch (error) {
+                    console.log(`Fallback API ${api} falhou, tentando próxima...`);
+                    continue;
+                }
+            }
             
-            // Mostrar mensagem de sucesso
-            showToast("✅ Connection Refreshed");
+            // Se todas falharem
+            return null;
+        }
+
+        // Função para buscar IPv6 com fallback
+        async function fetchIPv6() {
+            const ipv6APIs = [
+                'https://api64.ipify.org?format=json',
+                'https://ipv6.icanhazip.com/',
+                'https://v6.ident.me/.json'
+            ];
+            
+            for (const api of ipv6APIs) {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 3000);
+                    
+                    const response = await fetch(api, { 
+                        signal: controller.signal,
+                        mode: 'cors'
+                    });
+                    clearTimeout(timeoutId);
+                    
+                    if (response.ok) {
+                        let data;
+                        if (api.includes('icanhazip') || api.includes('ident.me/')) {
+                            const text = await response.text();
+                            data = { ip: text.trim() };
+                        } else {
+                            data = await response.json();
+                        }
+                        
+                        const el = document.getElementById('ipv6-display');
+                        if (!isManualSearch && data.ip) {
+                            el.innerText = data.ip.includes(':') ? data.ip : "NOT DETECTED";
+                            el.classList.remove('loading-pulse');
+                            return;
+                        }
+                    }
+                } catch (error) {
+                    continue;
+                }
+            }
+            
+            // Se todas as APIs falharem
+            if (!isManualSearch) {
+                const el = document.getElementById('ipv6-display');
+                el.innerText = "NOT DETECTED";
+                el.classList.remove('loading-pulse');
+            }
+        }
+
+        // Função para mostrar erro de conexão
+        function showConnectionError(elementId) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.innerText = "Connection Timeout";
+                element.classList.remove('loading-pulse');
+                element.classList.add('error-status');
+            }
+            
+            // Atualizar outros campos para mostrar erro
+            const infoFields = ['info-city', 'info-region', 'info-country', 'info-isp', 'info-org', 'info-asn'];
+            infoFields.forEach(field => {
+                const el = document.getElementById(field);
+                if (el && el.innerText === 'Searching...') {
+                    el.innerText = "Network Error";
+                    el.classList.add('error-status');
+                }
+            });
+            
+            const rdapFields = ['registry-created', 'registry-updated', 'registry-email', 'registry-abuse'];
+            rdapFields.forEach(field => {
+                const el = document.getElementById(field);
+                if (el && el.innerText === 'Searching...') {
+                    el.innerText = "N/A";
+                    el.classList.add('warning-status');
+                }
+            });
         }
 
         const translations = {
@@ -518,7 +658,7 @@
             ms: { queryMode: "KUERI MANUAL AKTIF", tagline: "Intelijen Rangkaian Global", btnCopy: "SALIN RINGKASAN", btnReset: "SAMBUNGAN SAYA", ipv4: "Identiti IP Semasa:", ipv6: "Protokol Sekunder:", location: "Lokasi", city: "Bandar", region: "Wilayah", country: "Negara", noteLocation: "Nota: Lokasi geografi mewakili titik penamatan rangkaian.", provider: "Maklumat Penyedia", isp: "ISP", org: "Organisasi", search: "Carian Manual", subSearch: "Masukkan sebarang alamat IP para disiasat.", terminal: "💻 Terminal", toast: "✅ LAPORAN DISALIN", rdap: "Pendaftaran (RDAP)", abuse: "Kenalan Aduan", regDate: "Dibuat", lastUpdate: "Dikemas Kini", support: "E-mel", abuseEmail: "Aduan", asnDetails: "ASN & Penghalaan", asTitle: "Nombor Sistem Autonomi", footer: "© 2024 CheckMyIP.Today • Forensik Rangkaian", copyV4: "SALIN IPV4", copyV6: "SALIN IPV6", edu: [{ h: "Apa itu IP?", p: "Alamat IP adalah pengecam unik para peranti dalam rangkaian." }, { h: "Forensik Rangkaian", p: "Kami menganalisis rekod ISP, ASN, dan RDAP para ketelusan sambungan." }, { h: "Ketersediaan Global", p: "Dioptimumkan para kelajuan di semua benua melalui pengkomputeran tepi." }] },
             kk: { queryMode: "ҚОЛМЕН СҰРАУ БЕЛСЕНДІ", tagline: "Жаһандық желілік барлау", btnCopy: "ЖИЫНТЫҚТЫ КӨШІРУ", btnReset: "МЕНІҢ ҚОСЫЛЫМЫМ", ipv4: "Ағымдағы IP идентификациясы:", ipv6: "Қосымша хаттама:", location: "Орналасқан жері", city: "Қала", region: "Аймақ", country: "Ел", noteLocation: "Ескертпе: Географиялық орналасу желінің аяқталу нүктесін білдіреді.", provider: "Провайдер туралы ақпарат", isp: "ISP", org: "Ұйым", search: "Қолмен іздеу", subSearch: "Зерттеу үшін кез келген IP мекенжайын енгізіңіз.", terminal: "💻 Терминал", toast: "✅ ЕСЕП КӨШІРІЛДІ", rdap: "Тізілім (RDAP)", abuse: "Теріс пайдалану контактілері", regDate: "Құрылды", lastUpdate: "Жаңартылды", support: "Электрондық пошта", abuseEmail: "Айыппұл", asnDetails: "ASN және маршруттау", asTitle: "Автономды жүйе нөмірі", footer: "© 2024 CheckMyIP.Today • Желілік криминалистика", copyV4: "IPV4 КӨШІРУ", copyV6: "IPV6 КӨШІРУ", edu: [{ h: "IP дегеніміз не?", p: "IP мекенжайы — желідегі құрылғылардың бірегей идентификаторы." }, { h: "Жаһандық қолжетімділік", p: "Edge computing арқылы барлық континенттерде жылдамдық үшін оңтайландырылған." }] },
             uk: { queryMode: "АКТИВНИЙ РУЧНИЙ ЗАПИТ", tagline: "Глобальна мережева розвідка", btnCopy: "КОПІЮВАТИ ЗВІТ", btnReset: "МОЄ З'ЄДНАННЯ", ipv4: "Поточний IP:", ipv6: "Вторинний протокол:", location: "Місцезнаходження", city: "Місто", region: "Регіон", country: "Країна", noteLocation: "Примітка: Географічне положення представляє точку термінації мережі.", provider: "Інформація про провайдера", isp: "Провайдер", org: "Організація", search: "Ручний пошук", subSearch: "Введіть будь-яку IP-адресу для дослідження.", terminal: "💻 Термінал", toast: "✅ ЗВІТ СКОПІЙОВАНО", rdap: "Реєстр (RDAP)", abuse: "Контакти", regDate: "Створено", lastUpdate: "Обновлено", support: "Email", abuseEmail: "Абуз", asnDetails: "ASN та маршрутизація", asTitle: "Номер автономної системи", footer: "© 2024 CheckMyIP.Today • Мережева криміналістика", copyV4: "КОПІЮВАТИ IPV4", copyV6: "КОПІЮВАТИ IPV6", edu: [{ h: "Що таке IP?", p: "IP-адреса — це унікальний ідентифікатор пристрою в мережі." }, { h: "Глобальна доступність", p: "Оптимізовано для швидкості на всіх континентах через граничні обчислення." }] },
-            pl: { queryMode: "RĘCZNE ZAPYTANIE AKTYWNE", tagline: "Globalna inteligencja sieciowa", btnCopy: "KOPIUJ RAPORT", btnReset: "MOJE POŁĄCZENIE", ipv4: "Aktualne IP:", ipv6: "Protokół wtórny:", location: "Lokalizacja", city: "Miasto", region: "Region", country: "Kraj", noteLocation: "Uwaga: Lokalizacja reprezentuje punkt zakończenia sieci.", provider: "Informacje o dostawcy", isp: "ISP", org: "Organizacja", search: "Wyszukiwanie ręczne", subSearch: "Wpisz dowolny adres IP, aby go zbadać.", terminal: "💻 Terminal", toast: "✅ RAPORT SKOPIOWANY", rdap: "Rejestr (RDAP)", abuse: "Kontakty ds. nadużyć", regDate: "Utworzono", lastUpdate: "Zaktualizowano", support: "Email", abuseEmail: "Nadużycie", asnDetails: "ASN i routing", asTitle: "Numer systemu autonomicznego", footer: "© 2024 CheckMyIP.Today • Informatyka śledcza", copyV4: "KOPIUJ IPV4", copyV6: "KOPIUJ IPV6", edu: [{ h: "Co to jest IP?", p: "Adres IP to unikalny identyfikator urządzenia w sieci." }, { h: "Globalna dostępność", p: "Zoptymalizowane pod kątem szybkości na wszystkich kontynentach." }] },
+            pl: { queryMode: "RĘCZNE ZAPYTANIE AKTYWNE", tagline: "Globalna inteligencja sieciowa", btnCopy: "KOPIUJ RAPORT", btnReset: "MOJE POŁĄCZENIE", ipv4: "Aktualne IP:", ipv6: "Protokół wtórny:", location: "Lokalizacja", city: "Miasto", region: "Region", country: "Kraj", noteLocation: "Uwaga: Lokalizacja reprezentuje punkt zakończenia sieci.", provider: "Informacje о dostawcy", isp: "ISP", org: "Organizacja", search: "Wyszukiwanie ręczne", subSearch: "Wpisz dowolny adres IP, aby go zbadać.", terminal: "💻 Terminal", toast: "✅ RAPORT SKOPIOWANY", rdap: "Rejestr (RDAP)", abuse: "Kontakty ds. nadużyć", regDate: "Utworzono", lastUpdate: "Zaktualizowano", support: "Email", abuseEmail: "Nadużycie", asnDetails: "ASN i routing", asTitle: "Numer systemu autonomicznego", footer: "© 2024 CheckMyIP.Today • Informatyka śledcza", copyV4: "KOPIUJ IPV4", copyV6: "KOPIUJ IPV6", edu: [{ h: "Co to jest IP?", p: "Adres IP to unikalny identyfikator urządzenia w sieci." }, { h: "Globalna доступність", p: "Zoptymalizowane pod kątem szybkości na wszystkich kontynentach." }] },
             ar: { 
                 dir: "rtl", queryMode: "طلب يدوي نشط", tagline: "استخبارات الشبكة العالمية", btnCopy: "نسخ الملخص", btnReset: "اتصالي", ipv4: "عنوان IP الحالي:", ipv6: "البروتوكول الثانوي:", location: "الموقع", city: "المدينة", region: "المنطقة", country: "البلد", noteLocation: "ملاحظة: الموقع الجغرافي يمثل نقطة نهاية الشبكة.", provider: "معلومات المزود", isp: "مزود الخدمة", org: "المؤسسة", search: "بحث يدوي", subSearch: "أدخل أي عنوان IP للتحقيق.", terminal: "💻 المحطة", toast: "✅ تم نسخ التقرير", rdap: "السجل (RDAP)", abuse: "جهات اتصال الإساءة", regDate: "تاريخ الإنشاء", lastUpdate: "تاريخ التحديث", support: "البريد", abuseEmail: "الإساءة", asnDetails: "ASN والتوجيه", asTitle: "رقم النظام المستقل", footer: "© 2024 CheckMyIP.Today • الطب الشرعي للشبكات", copyV4: "نسخ IPV4", copyV6: "نسخ IPV6", edu: [{ h: "ما هو IP؟", p: "عنوان IP هو معرف فريد للأجهزة على الشبكة." }, { h: "الأمان والسرعة", p: "نحن نحلل سجلات ISP و ASN و RDAP لشفافية الاتصال." }] 
             },
@@ -546,9 +686,16 @@
         }
 
         async function fetchRDAP(ip) {
-            if (!ip || ip === "..." || ip.includes("ERROR") || ip.includes("FAILED")) return;
+            if (!ip || ip === "..." || ip.includes("ERROR") || ip.includes("FAILED") || ip === "Connection Timeout") return;
             try {
-                const res = await fetch(`https://rdap.db.ripe.net/ip/${ip}`);
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3000);
+                
+                const res = await fetch(`https://rdap.db.ripe.net/ip/${ip}`, {
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+                
                 if (!res.ok) throw new Error("RDAP not found");
                 const d = await res.json();
                 document.getElementById('registry-created').innerText = (d.events?.find(e => e.eventAction === 'registration')?.eventDate || "N/A").split('T')[0];
@@ -572,6 +719,7 @@
                 ['registry-created', 'registry-updated', 'registry-email', 'registry-abuse'].forEach(id => {
                     const el = document.getElementById(id);
                     if(el) el.innerText = "N/A";
+                    el.classList.add('warning-status');
                 });
             }
         }
@@ -604,10 +752,20 @@
 
         async function fetchGeo(ip) {
             const providers = [
-                () => fetch(`https://ipwho.is/${ip}`).then(r => r.json()),
-                () => fetch(`https://ip-api.com/json/${ip}`).then(r => r.json()),
-                () => fetch(`https://ipapi.co/${ip}/json/`).then(r => r.json())
+                () => fetch(`https://ipwho.is/${ip}`, { 
+                    signal: AbortSignal.timeout(3000) 
+                }).then(r => r.json()),
+                () => fetch(`https://ip-api.com/json/${ip}`, { 
+                    signal: AbortSignal.timeout(3000) 
+                }).then(r => r.json()),
+                () => fetch(`https://ipapi.co/${ip}/json/`, { 
+                    signal: AbortSignal.timeout(3000) 
+                }).then(r => r.json()),
+                () => fetch(`https://api.ipdata.co/${ip}?api-key=test`, { 
+                    signal: AbortSignal.timeout(3000) 
+                }).then(r => r.json())
             ];
+            
             for (const provider of providers) {
                 try {
                     const data = await provider();
@@ -615,8 +773,14 @@
                         applyData(data);
                         return true;
                     }
-                } catch (e) {}
+                } catch (e) {
+                    console.log(`Geo API falhou: ${e.message}`);
+                    continue;
+                }
             }
+            
+            // Se todas as APIs falharem
+            applyData({});
             return false;
         }
 
@@ -636,24 +800,24 @@
                 updateUI(document.getElementById('lang-select').value);
             }
 
+            // Buscar IP atual com fallback
             let currentIP = null;
             try {
-                const res = await Promise.any([
-                    fetch('https://api.ipify.org?format=json').then(r => r.json()),
-                    fetch('https://api64.ipify.org?format=json').then(r => r.json())
-                ]);
-                currentIP = res.ip;
-            } catch(e) {}
-
-            if (currentIP) {
-                document.getElementById('ipv4-display').innerText = currentIP;
-                document.getElementById('ipv4-display').classList.remove('loading-pulse');
-                fetchRDAP(currentIP);
-                await fetchGeo(currentIP);
-            } else {
-                document.getElementById('ipv4-display').innerText = "OFFLINE/ERR";
-                document.getElementById('ipv4-display').classList.remove('loading-pulse');
+                currentIP = await fetchCurrentIP();
+                if (currentIP) {
+                    document.getElementById('ipv4-display').innerText = currentIP;
+                    document.getElementById('ipv4-display').classList.remove('loading-pulse');
+                    fetchRDAP(currentIP);
+                    await fetchGeo(currentIP);
+                } else {
+                    showConnectionError('ipv4-display');
+                }
+            } catch(e) {
+                showConnectionError('ipv4-display');
             }
+
+            // Buscar IPv6
+            await fetchIPv6();
         }
 
         async function manualLookup() {
@@ -671,35 +835,39 @@
             document.getElementById('ipv4-display').innerText = ip;
             document.getElementById('ipv4-display').classList.add('loading-pulse');
             const fields = ['info-city', 'info-region', 'info-country', 'info-isp', 'info-org', 'info-asn', 'registry-created', 'registry-updated', 'registry-email', 'registry-abuse'];
-            fields.forEach(f => document.getElementById(f).innerText = "Searching...");
-            const success = await fetchGeo(ip);
-            if(success) {
+            fields.forEach(f => {
+                document.getElementById(f).innerText = "Searching...";
+                document.getElementById(f).classList.remove('error-status', 'warning-status');
+            });
+            
+            try {
+                const success = await fetchGeo(ip);
+                if(success) {
+                    document.getElementById('ipv4-display').classList.remove('loading-pulse');
+                    fetchRDAP(ip);
+                } else {
+                    document.getElementById('ipv4-display').innerText = "FAILED";
+                    document.getElementById('ipv4-display').classList.remove('loading-pulse');
+                    document.getElementById('ipv4-display').classList.add('error-status');
+                    fields.forEach(f => {
+                        document.getElementById(f).innerText = "N/A";
+                        document.getElementById(f).classList.add('warning-status');
+                    });
+                }
+            } catch (error) {
+                document.getElementById('ipv4-display').innerText = "Connection Timeout";
                 document.getElementById('ipv4-display').classList.remove('loading-pulse');
-                fetchRDAP(ip);
-            } else {
-                document.getElementById('ipv4-display').innerText = "FAILED";
-                document.getElementById('ipv4-display').classList.remove('loading-pulse');
-                fields.forEach(f => document.getElementById(f).innerText = "N/A");
+                document.getElementById('ipv4-display').classList.add('error-status');
+                fields.forEach(f => {
+                    document.getElementById(f).innerText = "Network Error";
+                    document.getElementById(f).classList.add('error-status');
+                });
             }
         }
 
         window.onload = () => {
             document.body.classList.add('ready');
             startApp();
-            fetch('https://api64.ipify.org?format=json')
-                .then(r => r.json())
-                .then(d => {
-                    const el = document.getElementById('ipv6-display');
-                    if (!isManualSearch) {
-                        el.innerText = (d.ip && d.ip.includes(':')) ? d.ip : "NOT DETECTED";
-                        el.classList.remove('loading-pulse');
-                    }
-                })
-                .catch(() => {
-                    if (!isManualSearch) {
-                        document.getElementById('ipv6-display').innerText = "NOT DETECTED";
-                    }
-                });
         };
 
         function copyPageSummary() {
@@ -729,7 +897,7 @@
 
         function copySpecificIP(id) {
             const val = document.getElementById(id).innerText;
-            if (val === "..." || val === "NOT DETECTED" || val === "QUERY ACTIVE") return;
+            if (val === "..." || val === "NOT DETECTED" || val === "QUERY ACTIVE" || val === "Connection Timeout") return;
             
             // Incrementar contador apropriado
             if (id === 'ipv4-display') {
